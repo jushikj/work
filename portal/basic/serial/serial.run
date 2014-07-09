@@ -1,0 +1,124 @@
+#!/bin/bash 
+
+get_portal_input()
+{
+    QTIMESTAMP=`date +%G%m%d_%H%M`
+    PORTALVAR=/tmp/clusportal_$USER$QTIMESTAMP.var
+    dos2unix -n $1 $PORTALVAR 2>/dev/null
+    source $PORTALVAR
+}
+
+get_basic_params()
+{
+    source /opt/gridview/gridviewAppTemplate/basic/serial/serial.setting
+    prefix=$(basename $1|awk -F. '{print $1}')
+    username=$(whoami)
+    pbsfile=${GAP_NAME}.pbs
+}
+
+parse_portal_params()
+{
+    if [ "${GAP_VNC}" == "checked" ];then
+        VNC_OPTION="-vnc"
+    else
+        VNC_OPTION=""
+    fi
+    if [ "${GAP_WORK_DIR}" == "" ];then
+        GAP_WORK_DIR=$(readlink -f ~)
+    fi
+    cd ${GAP_WORK_DIR}
+}
+
+create_pbs_script()
+{
+################################################################################
+#createpbs -t Type [-o logfile] [-pbs pbsfile]
+#        -prog Program  [-proarg Program Argment] 
+#       [-nnodes NodeNum] [-ppn PPN] [-wtime WallTime] [-name JobName] 
+#       [-wdir WorkDir] [-q queque]
+#       [ -pbsoption 'option1:option2: ... :optionN' ]
+#       [-envfile envfile1 envfile2 ... envfileN] 
+#       [-precommand 'command1:command2: ... commandN'] 
+#       [ -postcommand 'command1:command2: ... :commandN' )
+#       [-vnc]
+#       [-mpirun mpirun command] [-net Network] 
+#       [-r ssh/rsh] [-bindcore] [-mpiarg MPIRUN Argment] 
+#       [-cri CheckPoint Interval(Minitues)] [-ocpg Old CheckPoint Group name] 
+#       [-ncpg Old CheckPoint Group name] [-ncp number CheckPoints]
+#       Type should be serial,openmpi,intelmpi cr_mpi, mvapich2,mpich2
+#       Network should be tcp,ib,memory,ib_memory,tcp_memory #
+################################################################################
+    /opt/gridview/gridviewAppTemplate/createpbs -t serial \
+        -pbs ${pbsfile} \
+        -name "${GAP_NAME}" \
+        -nnodes   "${GAP_NNODES}" \
+        -ppn "${GAP_PPN}" \
+        -wtime "${GAP_WALL_TIME}" \
+        -q "${GAP_QUEUE}"  \
+        -wdir "${GAP_WORK_DIR}" \
+        -pbsoption "${GAP_PBS_OPT}" \
+        -precommand "${GAP_PRE_CMD}" \
+        -envfile  "${GAP_ENVFILE}"     \
+        -prog "${GAP_PROGRAM}" \
+        -proarg "${GAP_PROGRAM_ARG}"\
+        -postcommand "${GAP_POST_CMD}" \
+        -o "${GAP_OUTPUT}" \
+        ${VNC_OPTION}  \
+        -ncpg '$id.ckps' -cri "${GAP_INTERVAL}" -ncp 2 
+}
+
+submit_job()
+{
+    jobid=$(qsub $pbsfile)
+    return $?
+}
+
+checkpoint_func()
+{
+if [ "${GAP_CKECK_POINT}" == "checked" ];then
+id=`echo $jobid|awk -F. '{print $1}' `
+echo "Jobid:${id}
+Cr_type:mpi_system
+User_name:`whoami`
+Work_dir:${wdir}
+Job_batch:${pbsfile}
+Cr_batch:autocr.${id}.pbs
+Cr_interval:${cri}
+Num_CP_save:${ncp}
+" >/checkpoints/autocr/spoolautocr.${id}.Q
+fi
+}
+
+clean_tmp_file()
+{
+    if [ "$debug" != "1" ];then
+        rm -f  $pbsfile
+        rm -f /tmp/${prefix}.var
+        rm -f /tmp/${prefix}.runvar
+        rm -f $PORTALVAR
+    fi
+}
+
+output_result()
+{
+
+    if [ "$1" == "0" ];then
+        echo $jobid | grep "^[0-9]*\.\w*" || exit 1
+    else
+        echo "${jobid}" && exit 1
+    fi
+}
+
+main()
+{
+    get_portal_input $@
+    get_basic_params $@
+    parse_portal_params
+    create_pbs_script
+    submit_job
+    job_status=$?
+    checkpoint_func
+    clean_tmp_file
+    output_result ${job_status}
+}
+main "$@"

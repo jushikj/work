@@ -1,0 +1,34 @@
+version=20130412
+## disk quota info
+## run 'quota -uv' to check it
+nfs_quota_available=0
+nfs_root_squash=1
+nfs_quota_filesystem=node22:/home
+
+## pbs setting
+queue_default=test
+nnodes_default=1
+name_prefix=`echo ${PORTALNAM}|tr [A-Z] [a-z]`
+hours_default=1
+ppn_default=1
+
+## run setting
+source $(dirname $(readlink -f $BASH_SOURCE))/common_functions
+
+openmpi_envfile=$(find_software_env mpi_openmpi-intel)
+program_list="source ${openmpi_envfile};\nmpirun -np $NP -machinefile $PBS_NODEFILE ./myprogram:"
+ib_available=1
+
+output_prefix=`echo ${PORTALNAM}|tr [A-Z] [a-z]`
+
+#for predefine
+PORTAL_PREDEFINE_LIST='{"Default Program List":"program_list", "Default Work Dir": "workdir_list"}'
+
+
+## vnc_setting
+vnc_available=1
+
+## checkpoint setting
+checkpoint_availabel=1
+interval_default=240
+min_interval=5

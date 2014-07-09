@@ -1,0 +1,79 @@
+#!/bin/bash
+
+get_portal_info()
+{
+    export DIRNAM=$(cd "$(dirname "$0")"; pwd)
+    export PORTALNAM=$(echo $DIRNAM|awk -F/ '{print $NF}')
+    export PORTALTYPE=$(dirname $DIRNAM|awk -F/ '{print $NF}')
+    echo "var PORTALNAM=\"$PORTALNAM\";"
+    echo "var PORTALTYPE=\"${PORTALTYPE}\";"
+    echo "var portal_version=\"${version}\";"
+}
+
+## $1 is UserName
+get_user_info()
+{
+    if [ -z $1 ]; then
+        export CHECKUSER='root'
+    else
+        export CHECKUSER=$1
+    fi
+    user_home=$(finger -mlp ${CHECKUSER}|head -n2| tail -n1|awk '{print $2}')
+    echo "var userhome=\"${user_home}\";"
+}
+
+
+get_portal_default()
+{
+    echo "var numnodes=\"$nnodes_default\";"
+    echo "var numppn=\"$ppn_default\";"
+    echo "var name=\"${name_prefix}\";"
+    echo "var hours=\"$hours_default\";"
+    echo "var minutes=\"0\";"
+    echo "var seconds=\"0\";"
+    echo "var vnc_available=\"$vnc_available\";"
+    echo "var checkpoint_available=\"$checkpoint_availabel\";"
+    echo "var checkpoint=\"$checkpoint_default\";"
+    echo "var checkpoint_def=\"$checkpoint_default\";"
+    echo "var interval=\"$interval_default\";"
+    echo "var interval_def=\"$interval_default\";"
+    echo "var min_interval=\"$min_interval\";"
+    echo "var current_time=\"$QTIMESTAMP\";"
+    echo "var portal_predefine_list=$PORTAL_PREDEFINE_LIST;"
+    echo "var version_list=\"$version_list\";"
+    echo "var version=\"$version_default\";"
+    echo "var s_version=version_list.split(':');"
+    echo "var mpitype=\"$mpi_default\";"
+    echo "var mpilist=\"$mpi_list\";"
+    echo "var s_mpi=mpilist.split(':');"
+}
+
+get_program_info()
+{
+    if [ "${workdir_list}" == "" ];then
+        workdir_list="${user_home}:"
+    fi
+    echo "var program_list=\"$program_list\";"
+    echo "var program=program_list.split(':')[0];"
+    echo "var program_argument_list=\"$program_argument_list\";"
+    echo "var program_argument=program_argument_list.split(':')[0];"
+    echo "var workdir_list=\"${workdir_list}\";"
+    echo "var workdir=workdir_list.split(':')[0];"
+    echo "var output=\"${output_prefix}\";"
+}
+
+main()
+{
+    get_portal_info $@
+    get_user_info $@
+    source ${DIRNAM}/../../CommonCheck.sh ${CHECKUSER}
+    source ${DIRNAM}/${PORTALNAM}.setting
+
+    if [ -f ${user_home}/.clusportal/${PORTALNAM}.setting ];then
+        source ${user_home}/.clusportal/${PORTALNAM}.setting
+    fi
+    get_portal_default
+    get_program_info
+}
+
+main $@

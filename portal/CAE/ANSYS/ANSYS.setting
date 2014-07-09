@@ -1,0 +1,36 @@
+version=20131229
+
+## disk quota info
+## run 'quota -uv' to check it
+nfs_quota_available=0
+nfs_root_squash=1
+
+
+## pbs setting
+queue_default=test
+nnodes_default=4
+name_prefix=`echo ${PORTALNAM}|tr [A-Z] [a-z]`
+hours_default=1
+
+## run setting
+
+lic_default=ANSYS_Mechanical
+lic_list=ANSYS_Mechanical:ANSYS_Multiphysics:ANSYS_Structural:ANSYS_Emag:ANSYS_FLOTRAN
+output_prefix=`echo ${PORTALNAM}|tr [A-Z] [a-z]`
+ib_available=1
+mpiprog_default=/public/software/ansys_inc/v121/ansys/bin/ansys121
+mpiprog_list=/public/software/ansys_inc/v121/ansys/bin/ansys121:
+programarg_default=' '
+
+## vnc_setting
+vnc_available=0
+
+#-add-#checkpoint
+checkpoint_availabel=1
+interval_default=240
+min_interval=5
+
+## runfile setting
+ANSYS_ENVFILE=/public/software/profile.d/ansys-env.sh
+debug=1
+

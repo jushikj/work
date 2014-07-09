@@ -1,0 +1,256 @@
+#!/bin/bash
+# common functions
+info()
+{
+   echo -e "[`hostname`] Info: $@"
+}
+waitfor()
+{
+    putsout=$1
+    count=$2
+    second=$3
+    echo ""
+    echo $putsout
+    for((i=$2;i>=1;i--)); do
+        echo -n "$i.. ";
+        sleep $second;
+    done
+    echo ""
+    echo ""
+}
+
+uniqfile()
+{
+    infile=`basename $1`
+    tmpfile=/tmp/${infile}.tmp
+    uniq $infile >$tmpfile;
+    mv -f  $tmpfile $infile
+}
+
+uncommentfile()
+{
+    awk '$1 !~ /^#/ ' $1 \
+        | grep -v "127.0.0.1" \
+        | grep -v "::1" \
+        | grep -v "^$"
+}
+
+warn()
+{
+   echo -e "[`hostname`] Warn: $@"
+}
+
+die()
+{
+   echo -e "[`hostname`] Sorry: $@"
+   echo
+   exit -1
+}
+
+check_dir()
+{
+   if [ ! -d $1 ]; then
+      mkdir -p $1 >& /dev/null || die "can not create directory $1!"
+   fi
+   if [ ! -w $1 ]; then
+      die "directory $1 has no write permission, please check!"
+   fi
+}
+
+check_file()
+{
+   if [ ! -r $1 ]; then
+      die "file $1 does not exist or not readable!"
+   fi
+}
+
+get_sysinfo()
+{
+    SYS_ARCH=`cat /proc/cpuinfo | grep vendor_id | uniq | awk '{print $3}'`
+    SYS_NP=`cat /proc/cpuinfo | grep processor | wc -l`
+    SYS_NCPUS=`cat /proc/cpuinfo | grep 'physical id'  | sort | uniq | wc -l`
+    SYS_NCPUS_HT=`cat /proc/cpuinfo | grep 'physical id' | uniq | wc -l`
+    SYS_FREQ=`cat /proc/cpuinfo | grep MHz | awk '{print $4}' | sort -n | tail -n 1`
+    SYS_MEM=`cat /proc/meminfo | grep MemTotal | awk '{print $2}'`  # in kB
+    if [[ "$SYS_ARCH" =~ AMD ]]; then
+        float_per_cycle=4
+    elif [[ "$SYS_ARCH" =~ Intel ]]; then
+        if cat /proc/cpuinfo | grep avx >& /dev/null; then
+            float_per_cycle=8
+        else
+            float_per_cycle=4
+        fi
+    fi
+    if [ "$SYS_NCPUS" -eq "$SYS_NCPUS_HT" ]; then
+        # HyperThread is disabled
+        export HPL_MAX_PERF=$(echo "scale=2; $SYS_FREQ/1000*$SYS_NP*$float_per_cycle" | bc -l)
+    else
+        # HyperThread is enabled
+        export HPL_MAX_PERF=$(echo "scale=2; $SYS_FREQ/1000*$SYS_NP*$float_per_cycle/2" | bc -l)
+    fi
+    SYS_KERNEL=`uname -r`
+    if [ -f /etc/issue ]; then
+        version=`rpm -qf /etc/issue | head -1`
+        if [[ $version =~ sles-release-11.2* ]]; then
+            SYS_OS=SLES
+            SYS_OS_VERSION=11.2 
+        elif [[ $version =~ sles-release-11.1* ]]; then
+            SYS_OS=SLES
+            SYS_OS_VERSION=11.1 
+        elif [[ $version =~ sles-release-11* ]]; then
+            SYS_OS=SLES
+            SYS_OS_VERSION=11.0 
+        elif [[ $version =~ "sles-release-10-15.35" ]]; then
+            SYS_OS=SLES
+            SYS_OS_VERSION=10.2 
+        elif [[ $version =~ "sles-release-10-15.45.8" ]]; then
+            SYS_OS=SLES
+            SYS_OS_VERSION=10.3 
+        elif [[ $version =~ "sles-release-10-15.57.1" ]]; then
+            #Suse
+            SYS_OS=SLES
+            SYS_OS_VERSION=10.4 
+        elif [[ $version =~ redhat-release ]];then
+            SYS_OS=RHEL
+            SYS_OS_VERSION=$(echo $version|grep -Po '(?<=-)\d+\.\d(?=[.-]\w+)')
+        elif [[ $version =~ centos-release ]];then
+            #CentOS Linux
+            SYS_OS=RHEL
+            SYS_OS_VERSION=$(echo $version|grep -Po '(?<=-)\d+[.-]\d(?=[.-]\w+)'|sed 's/\-/\./g')
+        elif [[ $version =~ sl-release ]];then
+            #for Scientific Linux
+            SYS_OS=RHEL
+            SYS_OS_VERSION=$(echo $version|grep -Po '(?<=-)\d+\.\d(?=[.-]\w+)')
+        else
+            SYS_OS=unsupported
+            SYS_OS_VERSION=unsupported
+        fi
+    fi
+}
+
+#this function will make software install cfg file if install.sh does not have input params
+make_software_cfg()
+{
+    if [ -z ${CP_CFG_FILE} ];then
+        echo "You should source clussoft.cfg file firstly!"
+        exit 1;
+    fi
+    info "software install cfg file is generated and saved at ${CP_CFG_FILE}"
+    if [ -z ${CP_ROOT_DIR} ];then
+        CP_ROOT_DIR=$(readlink -f $(dirname ${BASH_SOURCE}))
+    fi
+cat <<EOF >${CP_CFG_FILE}
+export $(cat ${CP_ROOT_DIR}/description.info|grep "INSTALL_TYPE")
+export INSTALL_NODES=$(hostname)
+export SETENV_NODES=$(hostname)
+export CP_SOFT_DIR=${CP_SOFT_DIR}
+export CP_SOFT_ENV=${CP_SOFT_ENV}
+export CP_SRC_DIR=${CP_ROOT_DIR}
+export CP_LOG_FILE=${CP_LOG_FILE}
+EOF
+}
+
+#this function will make software install record file
+#input $@
+make_install_record()
+{
+    if [ ! -z $1 ];then
+        CP_CFG_FILE=$1
+    else
+        make_software_cfg
+    fi
+    source ${CP_CFG_FILE}
+    current_user=$(whoami);
+    if [ $current_user == "root" ];then
+        userhome=/public
+    else
+        userhome=${HOME}
+    fi
+    mkdir -p ${userhome}/.gridview/record/software_manager
+    record_file=${userhome}/.gridview/record/software_manager/${CP_CFG_FILE##*/};
+    record_file=${record_file%.*}.log;
+    if [ -f ${record_file} ];then
+        return;
+    fi
+    if [ "${CP_ROOT_DIR}" == "" ];then
+        CP_ROOT_DIR=$(readlink -f $(dirname $0))
+    fi
+    software_prefix=$(cat ${CP_ROOT_DIR}/clussoft.cfg|grep CP_CFG_FILE|awk -F"=" '{print $2}')
+    software_prefix=${software_prefix##*/}
+    software_prefix=${software_prefix%.*}
+cat <<EOF > ${record_file}
+OPERATELOG_PATH=${userhome}/.gridview/log/${software_prefix}
+INSTALL_CFG_PATH=${CP_CFG_FILE}
+INSTALLED_TYPE=${INSTALL_TYPE}
+SETENV_NODES=${SETENV_NODES}
+INSTALLED_ENVFILE=${CP_SOFT_ENV}
+REMARK=$(whoami) install it!
+$(cat $CP_ROOT_DIR/description.info|grep DESCRIPTION)
+INSTALL_TIME=$(date +%F" "%H":"%m":"%S)
+RECORD_PATH=${record_file}
+INSTALLED_PATH=${CP_SOFT_DIR}
+INSTALLER=$(whoami)
+INSTALLED_NODES=${INSTALL_NODES}
+ICON_PATH=/public/.gridview/icons/software_manager/$(echo ${CP_CFG_FILE##*/}|awk -F"." '{print $1}')_icon.png
+UNINSTALL_PATH=/opt/gridview/software_depot/uninstall.sh
+$(cat $CP_ROOT_DIR/description.info|grep NAME)
+$(cat $CP_ROOT_DIR/description.info|grep VERSION)
+EOF
+}
+
+#this
+find_software_env()
+{
+    if [ -z $1 ];then
+        echo "Usage: find_software_env type_name"
+        exit 1;
+    fi
+    #find intel env file from /public/.gridview/record files
+    software_env_file=`find /public/.gridview/record -name $1\*log\
+        | head -n1|xargs cat|grep 'INSTALLED_ENVFILE'|cut -d= -f2`
+    if [ $? -eq 0 ] && [ ! -z $software_env_file ] && [ -f $software_env_file ];then
+        echo "$software_env_file"
+        return 0;
+    fi
+
+    #find intel env file from ~/.gridview/conf/software_manager file
+    if [ ! -d ~/.gridview/record ];then
+        return 1;
+    fi
+    software_env_file=`find ~/.gridview/record -name $1\*log\
+        | head -n1|xargs cat|grep 'INSTALLED_ENVFILE'|cut -d= -f2`
+    if [ $? -eq 0 ] && [ ! -z $software_env_file ] && [ -f $software_env_file ];then
+        echo "$software_env_file"
+        return 0;
+    fi
+
+    return 1;
+}
+
+find_software_dir()
+{
+    if [ -z $1 ];then
+        echo "Usage: find_software_dir type_name"
+        exit 1;
+    fi
+    #find intel env file from /public/.gridview/record files
+    software_dir=`find /public/.gridview/record -name $1\*log\
+        | head -n1|xargs cat|grep 'INSTALLED_PATH'|cut -d= -f2`
+    if [ $? -eq 0 ] && [ ! -z $software_dir ] && [ -d $software_dir ];then
+        echo "$software_dir"
+        return 0;
+    fi
+
+    #find intel env file from ~/.gridview/conf/software_manager file
+    if [ ! -d ~/.gridview/record ];then
+        return 1;
+    fi
+    software_dir=`find ~/.gridview/record -name $1\*log\
+        | head -n1|xargs cat|grep 'INSTALLED_PATH'|cut -d= -f2`
+    if [ $? -eq 0 ] && [ ! -z $software_dir ] && [ -d $software_dir ];then
+        echo "$software_dir"
+        return 0;
+    fi
+
+    return 1;
+}
