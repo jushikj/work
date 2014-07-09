@@ -1,0 +1,11 @@
+/file/rcd cavity_unsteady.cas
+/parallel/timer/reset
+/file/auto-save/data-frequency 2
+/solve/set/time-step 0.1
+/solve/dual-time-iterate 10 20
+/parallel/timer/usage
+/file/write-data cavity_unsteady_end.dat
+OK
+/exit
+
+

@@ -1,0 +1,8 @@
+/file/rc cavity.cas
+/parallel/timer/reset
+/solve/iterate 25
+/parallel/timer/usage
+/file/wd cavity.dat
+ok
+exit
+

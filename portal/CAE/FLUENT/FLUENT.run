@@ -15,7 +15,7 @@ create_jou_file()
 /parallel/timer/reset 
 /solve/iterate ${GAP_NUM_ITERATIONS} 
 /parallel/timer/usage 
-/file/wd ${GAP_DAT_FILE} 
+/file/wd ${GAP_DATA_SAVE} 
 ok 
 exit" >${jou_file_path}
     else

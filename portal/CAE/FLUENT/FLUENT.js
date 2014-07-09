@@ -41,7 +41,7 @@ var global_jobscheduler_general = {
             handler: function() {
                 var workdirRunFilePanel = new Gv.SelectFileWindow({
                     defaultPath: Gv.get('portal-pbs-params-workdir').val(),
-                    isDir: true,
+                    isDir: false,
                     tbar: [{
                         text: '确定',
                         handler: function(obj) {
@@ -59,7 +59,13 @@ var global_jobscheduler_general = {
             }
         });
 		//Dimension select
-		dimension_select = new Gv.form.TextFieldSelect({
+        var o_version = [];
+        if (!Gv.isEmpty(s_version)) {
+            for(var i in s_version){
+                o_version.push({id:s_version[i],text:s_version[i]});
+            }
+        };
+		dimension_select = new Gv.form.ComboBox({
             renderTo: 'page-portal-fluent-version',
             fieldLabel: 'Dimension',
             readOnly: false,
@@ -67,7 +73,7 @@ var global_jobscheduler_general = {
             //width: 540,
             value: version,
             autoLoad:false,
-            data:s_version
+            data:o_version
         });
         this.fluent_params.push(dimension_select);
 		global_jobscheduler_general.dimension_select=dimension_select;
@@ -89,7 +95,13 @@ var global_jobscheduler_general = {
         });
 		global_jobscheduler_general.precision_radio=precision_radio;
 		//mpi type select
-		mpitype_select = new Gv.form.TextFieldSelect({
+        var o_mpi=[];
+        if(!Gv.isEmpty(s_mpi)){
+            for(var i in s_mpi){
+                o_mpi.push({id:s_mpi[i],text:s_mpi[i]});
+            }
+        }
+		mpitype_select = new Gv.form.ComboBox({
             renderTo: 'page-portal-fluent-mpi-type',
             fieldLabel: 'MPI Type',
             readOnly: false,
@@ -97,7 +109,7 @@ var global_jobscheduler_general = {
             //width: 540,
             value: mpitype,
             autoLoad:false,
-            data:s_mpi
+            data:o_mpi
         });
         this.fluent_params.push(mpitype_select);
 		global_jobscheduler_general.mpitype_select=mpitype_select;
@@ -243,16 +255,21 @@ var global_jobscheduler_general = {
             renderTo: 'page-portal-fluent-bmp-case-file',
             fieldLabel: 'Cas File',
             allowBlank: true,
-            //value: PORTALNAM + "_" + portal_time_stamp + '.txt',
-            bodyStyle: '',
-			disabled:false
+            regex:/.cas$/i,
+			disabled:false,
+            regexText:'非法cas文件'
             //width: 540
         });
         this.fluent_params.push(input_case_file);
 		global_jobscheduler_general.input_case_file=input_case_file;
 		//与data save 关联
 		$("#"+input_case_file.getId()).bind('keyup',function(){
-			input_data_save.value(input_case_file.value());
+            var r = input_case_file.validate();
+            if(r){
+                var obj = input_case_file.value();
+                var n = obj.substring(obj.lastIndexOf('/')+1,obj.lastIndexOf('.')) + '.dat';
+                input_data_save.value(n);
+            }
 		});
 		//cas file buttion
 		btn1 = new Gv.Button({
@@ -263,12 +280,16 @@ var global_jobscheduler_general = {
             handler: function() {
                 var workdirRunFilePanel = new Gv.SelectFileWindow({
                     defaultPath: Gv.get('portal-pbs-params-workdir').val(),
-                    isDir: true,
+                    isDir: false,
                     tbar: [{
                         text: '确定',
                         handler: function(obj) {
                             input_case_file.value(obj);
-							input_data_save.value(obj);
+                            var r = input_case_file.validate();
+                            if(r){
+                                var n = obj.substring(obj.lastIndexOf('/')+1,obj.lastIndexOf('.')) + '.dat';
+                                input_data_save.value(n);
+                            }
                             workdirRunFilePanel.close();
                         }
                     }, {
@@ -286,8 +307,6 @@ var global_jobscheduler_general = {
             renderTo: 'page-portal-fluent-bmp-data-file',
             fieldLabel: 'Dat File',
             allowBlank: true,
-            //value: PORTALNAM + "_" + portal_time_stamp + '.txt',
-            bodyStyle: '',
 			disabled:false
             //width: 540
         });
@@ -302,7 +321,7 @@ var global_jobscheduler_general = {
             handler: function() {
                 var workdirRunFilePanel = new Gv.SelectFileWindow({
                     defaultPath: Gv.get('portal-pbs-params-workdir').val(),
-                    isDir: true,
+                    isDir: false,
                     tbar: [{
                         text: '确定',
                         handler: function(obj) {
@@ -399,10 +418,9 @@ var global_jobscheduler_general = {
             renderTo: 'page-portal-fluent-data-save',
             fieldLabel: 'Data Save',
             allowBlank: true,
-            //value: '100',
-            bodyStyle: '',
-			disabled:false
-            //width: 540
+			disabled:false,
+            emptyText:'文件名与cas文件名相同'
+            
         });
         this.fluent_params.push(input_data_save);
 		global_jobscheduler_general.input_data_save=input_data_save;
