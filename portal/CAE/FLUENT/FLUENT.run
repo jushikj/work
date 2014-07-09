@@ -42,33 +42,33 @@ parse_portal_params()
 {
     #vnc
     if [ "$GAP_VNC" == 1 ];then
-	VNC_OPTION="-vnc"
-	FLUENT_VNC=""
+    	VNC_OPTION="-vnc"
+    	FLUENT_VNC=""
     else
-	VNC_OPTION=""
-	FLUENT_VNC="-g"
+    	VNC_OPTION=""
+    	FLUENT_VNC="-g"
     fi
     #remote shell
     if [ "$GAP_REMOTE_SHELL" == ssh ];then
-	rsh_option="-ssh"
+	   rsh_option="-ssh"
     else
-	rsh_option=""
+	   rsh_option=""
     fi
     #pbs opt
     if [ "null$GAP_PBS_OPT" == "null" ];then
-	GAP_PBS_OPT=" "
+	   GAP_PBS_OPT=" "
     fi
     #pre cmd
     if [ "null$GAP_PRE_CMD" == "null" ];then
-	GAP_PRE_CMD=" "
+	   GAP_PRE_CMD=" "
     fi
     #post cmd
     if [ "null$GAP_POST_CMD" == "null" ];then
-	GAP_POST_CMD=" "
+	   GAP_POST_CMD=" "
     fi
     #pbs work directory
     if [ "${GAP_WORK_DIR}" == "" ];then
-	GAP_WORK_DIR=$(readlink -f ~)
+	   GAP_WORK_DIR=$(readlink -f ~)
     fi
     cd ${GAP_WORK_DIR}
 }

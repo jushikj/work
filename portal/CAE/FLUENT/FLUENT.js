@@ -256,6 +256,7 @@ var global_jobscheduler_general = {
             fieldLabel: 'Cas File',
             allowBlank: true,
             regex:/.cas$/i,
+            //regex:/.*(?!\.cas)$/,
 			disabled:false,
             regexText:'非法cas文件'
             //width: 540
