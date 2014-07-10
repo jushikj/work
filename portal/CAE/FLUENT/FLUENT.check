@@ -53,8 +53,9 @@ get_program_info()
     if [ "${workdir_list}" == "" ];then
         workdir_list="${user_home}:"
     fi
-    echo "var program_list=\"$program_list\";"
-    echo "var program=program_list.split(':')[0];"
+    echo "var program=\"$prog_default\";"
+    echo "var proglist=\"$prog_list\";"
+    echo "var s_prog=proglist.split(':');"
     echo "var program_argument_list=\"$program_argument_list\";"
     echo "var program_argument=program_argument_list.split(':')[0];"
     echo "var workdir_list=\"${workdir_list}\";"

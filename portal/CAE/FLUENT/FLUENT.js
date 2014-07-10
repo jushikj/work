@@ -23,14 +23,22 @@ var global_jobscheduler_general = {
 		
         var cur_id = 'portal-pbs-params-workdir';
 		//fluent bin
-		fluent_bin = new Gv.form.TextField({
+		var o_prog = [];
+        if(!Gv.isEmpty(s_prog)){
+            for(var i in s_prog){
+                if(!Gv.isEmpty(s_prog[i]))
+                    o_prog.push({id:s_prog[i],text:s_prog[i]});
+            }
+        }
+        fluent_bin = new Gv.form.ComboBox({
             renderTo: 'page-portal-fluent-bin-path',
             fieldLabel: 'Fluent Bin',
-            allowBlank: false,
+            allowBlank:false,
             value: program,
-            bodyStyle: '',
-            //width: 540
+            autoLoad:false,
+            data:o_prog
         });
+
         this.fluent_params.push(fluent_bin);
 		global_jobscheduler_general.fluent_bin=fluent_bin;
 		//fluent bin browers button
@@ -41,10 +49,12 @@ var global_jobscheduler_general = {
             handler: function() {
                 var workdirRunFilePanel = new Gv.SelectFileWindow({
                     defaultPath: Gv.get('portal-pbs-params-workdir').val(),
-                    isDir: false,
+                    isDir: true,
                     tbar: [{
                         text: '确定',
                         handler: function(obj) {
+                            o_prog.push({id:obj,text:obj});
+                            fluent_bin.data(o_prog);
                             fluent_bin.value(obj);
 							fluent_bin.validate();
                             workdirRunFilePanel.close();
