@@ -1,173 +1,233 @@
-#!/bin/bash 
+#!/bin/bash
+get_portal_input()
+{
+	QTIMESTAMP=`date +%G%m%d_%H%M`
+	PORTALVAR=/tmp/clusportal_$USER$QTIMESTAMP.var
+	#touch $PORTALVAR
+	dos2unix -n $1 $PORTALVAR 2>/dev/null
+	source $PORTALVAR
 
-QTIMESTAMP=`date +%G%m%d_%H%M`
-PORTALVAR=/tmp/clusportal_$USER$QTIMESTAMP.var
-touch $PORTALVAR
-dos2unix -n $1 $PORTALVAR 2>/dev/null
-source $PORTALVAR
+	#GAP_MPI_NNODES=2
+	#GAP_MPI_PPN=2
+	#GAP_MPI_WALL_TIME=1:0:0
+	#GAP_MPI_QUEUE=high
+	#GAP_MPI_NAME=ANSYS_job
 
-#GAP_MPI_NNODES=2
-#GAP_MPI_PPN=2
-#GAP_MPI_WALL_TIME=1:0:0
-#GAP_MPI_QUEUE=high
-#GAP_MPI_NAME=ANSYS_job
+	#GAP_MPI_MPI_TYPE=openmpi
+	#GAP_MPI_REMOTE_SHELL=ssh
+	#GAP_MPI_COMMUCATION=(ib,valure)
+	#GAP_MPI_SHARE_MEMORY=(1,null)
+	#GAP_MPI_CPU_BINDING=(1,null)
+	#GAP_MPI_PROGRAM=/public/software/vasp/vasp5-ompi
+	#GAP_MPI_PROGRAM_ARG=(null,'optin')
+	#GAP_MPI_WORK_DIR=/root
+	#GAP_MPI_INPUT=INCAR
+	#GAP_MPI_OUTPUT=ANSYS_job.log
 
-#GAP_MPI_MPI_TYPE=openmpi
-#GAP_MPI_REMOTE_SHELL=ssh
-#GAP_MPI_COMMUCATION=(ib,valure)
-#GAP_MPI_SHARE_MEMORY=(1,null)
-#GAP_MPI_CPU_BINDING=(1,null)
-#GAP_MPI_PROGRAM=/public/software/vasp/vasp5-ompi
-#GAP_MPI_PROGRAM_ARG=(null,'optin')
-#GAP_MPI_WORK_DIR=/root
-#GAP_MPI_INPUT=INCAR
-#GAP_MPI_OUTPUT=ANSYS_job.log
+	#GAP_MPI_VNC=(1,null)
 
-#GAP_MPI_VNC=(1,null)
+	#GAP_MPI_CKECK_POINT=null
+	#GAP_MPI_INTERVAL=null
 
-#GAP_MPI_CKECK_POINT=null
-#GAP_MPI_INTERVAL=null
+	#GAP_MPI_MPI_OPT='--mca btl self'
+	#GAP_MPI_PBS_OPT='#PBS -j oe:#PBS -m zj@sugon.com'
+	#GAP_MPI_PRE_CMD='echo $HOME:echo $USER'
+	#GAP_MPI_POST_CMD='echo $JOB_ID:echo $PATH'
+}
 
-#GAP_MPI_MPI_OPT='--mca btl self'
-#GAP_MPI_PBS_OPT='#PBS -j oe:#PBS -m zj@sugon.com'
-#GAP_MPI_PRE_CMD='echo $HOME:echo $USER'
-#GAP_MPI_POST_CMD='echo $JOB_ID:echo $PATH'
+create_inp_file(){
+	#TODO
+}
 
+get_basic_params()
+{
+	## ANSYS Input check
 
-## ANSYS Input check
+	source /opt/gridview/gridviewAppTemplate/CAE/ANSYS/ANSYS.setting
+	### runfile setting
+	#openmpi_ENVFILE intelmpi_ENVFILE mpich2_ENVFILE cr_mpi_ENVFILE mvapich2_ENVFILE debug
 
-source /opt/gridview/gridviewAppTemplate/CAE/ANSYS/ANSYS.setting
-### runfile setting
-#openmpi_ENVFILE intelmpi_ENVFILE mpich2_ENVFILE cr_mpi_ENVFILE mvapich2_ENVFILE debug
+	##prefix=`basename $1|awk -F. '{print $1}'`
+	time=`date +%m%d%H%M%S`
+	username=`whoami`
+	#pbsfile=${username}_${time}.pbs
+	pbsfile=${GAP_MPI_NAME}.pbs
+}
 
-##prefix=`basename $1|awk -F. '{print $1}'`
-time=`date +%m%d%H%M%S`
-username=`whoami`
-#pbsfile=${username}_${time}.pbs
-pbsfile=${GAP_MPI_NAME}.pbs
+parse_portal_params()
+{
+	# PRODUCTID Check
+	# TODO GAP_MPI_LIC_TYPE not exist now!!!
+	case "${GAP_MPI_LIC_TYPE}" in
+	ANSYS_Mechanical*) PRODUCTID=ANSYS;;
+	ANSYS_Multiphysics*) PRODUCTID=ANE3FL;;
+	ANSYS_Structural*) PRODUCTID=STRUCT;;
+	ANSYS_Emag*) PRODUCTID=EMAG;;
+	ANSYS_FLOTRAN*) PRODUCTID=FLOTRAN;;
+	*) PRODUCTID=ANSYS;
+	esac
+	PRODUCT="-p $PRODUCTID"
 
-# PRODUCTID Check
-case "${GAP_MPI_LIC_TYPE}" in
-ANSYS_Mechanical*) PRODUCTID=ANSYS;;
-ANSYS_Multiphysics*) PRODUCTID=ANE3FL;;
-ANSYS_Structural*) PRODUCTID=STRUCT;;
-ANSYS_Emag*) PRODUCTID=EMAG;;
-ANSYS_FLOTRAN*) PRODUCTID=FLOTRAN;;
-*) PRODUCTID=ANSYS;
-esac
-PRODUCT="-p $PRODUCTID"
+	if [ "null$GAP_MPI_MPI_OPT" == "null" ];then
+	 GAP_MPI_MPI_OPT=" "
+	fi
+	if [ "null$GAP_MPI_PBS_OPT" == "null" ];then
+	 GAP_MPI_PBS_OPT=" "
+	fi
+	if [ "null$GAP_MPI_PRE_CMD" == "null" ];then
+	 GAP_MPI_PRE_CMD=" "
+	fi
+	if [ "null$GAP_MPI_POST_CMD" == "null" ];then
+	 GAP_MPI_POST_CMD=" "
+	fi
 
+	## remote shell option
 
+	if [ "$GAP_MPI_REMOTE_SHELL" == "ssh" ];then
+		RSH="-usessh"
+	else
+		RSH=""
+	fi
+	cd ${GAP_MPI_WORK_DIR}
 
-if [ "null$GAP_MPI_MPI_OPT" == "null" ];then
- GAP_MPI_MPI_OPT=" "
-fi
-if [ "null$GAP_MPI_PBS_OPT" == "null" ];then
- GAP_MPI_PBS_OPT=" "
-fi
-if [ "null$GAP_MPI_PRE_CMD" == "null" ];then
- GAP_MPI_PRE_CMD=" "
-fi
-if [ "null$GAP_MPI_POST_CMD" == "null" ];then
- GAP_MPI_POST_CMD=" "
-fi
+	## MPI Type optios
 
-## remote shell option
+	if [ ${GAP_MPI_MPIRUNTYPE}=="hpmpi" ];then
+		MPIINPUT="-mpi HPMPI"
+	else
+		MPIINPUT="-mpi INTELMPI"
+	fi
 
-if [ "$GAP_MPI_REMOTE_SHELL" == "ssh" ];then
-	RSH="-usessh"
-else
-	RSH=""
-fi
-cd ${GAP_MPI_WORK_DIR}
+	## input type option
+	if [ ${GAP_MPI_INPUT} != "" ];then
+		FILE=${GAP_MPI_INPUT}
+		FILE=${FILE##/*/}
+	if [ ${GAP_MPI_INPUTTYPE} == "inp" ];then
+		dos2unix ${FILE} >& /dev/null &
+		INPUT=${FILE}
+	else
+		FILE=${FILE%%.*}
+		echo "resume,$FILE,db,,,
+	/solu
+	SOLVE" > ${FILE}.inp
+		INPUT=${FILE}.inp
+	fi
+	INP="-i ${INPUT}"
+	else
+	INP=""
+	fi
 
-## MPI Type optios
+	##VNC options
+	if [ "$GAP_VNC" == 1 ];then
+	 VNC_OPTION="-vnc"
+	 ANSYS_VNC="-g"
+	else
+	 VNC_OPTION=""
+	 ANSYS_VNC=""
+	fi
 
-if [ ${GAP_MPI_MPIRUNTYPE}=="hpmpi" ];then
-	MPIINPUT="-mpi HPMPI"
-else
-	MPIINPUT="-mpi INTELMPI"
-fi
+	## hpc run option	
+	if [ ${GAP_MPI_PARAMODE} == dmp ];then
+		PRECMD='hostlist="";for node in `cat $PBS_NODEFILE | uniq`;do num=`cat $PBS_NODEFILE | grep $node | wc -l`;if [ -z $hostlist ];then hostlist=$nodeGridViewPortalColon$num;else hostlist=$hostlistGridViewPortalColon$nodeGridViewPortalColon$num;fi;done'
 
-## input type option
-if [ ${GAP_MPI_INPUT} != "" ];then
-	FILE=${GAP_MPI_INPUT}
-	FILE=${FILE##/*/}
-if [ ${GAP_MPI_INPUTTYPE} == "inp" ];then
-	dos2unix ${FILE} >& /dev/null &
-	INPUT=${FILE}
-else
-	FILE=${FILE%%.*}
-	echo "resume,$FILE,db,,,
-/solu
-SOLVE" > ${FILE}.inp
-	INPUT=${FILE}.inp
-fi
-INP="-i ${INPUT}"
-else
-INP=""
-fi
-
-##VNC options
-if [ "$GAP_VNC" == 1 ];then
- VNC_OPTION="-vnc"
- ANSYS_VNC="-g"
-else
- VNC_OPTION=""
- ANSYS_VNC=""
-fi
-
-## hpc run option	
-if [ ${GAP_MPI_PARAMODE} == dmp ];then
-	PRECMD='hostlist="";for node in `cat $PBS_NODEFILE | uniq`;do num=`cat $PBS_NODEFILE | grep $node | wc -l`;if [ -z $hostlist ];then hostlist=$nodeGridViewPortalColon$num;else hostlist=$hostlistGridViewPortalColon$nodeGridViewPortalColon$num;fi;done'
-
-	RUNLIST='-dis -machines $hostlist'
-else
-	PRECMD='num=`cat $PBS_NODEFILE | wc -l`;'
-	RUNLIST='-np $num'
-fi
+		RUNLIST='-dis -machines $hostlist'
+	else
+		PRECMD='num=`cat $PBS_NODEFILE | wc -l`;'
+		RUNLIST='-np $num'
+	fi
 
 
-## gpu acc option
+	## gpu acc option
 
-if [ ${GAP_MPI_GPUACC} = '1' -a ${GAP_MPI_GPUTYPE} != "null" ];then
-	GPUACC="-acc ${GAP_MPI_GPUTYPE}"
-else
-	GPUACC=""
-fi
-## vnc option
+	if [ ${GAP_MPI_GPUACC} = '1' -a ${GAP_MPI_GPUTYPE} != "null" ];then
+		GPUACC="-acc ${GAP_MPI_GPUTYPE}"
+	else
+		GPUACC=""
+	fi
+	cd ${GAP_MPI_WORK_DIR}
+}
 
-################################################################################################################################################
-#createpbs -t Type [-o logfile] [-pbs pbsfile]
-#        -prog Program  [-proarg Program Argment] 
-#       [-nnodes NodeNum] [-ppn PPN] [-wtime WallTime] [-name JobName] [-wdir WorkDir] [-q queque] [ -pbsoption 'option1:option2: ... :optionN' ]
-#       [-envfile envfile1 envfile2 ... envfileN] 
-#       [-precommand 'command1:command2: ... commandN'] [ -postcommand 'command1:command2: ... :commandN' )
-#       [-vnc]
-#       [-mpirun mpirun command] [-net Network] [-r ssh/rsh] [-bindcore] [-mpiarg MPIRUN Argment] 
-#       [-cri CheckPoint Interval(Minitues)] [-ocpg Old CheckPoint Group name] [-ncpg Old CheckPoint Group name] [-ncp number CheckPoints]
-#       Type should be serial,openmpi,intelmpi cr_mpi, mvapich2,mpich2
-#       Network should be tcp,ib,memory,ib_memory,tcp_memory #
-##############################################################################################################################################
-cd ${GAP_MPI_WORK_DIR}
+create_pbs_script()
+{
+	################################################################################################################################################
+	#createpbs -t Type [-o logfile] [-pbs pbsfile]
+	#        -prog Program  [-proarg Program Argment] 
+	#       [-nnodes NodeNum] [-ppn PPN] [-wtime WallTime] [-name JobName] [-wdir WorkDir] [-q queque] [ -pbsoption 'option1:option2: ... :optionN' ]
+	#       [-envfile envfile1 envfile2 ... envfileN] 
+	#       [-precommand 'command1:command2: ... commandN'] [ -postcommand 'command1:command2: ... :commandN' )
+	#       [-vnc]
+	#       [-mpirun mpirun command] [-net Network] [-r ssh/rsh] [-bindcore] [-mpiarg MPIRUN Argment] 
+	#       [-cri CheckPoint Interval(Minitues)] [-ocpg Old CheckPoint Group name] [-ncpg Old CheckPoint Group name] [-ncp number CheckPoints]
+	#       Type should be serial,openmpi,intelmpi cr_mpi, mvapich2,mpich2
+	#       Network should be tcp,ib,memory,ib_memory,tcp_memory #
+	##############################################################################################################################################
 
-/opt/gridview/gridviewAppTemplate/createpbs -t serial -o "${GAP_MPI_OUTPUT}" -pbs ${pbsfile} -precommand "${PRECMD}" -prog "${GAP_MPI_PROGRAM}" -proarg "${PRODUCT} ${MPIINPUT} ${INP} ${RUNLIST} ${RSH} ${GPUACC} ${ANSYS_VNC} -dir ${GAP_MPI_WORK_DIR} ${GAP_MPI_PROGRAM_ARG}" -envfile "${ANSYS_ENVFILE}" ${VNC_OPTION}  -nnodes   "${GAP_MPI_NNODES}" -ppn "${GAP_MPI_PPN}" -wtime "${GAP_MPI_WALL_TIME}" -name "${GAP_MPI_NAME}" -wdir "${GAP_MPI_WORK_DIR}" -q "${GAP_MPI_QUEUE}" -pbsoption "${GAP_MPI_PBS_OPT}" 
-sed -i 's/GridViewPortalColon/:/g' ${pbsfile}
-#/opt/gridview/gridviewAppTemplate/createpbs -t "${GAP_MPI_MPI_TYPE}" -o "${GAP_MPI_OUTPUT}" -pbs ${pbsfile} \
-#            -prog "${GAP_MPI_PROGRAM}" -proarg "${FLUENT_VNC}" "${GAP_MPI_PROGRAM_ARG}"\
-#            -envfile  "${ANSYS_ENVFILE}"     \
-#            -precommand "${GAP_MPI_PRE_CMD}" -postcommand "${GAP_MPI_POST_CMD}" \
-#            ${VNC_OPTION}  \
-#            -nnodes   "${GAP_MPI_NNODES}" -ppn "${GAP_MPI_PPN}" -wtime "${GAP_MPI_WALL_TIME}" -name "${GAP_MPI_NAME}" -wdir "${GAP_MPI_WORK_DIR}" -q "${GAP_MPI_QUEUE}"  \
-#             -pbsoption "${GAP_MPI_PBS_OPT}" \
-#            -net "${GAP_MPI_NETWORK}" -r "${GAP_MPI_REMOTE_SHELL}"  ${CPU_BINDING_OPTION} -mpiarg "${GAP_MPI_MPI_OPT}"  \
-#            -ncpg '$id.ckps' -cri "${GAP_MPI_INTERVAL}" -ncp 2 
-#
-jobid=`qsub $pbsfile`
 
-if [ "$debug" != 1 ];then
-rm -f  $pbsfile
-rm -f $PORTALVAR
-fi
-#echo $jobid
-echo $jobid | grep "^[0-9]*\.\w*" || exit 1 
+	/opt/gridview/gridviewAppTemplate/createpbs -t serial -o "${GAP_MPI_OUTPUT}" -pbs ${pbsfile} -precommand "${PRECMD}" -prog "${GAP_MPI_PROGRAM}" -proarg "${PRODUCT} ${MPIINPUT} ${INP} ${RUNLIST} ${RSH} ${GPUACC} ${ANSYS_VNC} -dir ${GAP_MPI_WORK_DIR} ${GAP_MPI_PROGRAM_ARG}" -envfile "${ANSYS_ENVFILE}" ${VNC_OPTION}  -nnodes   "${GAP_MPI_NNODES}" -ppn "${GAP_MPI_PPN}" -wtime "${GAP_MPI_WALL_TIME}" -name "${GAP_MPI_NAME}" -wdir "${GAP_MPI_WORK_DIR}" -q "${GAP_MPI_QUEUE}" -pbsoption "${GAP_MPI_PBS_OPT}" 
+	sed -i 's/GridViewPortalColon/:/g' ${pbsfile}
+	#/opt/gridview/gridviewAppTemplate/createpbs -t "${GAP_MPI_MPI_TYPE}" -o "${GAP_MPI_OUTPUT}" -pbs ${pbsfile} \
+	#            -prog "${GAP_MPI_PROGRAM}" -proarg "${FLUENT_VNC}" "${GAP_MPI_PROGRAM_ARG}"\
+	#            -envfile  "${ANSYS_ENVFILE}"     \
+	#            -precommand "${GAP_MPI_PRE_CMD}" -postcommand "${GAP_MPI_POST_CMD}" \
+	#            ${VNC_OPTION}  \
+	#            -nnodes   "${GAP_MPI_NNODES}" -ppn "${GAP_MPI_PPN}" -wtime "${GAP_MPI_WALL_TIME}" -name "${GAP_MPI_NAME}" -wdir "${GAP_MPI_WORK_DIR}" -q "${GAP_MPI_QUEUE}"  \
+	#             -pbsoption "${GAP_MPI_PBS_OPT}" \
+	#            -net "${GAP_MPI_NETWORK}" -r "${GAP_MPI_REMOTE_SHELL}"  ${CPU_BINDING_OPTION} -mpiarg "${GAP_MPI_MPI_OPT}"  \
+	#            -ncpg '$id.ckps' -cri "${GAP_MPI_INTERVAL}" -ncp 2 
+	#
+}
+
+submit_job()
+{
+	jobid=`qsub $pbsfile`
+	return $?
+}
+
+checkpoint_func()
+{
+	if [ "${GAP_CHECK_POINT}" == 1 ];then
+	    id=`echo $jobid|awk -F. '{print $1}' `
+    	echo "Jobid:${id}
+    	Cr_type:mpi_system
+    	User_name:`whoami`
+    	Work_dir:${wdir}
+    	Job_batch:autocr.${id}.pbs
+    	Cr_batch:autocr.${id}.pbs
+    	Cr_interval:${cri}
+    	Num_CP_save:${ncp}
+    	" >/checkpoints/autocr/spoolautocr.${id}.Q
+    fi
+}
+
+clean_tmp_file()
+{
+    if [ "$debug" != "1" ];then
+    	rm -f $pbsfile
+    	rm -f /tmp/${prefix}.var
+    	rm -f /tmp/${prefix}.runvar
+    	rm -f $PORTALVAR
+    fi
+}
+output_result()
+{
+    if [ "$1" == "0" ];then
+	   echo $jobid | grep "^[0-9]*\.\w*" || exit 1
+    else
+	   echo "Job Submit Error: ${jobid}" && exit 1
+    fi
+}
+main()
+{
+	get_portal_input $@
+	create_inp_file #not complete
+	get_basic_params $@
+	parse_portal_params
+	create_pbs_script
+	submit_job
+	job_status=$?
+	checkpoint_func
+	clean_tmp_file
+	output_result ${job_status}
+}
+main "$@"
+
