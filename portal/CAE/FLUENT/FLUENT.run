@@ -106,33 +106,33 @@ submit_job()
 checkpoint_func()
 {
     if [ "${GAP_CHECK_POINT}" == 1 ];then
-	id=`echo $jobid|awk -F. '{print $1}' `
-	echo "Jobid:${id}
-	Cr_type:mpi_system
-	User_name:`whoami`
-	Work_dir:${wdir}
-	Job_batch:autocr.${id}.pbs
-	Cr_batch:autocr.${id}.pbs
-	Cr_interval:${cri}
-	Num_CP_save:${ncp}
-	" >/checkpoints/autocr/spoolautocr.${id}.Q
+	    id=`echo $jobid|awk -F. '{print $1}' `
+    	echo "Jobid:${id}
+    	Cr_type:mpi_system
+    	User_name:`whoami`
+    	Work_dir:${wdir}
+    	Job_batch:autocr.${id}.pbs
+    	Cr_batch:autocr.${id}.pbs
+    	Cr_interval:${cri}
+    	Num_CP_save:${ncp}
+    	" >/checkpoints/autocr/spoolautocr.${id}.Q
     fi
 }
 clean_tmp_file()
 {
     if [ "$debug" != "1" ];then
-	rm -f $pbsfile
-	rm -f /tmp/${prefix}.var
-	rm -f /tmp/${prefix}.runvar
-	rm -f $PORTALVAR
+    	rm -f $pbsfile
+    	rm -f /tmp/${prefix}.var
+    	rm -f /tmp/${prefix}.runvar
+    	rm -f $PORTALVAR
     fi
 }
 output_result()
 {
     if [ "$1" == "0" ];then
-	echo $jobid | grep "^[0-9]*\.\w*" || exit 1
+	   echo $jobid | grep "^[0-9]*\.\w*" || exit 1
     else
-	echo "Job Submit Error: ${jobid}" && exit 1
+	   echo "Job Submit Error: ${jobid}" && exit 1
     fi
 }
 main()

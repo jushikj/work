@@ -1,0 +1,238 @@
+@charset "utf-8";
+/*框架布局*/
+#main { overflow: hidden; display: block; position: relative; }
+/* .header { width: 100%; height: 50px; position: relative; min-width:710px; }
+.frame-subnav { position: absolute; top: 0; right: 20px; height: 50px; float: right; z-index: 5000;}
+.frame-subnav >ul >li { float: right; position: relative;}
+.frame-subnav >ul >li >a { display: block; font-size: 24px; width: 50px; height: 42px; padding:8px 5px 0; line-height:34px; text-align: center; border-left:1px solid transparent; border-right:1px solid transparent; }
+.frame-subnav >ul >li >a:hover { text-decoration: none; } */
+.frame-system-stepdiv {position:absolute; top:0; right:0; height:40px; color:#FFF; font-size:14px; z-index:6; }
+.frame-system-stepdiv ul li { float:left; height:40px; border-left:1px solid #00A6ED;}
+.frame-system-stepdiv ul li img { padding:0 15px; padding-top:5px;}
+.frame-user-name { position:absolute; left:0; bottom:61px; height:40px; width:90px; line-height:40px; color:#FFF; font-size:12px; border-top:1px solid #444; padding:0 5px;background:#262626;}
+.frame-user-name i { display:inline-block; width:16px; height:16px; line-height:16px; font-size:12px; text-align:center; background:#999; color:#333; vertical-align:middle;}
+.frame-user-name p { display:inline-block; overflow: hidden;white-space: nowrap;text-overflow: ellipsis; vertical-align:middle;}
+.container { width: 100%; height:100%;}
+/*导航 start*/
+.frame-nav { position:relative; width: 100px; float: left; height:100%;}
+.frame-btn-nav { height: 25px; padding:7px 5px; position:relative; z-index:999; background:#262626;}
+.frame-btn-nav img { margin-left:15px;}
+.frame-btn-nav a.back-navigation { display:block; line-height:25px; color:#DDD; font-size:22px; width:55px; text-align:center;}
+.frame-btn-nav a.navswitch { position:absolute; top:0; right:0; color:#CCC; width:39px; height:39px; border-left:1px solid #333; line-height:39px; text-align:center;}
+.frame-btn-nav a:hover { text-decoration:none; color:#FFF;}
+.frame-nav-body{position:none;left:0; top:40px; bottom:81px; width:100px;}
+
+#frame-nav-body li:hover>ul{
+	/*display:block;
+	*/
+}
+
+
+.frame-set-center {position:absolute;left:0; bottom:0; height:50px; width:100px;border-top:1px solid #444; z-index:1901;background:#262626;}
+.frame-set-center .dropdown .dropdown-toggle { display:block; line-height:50px; white-space: nowrap; width:100px; text-align:center; cursor:pointer; }
+/*mini 导航*/
+.frame-mini-nav {
+	width: 100px;
+	display: none;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	background: #363636;
+}
+.frame-mini-nav {
+	width: 100px;
+	display: none;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	background: #363636;
+}
+.frame-mini-nav span{
+    cursor:pointer;
+	color:#ccc;
+	font-size:14px;
+	font-weight:400;
+	width:39px;
+	height:39px;
+	line-height:39px;
+	position:absolute;
+	top:0px;
+	text-align:center;
+
+}
+.frame-mini-nav span:first-child { width:55px;}
+.frame-mini-nav span[attr='mini']{
+
+	left:0px;
+
+}
+.frame-mini-nav span[attr='open']{
+    border-left:1px solid #333;
+	left:55px;
+
+}
+.frame-mini-nav span:hover{
+
+	color:#fff;
+
+}
+.frame-mini-nav span[attr='mini'] ul{
+	display: none;
+}
+
+.frame-mini-nav span[attr='mini']:hover ul.frame-mini-nav-menu{
+
+	display: block;
+
+
+}
+.frame-mini-nav span[attr='mini'] ul.frame-mini-nav-menu{
+
+	position: absolute;
+	top: 39px;
+	left: 2px;
+	background: #fff;
+	border:1px solid #333;
+	width:150px;
+	height:auto;
+	z-index:1000;
+	border-radius:5px;
+	box-shadow:0 3px 5px rgba(0,0,0,0.3);
+
+}
+.frame-mini-nav span[attr='mini'] ul.frame-mini-nav-menu:after {
+	content:"";
+	border:8px solid transparent;
+	border-bottom-color:#FFF;
+	position:absolute; top:-16px;
+	left:15px; line-height:0; height:0; font-size:0;
+}
+.frame-mini-nav span[attr='mini'] ul li{
+	height:32px;
+	line-height:32px;
+	text-align:left;
+
+
+}
+.frame-mini-nav span[attr='mini'] ul  li> a >i{
+	display:none;
+}
+.frame-mini-nav span[attr='mini'] ul  li[attr="children"]> a >i{
+	display:block;
+	position:absolute;
+	right:10px;
+	top:0px;
+	color: #666666;
+    font-size: 12px;
+}
+.frame-mini-nav span[attr='mini']  ul  li:hover{
+	background:#0096D6;
+	color:#fff;
+
+
+}
+.frame-mini-nav span[attr='mini']  ul  li:hover>a{
+
+	color:#fff;
+
+
+}
+.frame-mini-nav span[attr='mini'] ul li dd,.frame-mini-nav span[attr='mini'] ul li tt{
+	float:left;
+	display:block;
+}
+.frame-mini-nav span[attr='mini'] ul li dd{
+
+	height:32px;
+	line-height:32px;
+	text-align:left;
+	width:120px;
+
+
+
+}
+.frame-mini-nav span[attr='mini'] ul li a{
+
+	border:0px;
+	position:static;
+	width:150px;
+	height:32px;
+	line-height:32px;
+	color:#666;
+	display:block;
+	padding-left:12px;
+}
+.frame-mini-nav span[attr='mini'] ul li a:hover{
+	color:#fff;
+
+
+}
+.frame-mini-nav span[attr='mini'] li{
+	position:relative;
+}
+.frame-mini-nav span[attr='mini'] li.active{
+	background:#777;
+}
+.frame-mini-nav span[attr='mini'] li.active>a{
+	color:#fff;
+}
+.frame-mini-nav span[attr='mini'] li ul{
+    top: 0px;
+	left:150px;
+	position:absolute;
+	background: #fff;
+	border:1px solid #333;
+	width:150px;
+	height:auto;
+	z-index:1000;
+	border-radius:5px;
+	box-shadow:0 3px 5px rgba(0,0,0,0.3);
+}
+.frame-mini-nav span[attr='mini'] li:hover > ul{
+	display:block;
+}
+.frame-mini-nav span[attr='mini'] li:hover > ul:after {
+	content:""; border:8px solid transparent; border-right-color:#FFF; position:absolute; top:8px; left:-16px; line-height:0; height:0; font-size:0;
+}
+/*导航 end*/
+.frame-main { margin-left: 140px; height: 100%; }
+/*选项卡*/
+.frame-tab { height: 100%; }
+.tab-header { position:relative;}
+.tab { float: left; width: 500000px; position: relative; left: 0px; height: 40px; margin:0 20px 0 0;}
+.tab .on { display: block; height: 40px; line-height:40px; text-align: center; overflow: hidden }
+.tab .off { display: block; height: 40px; line-height:40px; text-align: center; overflow: hidden }
+.tab .inner {
+    padding:0px 10px;
+	font-size:14px;
+}
+.tab .close { float: right; width: 18px; height: 15px; margin:0 2px 0 0; display: block;}
+.tab ul { display: block; height: 40px;}
+.tab li {
+	overflow: hidden;
+    white-space: nowrap;
+	list-style: none; float: left; height: 40px; width: 150px; border-right:1px solid #00A6ED; cursor: pointer ;}
+.tab li a {font-family:"微软雅黑"; font-size:14px; font-weight:bold;}
+.tab li a  span.text{
+	overflow: hidden;
+	display:inline-block;
+	width:120px;
+    overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.scroll-left { left: 19px; position: absolute; width: 14px; padding-left:5px; height: 15px; margin-top: 12px; display: inline; cursor: pointer; z-index: 5 }
+.scroll-right { right: 195px; position: absolute; width: 14px; padding-left:5px; height: 15px; margin-top: 12px; display: inline; cursor: pointer; z-index: 5 }
+.tab-menu{margin:0px 37px;overflow:hidden;float:left;position:relative;}
+.tab-html { background: url(tag_house_bg.gif); margin: 0; margin-top: 0px !important; margin-top: 7px; width: 200px !important; width: 197px; float: right; text-align: right }
+.tab-content { overflow: auto; }
+.tab-content > div { width:auto; height: 100%;}
+/*正常显示Btn*/
+.frame-normal-btn { background:#0A7CC9; color:#FFF; display: block; position: absolute; top:0; cursor:pointer; right:0; width:32px; font-size:16px; height: 25px; text-align:center; padding-top:7px; }
+
+/*左侧快捷操作Menu样式 end*/
+/*DIV 快速布局样式*/
+.gv-row, .gv-rol { float:left;}
+/*系统设置样式*/
+.gv-system-step { position:absolute; right:-501px; top:40px; bottom:0; width:450px; background:#FFF; z-index:9000; border-left:1px solid #bbb; box-shadow:-5px 0 10px rgba(0,0,0,0.2);}
+

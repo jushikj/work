@@ -1,0 +1,115 @@
+﻿/*针对IE10设置样式*/
+@media screen and (-ms-high-contrast: active) , ( -ms-high-contrast
+	:none) {
+	.gv-button-menu>.sub-menu {
+		top: 10px;
+	}
+	.page-toolbar .toolbar-r li span label.input-control {
+		margin-top: 5px;
+	}
+	/*webshell 样式*/
+	#gv-webCmd-term {
+		height: 350px !important;
+	}
+	.page-form-control select.placholderColor {
+		color: #ccc;
+	}
+	.page-form-control select>option {
+		color: #000 !important;
+	}
+	/*superrack*/
+	.rack-front,.rack-back {
+		height: 877px;
+	}
+	.page-rack-list .cube-screen {
+	  height:1010px;
+	}
+	.page-rack-list .cube-screen .scene,.shape,.face,.face-wrapper {
+		position: static;
+	}
+	.page-rack-list .cube-screen .face,.face-wrapper {
+		overflow: auto;
+	}
+	.page-rack-list .cube-screen .face {
+		position: absolute;
+		top: 0px;
+		left: 60px;
+	}
+	.page-rack-list .cube-screen .rack-btn {
+		top: 930px;
+	}
+	.page-rack-list .cube-screen [class *="cuboid"] .bk {
+		left: 60px;
+	}
+	.page-rack-list .cube-screen .cub-1 .bk {
+		-ms-transform: none;
+		transform: none;
+		display: none;
+	}
+	/*刀片机箱样式*/
+	.ie-blade .page-bladechassis-view-con {-ms-transform: none;transform: none;}
+	.ie-blade .page-blade-box {-ms-transform: none;transform: none;-ms-perspective: none;perspective: none;-ms-perspective-origin:none;perspective-origin:none;}
+	.ie-blade .blade-block {-ms-transform: none;transform: none;}
+	.ie-blade .blade-block.flipped {-ms-transform: none;transform: none;}
+	.ie-blade .blade3600-front { -ms-transform: none;transform: none;}
+	.ie-blade .blade3600-back {-ms-transform: none;transform: none;}
+	.ie-blade .blade3600-front { width:430px; height:465px; padding:15px 0 0 30px; background:url(../../images/tc3600-front-ie.png) 0 0 no-repeat #333; margin:0; position:relative;}
+	.ie-blade .blade3600-back { width:430px; height:465px; padding:15px 0 0 30px; background:url(../../images/tc3600-front-ie.png) 0 0 no-repeat #333; margin:0; position:relative;}
+	.ie-blade .blade3600-top { display:none;}
+	.ie-blade .blade3600-bottom { display:none;}
+	.ie-blade .blade3600-left { display:none;}
+	.ie-blade .blade3600-right { display:none;}
+	.ie-blade .blade3600-daopian { width:400px; height:300px;}
+	.ie-blade .blade3600-daopian .blade3600-w {float:left; width:40px; height:300px;}
+	.ie-blade .blade3600-daopian .blade3600-d { float:left; width:40px; height:300px; background:url(../../images/tc3600daopian-ie.png) no-repeat; position:relative; cursor:pointer;}
+	.ie-blade .blade3600-daopian .blade3600-d .light { position:absolute; width:14px; height:14px; margin-left:-7px; top:22px; left:50%;}
+	.ie-blade .blade3600-daopian .blade3600-d:hover { outline:2px solid #F00; box-shadow:inset 0 0 5px #F00; z-index:99;}
+	.ie-blade .blade3600-dianyuan { width:400px; height:50px; background:url(../../images/tc3600dianyuan-ie.png) no-repeat;}
+	.ie-blade .blade3600-fengshan { width:398px; height:98px; border:1px solid #000; background:#aaa;}
+	.ie-blade .blade3600-fengshan .blade3600-f { float:left; width:98px; height:98px; display:inline; margin:0 1px 0 0; background:url(../../images/tc3600fengshan-ie.png) no-repeat; cursor:pointer;}
+	.ie-blade .blade3600-fengshan .blade3600-f:hover { outline:2px solid #F00; box-shadow:inset 0 0 5px #F00; z-index:99;}
+	.ie-blade .blade3600-io { width:400px; height:175px; background:url(../../images/tc3600io-ie.png) no-repeat;}
+	.ie-blade .blade3600-bk { position:relative; width:400px; height:175px; background:url(../../images/tc3600back-ie.png) no-repeat;}
+	.ie-blade .blade3600-gaosu { position:absolute; width:275px; height:25px; background:url(../../images/tc3600gaosu-ie.png) no-repeat; cursor:pointer;}
+	.ie-blade .blade3600-gaosu:hover,.blade3600-disu1:hover,.blade3600-disu:hover { outline:2px solid #F00; box-shadow:inset 0 0 5px #F00; z-index:99;}
+	.ie-blade .blade3600-disu1 { position:absolute; width:98px; height:36px; background:url(../../images/tc3600disu1-ie.png) no-repeat; cursor:pointer;}
+	.ie-blade .blade3600-disu { position:absolute; width:98px; height:36px; background:url(../../images/tc3600disu-ie.png) no-repeat; cursor:pointer;}
+	.ie-blade .blade3600-guanli { position:absolute; width:128px; height:36px; background:url(../../images/tc3600guanli-ie.png) no-repeat;}
+	.ie-blade .blade3600-daopian .blade3600-d .light>img { width:14px;height:14px;}
+	.ie-blade .blade3600-fengshan .blade3600-f >img{width:95px; height:95px;}
+	.ie-blade .blade3600-gaosu>img {width:275px;height:25px;}
+	.ie-blade .blade3600-disu1>img {width:98px; height:36px;}
+	.ie-blade .blade3600-disu>img {width:98px; height:36px;}
+
+	.ie-blade .blade4600-front { -ms-transform: none;transform: none;}
+	.ie-blade .blade4600-back {-ms-transform: none;transform: none;}
+	.ie-blade .blade4600-front { width:430px; height:210px; padding:15px 0 0 30px; background:url(../../images/tc4600-front-ie.png) 0 0 no-repeat #333; margin:0; position:relative;}
+	.ie-blade .blade4600-back { width:430px; height:210px; padding:15px 0 0 30px; background:url(../../images/tc4600-front-ie.png) 0 0 no-repeat #333; margin:0; position:relative;}
+	.ie-blade .blade4600-top { display:none;}
+	.ie-blade .blade4600-bottom { display:none;}
+	.ie-blade .blade4600-left { display:none;}
+	.ie-blade .blade4600-right { display:none;}
+	.ie-blade .blade4600-daopian { width:400px; height:195px;}
+	.ie-blade .blade4600-daopian .blade4600-w {float:left; width:28px; height:195px;}
+	.ie-blade .blade4600-daopian .blade4600-d { float:left; width:28px; height:195px; background:url(../../images/tc4600daopian-ie.png) no-repeat; position:relative; cursor:pointer;}
+	.ie-blade .blade4600-daopian .blade4600-d .light { position:absolute; width:14px; height:14px; margin:-7px 0 0 -7px; top:50%; left:50%;}
+	.ie-blade .blade4600-daopian .blade4600-d:hover { outline:2px solid #F00; box-shadow:inset 0 0 5px #F00; z-index:99;}
+	.ie-blade .blade4600-fengshan { width:398px; height:98px; border:1px solid #000; background:#aaa;}
+	.ie-blade .blade4600-fengshan .blade4600-f { float:left; width:98px; height:98px; display:inline; margin:0 1px 0 0; background:url(../../images/tc3600fengshan-ie.png) no-repeat; cursor:pointer;}
+	.ie-blade .blade4600-fengshan .blade4600-f:hover { outline:2px solid #F00; box-shadow:inset 0 0 5px #F00; z-index:99;}
+	.ie-blade .blade4600-jiaohuan { width:400px; height:38px;}
+	.ie-blade .blade4600-jiaohuan .blade4600-kaiguan { float:left; width:38px; height:38px; background:url(../../images/tc4600kaiguan-ie.png) no-repeat; position:relative; cursor:pointer; }
+	.ie-blade .blade4600-jiaohuan .blade4600-swich { float:left; width:100px; height:38px; background:url(../../images/tc4600swich-ie.png) no-repeat; position:relative; cursor:pointer; }
+	.ie-blade .blade4600-jiaohuan .blade4600-swich:hover { outline:2px solid #F00; box-shadow:inset 0 0 5px #F00; z-index:99; }
+	.ie-blade .blade4600-jiaohuan .blade4600-guanli { float:left; width:130px; height:38px; background:url(../../images/tc4600guanli-ie.png) no-repeat; position:relative; cursor:pointer; }
+	.ie-blade .blade4600-jiaohuan .blade4600-zhitong { float:left; width:131px; height:38px; background:url(../../images/tc4600zhitong-ie.png) no-repeat; position:relative; cursor:pointer; }
+	.ie-blade .blade4600-jiaohuan .blade4600-zhitong:hover { outline:2px solid #F00; box-shadow:inset 0 0 5px #F00; z-index:99; }
+	.ie-blade .blade4600-power { width:400px; height:57px;}
+	.ie-blade .blade4600-power .blade4600-p { float:left; width:100px; height:57px; background:url(../../images/tc4600power-ie.png) no-repeat; position:relative; cursor:pointer;}
+	.ie-blade .blade4600-power .blade4600-p:hover { outline:2px solid #F00; box-shadow:inset 0 0 5px #F00; z-index:99;}
+	.ie-blade .blade4600-fengshan .blade4600-f >img{width:95px; height:95px;}
+	.ie-blade .blade4600-power .blade4600-p img{width:100px;height:57px;}
+	.h-blade-ie .blade4600-front ,.h-blade-ie .blade4600-back {background:url(../../images/tc4600-front-h-ie.png) 0 0 no-repeat #333;}
+	.h-blade-ie .blade4600-daopian  .blade4600-w { width:39px;}
+	.h-blade-ie .blade4600-daopian .blade4600-d { float:left; width:39px; height:195px; background:url(../../images/tc4600daopian-h-ie.png) no-repeat; position:relative; cursor:pointer;}
+}

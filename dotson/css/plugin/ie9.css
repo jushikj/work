@@ -1,0 +1,22 @@
+﻿/*针对IE设置样式*/
+.page-form-control select.placholderColor {
+	color: #000;
+}
+/*superrack*/
+.page-rack-list .cube-screen .scene {
+	overflow: hidden;
+	position: absolute;
+	top: 0px;
+	left: 60px;
+}
+
+.page-rack-list .cube-screen .rack-btn {
+	top:930px;
+}
+
+.page-rack-list .cube-screen .cub-1 .bk {
+	-ms-transform: none;
+	transform: none;
+
+}
+.page-form-control select {white-space:nowrap;}

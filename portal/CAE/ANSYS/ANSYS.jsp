@@ -216,34 +216,59 @@ gen_time_identify_string = function() {
                         <div class="title-front">
                             <i class="icon-chevron-sign-down"></i>
                         </div>
+                        <div class="title-text">Environment Parameters</div>
+                    </div>
+                </div>
+                <div class="form-group-content">
+                    <div class="cl">
+                      <div class="fl" style="display:inline; margin-right:20px;">
+                        <span>Run Mode:</span><span id='page-portal-ansys-run-mode'/><br/>
+                        <span>MPI Type:</span><span id="page-portal-ansys-mpi-type"/>
+                        <span>Remote Shell:</span><span id='page-portal-ansys-remote-shell'/>
+                        <span id='page-portal-ansys-arguments'></span>
+                      </div>
+                      <div class="fl">
+                        <div>
+                          <span id='page-portal-ansys-bin' style="display: inline-block;"></span>
+                          <a id='page-portal-ansys-bin-select-btn' style="display: inline-block; vertical-align: middle;"></a>
+                        </div>
+                        <div>
+                          <span id='page-portal-ansys-work-dir' style="display: inline-block;"></span>
+                          <a id='page-portal-ansys-workdir-btn' style="display: inline-block; vertical-align: middle;"></a>
+                        </div>
+                        <div>
+                          <span id='page-portal-ansys-job-name' style="display: inline-block;"></span>
+                          <a id='page-portal-ansys-job-name-btn' style="display: inline-block; vertical-align: middle;"></a>
+                        </div>                   
+                      </div>
+                    </div>
+              </div> 
+            </div>
+            <div class="form-group" id="page-portal-ansys-run-parameters-group">
+                <div class="form-group-title">
+                    <div class="title-float cl">
+                        <div class="title-front">
+                            <i class="icon-chevron-sign-down"></i>
+                        </div>
                         <div class="title-text">Run Parameters</div>
                     </div>
                 </div>
                 <div class="form-group-content">
                     <div class="cl">
                       <div class="fl" style="display:inline; margin-right:20px;">
-                        <span>MPI Type:</span><span id="page-portal-ansys-mpi-type"/>
-                        <span>HPC run:</span><span id="page-portal-ansys-hpc-run"/>
-                        <span id='page-portal-ansys-license'/>
-                        <div>
-                          <span id='page-portal-ansys-bin' style="display: inline-block;"></span>
-                          <a id='page-portal-ansys-bin-select-btn' style="display: inline-block; vertical-align: middle;"></a>
-                        </div>
-                        <span id='page-portal-ansys-arguments'></span>
-                      </div>
-
-                      <div class="fl">
-                        <span>Remote Shell:</span><span id='page-portal-ansys-remote-shell'/>
-                        <span>Input Type:</span><span id='page-portal-ansys-input-type'/>
-                        <div>
-                          <span id='page-portal-ansys-work-dir' style="display: inline-block;"></span>
-                          <a id='page-portal-ansys-workdir-btn' style="display: inline-block; vertical-align: middle;"></a>
-                        </div>
+                        <span>File Type:</span><span id="page-portal-ansys-input-type"/>
                         <div>
                           <span id='page-portal-ansys-input' style="display: inline-block;"></span>
                           <a id='page-portal-ansys-input-btn' style="display: inline-block; vertical-align: middle;"></a>
                         </div>
-                        <span id='page-portal-ansys-output'></span>                     
+                        <span id='page-portal-ansys-inp-file'/>
+                        <span id='page-portal-ansys-log-file'></span> 
+                      </div>
+                      <div class="fl">
+                        <span id='page-portal-ansys-use-custom-memory-setting'/><br/>
+                        <span>Parallel Mode:</span><span id="page-portal-ansys-hpc-run"/>
+                        <span id='page-portal-ansys-database'></span>
+                        <span id='page-portal-ansys-total-workspace'></span>
                       </div>
                     </div>
               </div> 

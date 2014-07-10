@@ -1,0 +1,37 @@
+﻿/*针对IE设置样式*/
+.page-form-control select.placholderColor {
+	color: #000;
+}
+/*superrack*/
+.page-rack-list .cube-screen .scene {
+	overflow: hidden;
+	position: absolute;
+	top: 0px;
+	left: 60px;
+}
+
+.page-rack-list .cube-screen .rack-btn {
+	top:930px;
+}
+
+.page-rack-list .cube-screen .cub-1 .bk {
+	-ms-transform: none;
+	transform: none;
+
+}
+.page-form-control select {white-space:nowrap;}
+
+
+.rack-front {
+	background:url(../../images/rack-frame-min.png) 0 0 no-repeat #333;
+}
+.rack-back{
+	background:url(../../images/rack-frame-min.png) 0 0 no-repeat #333;
+}
+.rack-back .rack-power-box{
+	background:url(../../images/rack-power-box-min.png) 0 0 no-repeat;
+}
+.rack-back .rack-back-box{
+   background:url(../../images/rack-box-min.png) 0 0 no-repeat;
+
+}

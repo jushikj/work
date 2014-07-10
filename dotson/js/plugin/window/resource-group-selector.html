@@ -1,0 +1,637 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>分组选择器</title>
+<style type="text/css">
+</style>
+<script type='text/javascript'>
+
+$(function () {
+    var msg = {
+
+
+    };
+    var tips = {
+        refresh: '刷新',
+        checkAll: '全选',
+        removeAll: '置空选择'
+
+
+    };
+    //初始化
+
+
+    function init() {
+    	Gv.ResouceGroupSelecterActionHandler=save;
+        //资源树
+        Gv.get('gv-plugin-res-grp-selector-resTree-refresh').click(function () {
+            refreshResTree();
+        });
+        Gv.get('gv-plugin-res-grp-selector-resTree-check').click(function () {
+            checkAllResTree();
+        });
+        Gv.get('gv-plugin-res-grp-selector-resTree-empty').click(function () {
+            removeAllCheckedResTree();
+        });
+        //选中资源
+        Gv.get('gv-plugin-res-grp-selector-selectedRes-refresh').click(function () {
+            refreshSelectedRes();
+        });
+        Gv.get('gv-plugin-res-grp-selector-selectedRes-check').click(function () {
+            checkAllSelectedRes();
+        });
+        Gv.get('gv-plugin-res-grp-selector-selectedRes-empty').click(function () {
+            removeAllSelectedRes();
+        });
+        //选中已有关联关系资源
+        Gv.get('gv-plugin-res-grp-selector-relatedRes-refresh').click(function () {
+            refreshRelatedRes();
+        });
+        Gv.get('gv-plugin-res-grp-selector-relatedRes-check').click(function () {
+            checkAllRelatedRes();
+        });
+        Gv.get('gv-plugin-res-grp-selector-relatedRes-empty').click(function () {
+            removeAllRelatedRes();
+        });
+        //组资源树
+        Gv.get('gv-plugin-res-grp-selector-groupTree-refresh').click(function () {
+            refreshGroupTree();
+        });
+        Gv.get('gv-plugin-res-grp-selector-groupTree-empty').click(function () {
+            removeAllGroupTree();
+        });
+
+        Gv.get('gv-selector-arrow-right').click(function () {
+        	selected2Related();
+        });
+        Gv.get('gv-selector-arrow-left').click(function () {
+        	removeRelated();
+        });
+        //加载资源树
+       createResTree();
+        //加载组资源树
+        createGroupTree();
+    }
+    //得到选中List的Jquery对象
+    function getSelectedListCon(){
+	    return Gv.get('gv-plugin-res-grp-selector-seleted-list');
+    }
+
+    //刷新资源树
+    function refreshResTree() {
+    	removeAllCheckedResTree();
+    	var root=getResTree().getNodeByParam("id", "0", null);
+    	getResTree().reAsyncChildNodes(root, "refresh",false);
+    }
+    //全选资源树
+    function checkAllResTree() {
+    	getResTree().checkAllNodes(true);
+    	var data=getResTree().getCheckedNodes(true);
+    	for(var i=0;i<data.length;i++){
+            var d=data[i];
+            showResTreeSelectedList(d);
+    	}
+    	//resTreenodeCheck();
+
+    }
+    //取消全部选项资源树
+    function removeAllCheckedResTree() {
+    	getResTree().checkAllNodes(false);
+    	getSelectedListCon().html('');
+
+    }
+
+    //刷新选择的资源
+    function refreshSelectedRes() {
+    	var con=getSelectedListCon();
+    	con.find('input[type="checkbox"]').each(function(){
+    		if($(this).attr("checked")!='checked'){
+    			$(this).parent().remove();
+    		}
+    	});
+    }
+    //全选选择的资源
+    function checkAllSelectedRes() {
+    	var con=getSelectedListCon();
+    	con.find('input[type="checkbox"]').each(function(){
+    		$(this).attr("checked",true)
+    		var p=$(this).parent();
+    		var nodeId=p.data('data').id;
+    		var node=getResTree().getNodeByParam("id", nodeId, null);
+    		    getResTree().checkNode(node, true, true,false);
+
+
+    	});
+    }
+    //清空选择的资源
+    function removeAllSelectedRes() {
+    	var con=getSelectedListCon();
+    	con.find('input[type="checkbox"]').each(function(){
+    		$(this).removeAttr("checked");
+    		var p=$(this).parent(),
+		    	nodeId=p.data('data').id,
+		    	node=getResTree().getNodeByParam("id", nodeId, null);
+		    	getResTree().checkNode(node, false, true,false);
+
+    	});
+    }
+    function showResTreeSelectedList(d){
+    	if(Gv.isArr(d)){
+    		if(Gv.isEmpty(d)){
+    			removeAllCheckedResTree();
+    			return null;
+
+    		}
+            for(var i=0;i<d.length;i++){
+				var r=d[i];
+				addSelectedListRow(r);
+            }
+    	}else{
+    		addSelectedListRow(d);
+    	}
+    }
+    //增加选择list中单条记录
+    function addSelectedListRow(d){
+    	var con=getSelectedListCon();
+    	if(d.isParent){//只添加节点
+            return null;
+ 		}
+    	if(Gv.dom(d.id+'-selected')){
+    		if(d.checked){
+    		   Gv.get(d.id+'-selected').attr('checked',d.checked);
+    		}else{//如果checkbox是false就删除
+    			Gv.get(d.id+'-selected').parent().remove();
+    		}
+    	}else{
+    		if(!d.checked){//如果是个新选中的节点但是checkbox是false就不添加
+                return null;
+     		}
+	 		var r=d,
+	 		    chk=$('<input type="checkbox">').attr('id',d.id+'-selected').attr('checked',d.checked),
+	 		    spn=$('<span />').text(d.name),
+	 		    tmpDiv=$('<div class="gv-selector-row" />').append(chk).append(spn);
+	 		tmpDiv.data('data',r);
+	 		chk.click(function(){
+	 			resSelectedListCheck(this);
+	 		});
+	 		con.append(tmpDiv);
+
+    	}
+    }
+    //选中List中的Click事件
+    function resSelectedListCheck(obj){
+    	var flag=$(obj).attr('checked')=='checked'?true:false;
+    	var p=$(obj).parent(),
+		    nodeId=p.data('data').id,
+		    node=getResTree().getNodeByParam("id", nodeId, null);
+    	getResTree().checkNode(node, flag, true,false);
+    }
+
+    function resTreenodeCheck(event, treeId, treeNode){
+    	//var flag=true;
+    	//将所有选中的节点进行添加
+    	var checks=getResTree().getCheckedNodes(true);
+    	showResTreeSelectedList(checks);
+    	if(treeNode==null){
+    		return null;
+    	}
+    	//对直接点击checkbox的节点进行添加
+    	showResTreeSelectedList(treeNode);
+
+    }
+
+    function resTreenodeClick(event, treeId, treeNode){
+    		var flag=treeNode.checked==false?true:false;
+    		getResTree().checkNode(treeNode, flag, true);
+    		//将所有选中的节点进行添加
+        	var checks=getResTree().getCheckedNodes(true);
+        	showResTreeSelectedList(checks);
+    		//对直接点击checkbox的节点进行添加
+        	showResTreeSelectedList(treeNode);
+
+    }
+
+    function resOnAsyncSuccess(event, treeId, treeNode, msg){
+    	if(treeNode){
+    		if(!Gv.isEmpty(treeNode.children)){
+				//showResTreeSelectedList()
+    		}
+    	}
+
+    	//Gv.log(msg)
+    }
+
+    //===================
+    //得到关联关系List
+    function getRelatedListCon(){
+    	return Gv.get('gv-plugin-res-grp-selector-related-list');
+    }
+    //刷新选中的有关联关系资源
+    function refreshRelatedRes() {
+    	var con=getRelatedListCon();
+    	con.find('input[type="checkbox"]').each(function(){
+    		if($(this).attr("checked")!='checked'){
+    			$(this).parent().remove();
+    		}
+    	});
+    }
+    //全选选中的有关联关系资源
+    function checkAllRelatedRes() {
+    	var con=getRelatedListCon();
+    	con.find('input[type="checkbox"]').each(function(){
+    		$(this).attr("checked",true)
+    		var p=$(this).parent(),
+    		    nodeId=p.data('data').id,
+    		    node=getGroupTree().getNodeByParam("id", nodeId, null);
+    		    getGroupTree().checkNode(node, true, true,false);
+
+
+    	});
+    }
+    //清空选中的有关联关系资源
+    function removeAllRelatedRes() {
+    	var con=getRelatedListCon();
+    	con.find('input[type="checkbox"]').each(function(){
+    		$(this).removeAttr("checked");
+    		var p=$(this).parent(),
+		    	nodeId=p.data('data').id,
+		    	node=getGroupTree().getNodeByParam("id", nodeId, null);
+    		    getGroupTree().checkNode(node, false, true,false);
+
+    	});
+    }
+
+    //刷新组资源树
+    function refreshGroupTree() {
+    	removeAllGroupTree();
+    	var root=getGroupTree().getNodeByParam("id", "0", null);
+    	getGroupTree().reAsyncChildNodes(root, "refresh",false);
+    }
+    //清空全部checkbox组资源树
+    function removeAllGroupTree() {
+    	getGroupTree().checkAllNodes(false);
+    	getRelatedListCon().html('');
+
+    }
+    function showGroupTreeRelatedList(d){
+    	Gv.log(d)
+    	if(Gv.isArr(d)){
+    		if(Gv.isEmpty(d)){
+    			removeAllGroupTree();
+    			return null;
+
+    		}
+            for(var i=0;i<d.length;i++){
+				var r=d[i];
+				addRelatedListRow(r);
+            }
+    	}else{
+    		addRelatedListRow(d);
+    	}
+
+
+    }
+
+    //增加关系list中单条记录
+    function addRelatedListRow(d){
+    	var con=getRelatedListCon();
+    	if(d.isParent){//只添加节点
+            return null;
+ 		}
+    	/**
+    	if(Gv.dom(d.id+'-related')){
+    		if(d.checked){
+    		   Gv.get(d.id+'-related').attr('checked',d.checked);
+    		}else{//如果checkbox是false就删除
+    			Gv.get(d.id+'-related').parent().remove();
+    		}
+    	}else{
+    		if(!d.checked){//如果是个新选中的节点但是checkbox是false就不添加
+                return null;
+     		}
+
+	 		var r=d,
+	 		    chk=$('<input type="checkbox">').attr('id',d.id+'-related').attr('checked',d.checked),
+	 		    spn=$('<span />').text(d.name),
+	 		    tmpDiv=$('<div class="gv-selector-row" />').append(chk).append(spn);
+	 		tmpDiv.data('data',r);
+	 		chk.click(function(){
+	 			resRelateListCheck(this);
+	 		});
+	 		if(r.related===false){
+	 			tmpDiv.addClass('gv-selector-norelated')
+	 		}
+	 		con.append(tmpDiv);
+
+    	}*/
+    	var r=d,
+		    chk=$('<input type="checkbox">').attr('id',d.id+'-related').attr('checked',true),
+		    spn=$('<span />').text(d.name),
+		    tmpDiv=$('<div class="gv-selector-row" />').append(chk).append(spn);
+		tmpDiv.data('data',r);
+		chk.click(function(){
+			resRelateListCheck(this);
+		});
+		if(r.related===false){
+			tmpDiv.addClass('gv-selector-norelated')
+		}
+		con.append(tmpDiv);
+    }
+    //关联关系List中的Click事件
+    function resRelateListCheck(obj){
+    	var flag=$(obj).attr('checked')=='checked'?true:false;
+    	var p=$(obj).parent(),
+		    nodeId=p.data('data').id,
+		    node=getGroupTree().getNodeByParam("id", nodeId, null);
+    	getGroupTree().checkNode(node, flag, true,false);
+
+    }
+    //组资源树选择前事件
+    function groupTreenodeBeforeCheck(treeId, treeNode){
+    	/*
+    	var flag=treeNode.checked;
+    	var isOpen = treeNode.open;
+    	//没有选中同时也没有展开
+    	if(!flag&&!isOpen){
+    		getGroupTree().expandNode(treeNode,true);
+    	}*/
+
+    }
+    //组资源树选择事件
+    function groupTreenodeCheck(event, treeId, treeNode){
+    	getRelatedListCon().html('');
+    	var flag=treeNode.checked;
+    	/*
+    	if(treeNode==null){
+    		return null;
+    	}else{
+    		flag=treeNode.checked;
+    	}*/
+    	Gv.log('groupTreenodeCheck'+flag)
+    	var children=treeNode.children;
+    	//getGroupTree().checkAllNodes(false);
+    	//treeNode.checked=flag;
+    	//getGroupTree().checkNode(treeNode, flag, true,false);
+    	//将所有选中的节点进行添加
+    	//var checks=getGroupTree().getCheckedNodes(true),
+    	//    flag;
+    	if(!flag){//取消选中 清空列表
+    		var con=getRelatedListCon();
+    		con.html('');
+    	}else{
+	    	if(Gv.isArr(children)){
+	    	    showGroupTreeRelatedList(children);
+	    	}
+    	}
+    	//对直接点击checkbox的节点进行添加
+    	//showGroupTreeRelatedList(treeNode);
+
+    }
+    //组资源树点击前事件
+    function groupTreenodeBeforeClick(treeId, treeNode){
+
+    }
+    //组资源树点击事件
+    function groupTreenodeClick(event, treeId, treeNode){
+    	    //getRelatedListCon().html('');
+    	    // var flag=treeNode.checked
+    	    //getGroupTree().checkAllNodes(false);
+    	    //treeNode.checked=flag;
+    		//flag=treeNode.checked==false?true:false;
+    		//getGroupTree().checkNode(treeNode, flag, true,false);
+    		//将所有选中的节点进行添加
+        	//var checks=getGroupTree().getCheckedNodes(true),
+        	//    flag;
+        	//showGroupTreeRelatedList(checks);
+    		//对直接点击checkbox的节点进行添加
+        	//showGroupTreeRelatedList(treeNode);
+    }
+
+    function groupOnAsyncSuccess(event, treeId, treeNode, msg){
+    	if(treeNode){
+    		if(!Gv.isEmpty(treeNode.children)){
+    			Gv.log('groupOnAsyncSuccess')
+    		}
+    	}
+    }
+    function createResTree() {
+    	var setting = {
+    	        callback: {
+    	        	onCheck: resTreenodeCheck,
+    	            onClick: resTreenodeClick,
+    	            onAsyncSuccess: resOnAsyncSuccess,
+
+    	        },
+    	        check: {
+    				enable: true
+    			},
+    	        async: {
+    	            enable: true,
+    	            url: Gv.resouceGroupSelecterUrl.resTreeUrl,
+    	            autoParam: ["id"]
+    	        }
+    	    }
+    	/*
+    	Gv.resouceGroupSelecterUrl={
+    	 		actionUrl:,
+    	 		resTreeUrl:,
+    	 		groupTreeUrl:
+    	 	};*/
+
+        $.fn.zTree.init($("#gv-plugin-res-grp-selector-resTree"), setting);
+
+
+    }
+
+    function createGroupTree() {
+      var setting = {
+    			callback: {
+    				beforeCheck:groupTreenodeBeforeCheck,
+    	        	onCheck: groupTreenodeCheck,
+    	        	beforeClick:groupTreenodeBeforeClick,
+    	            onClick: groupTreenodeClick,
+    	            onAsyncSuccess: groupOnAsyncSuccess
+
+    	        },
+    			check: {
+    				enable: true,
+    				chkStyle: "radio",
+    				radioType: "all"
+    			},
+			async: {
+				enable: true,
+				url:Gv.resouceGroupSelecterUrl.groupTreeUrl,
+				autoParam:["id"],
+			}
+    	};
+       $.fn.zTree.init($("#gv-plugin-res-grp-selector-groupTree"), setting);
+
+
+    }
+    //从选择资源List到关联关系List
+    function selected2Related(){
+    	var sCon=getSelectedListCon(),
+    	    rCon=getRelatedListCon();
+    	    sCon.find('input[type="checkbox"]').each(function(){
+    		if($(this).attr("checked")=='checked'){
+    			var r=$(this).parent().data('data'),
+    				node=getResTree().getNodeByParam("id", r.id, null);
+    			    node.related=false;
+    			    showGroupTreeRelatedList(node);
+    		}
+    	});
+    	    doAction('add');
+
+    }
+    //取消关联关系List
+    function removeRelated(){
+    	doAction('delete');
+    	getRelatedListCon().find('input[type="checkbox"]').each(function(){
+    		var r=$(this).parent().data('data'),
+    		    node=getGroupTree().getNodeByParam("id", r.id, null);
+    		    if(node!=null){
+    		       getGroupTree().checkNode(node, false, true,false);
+    		    }
+    		    if($(this).attr("checked")=='checked'){
+    		    	$(this).parent().remove();
+        		}
+
+
+    	});
+
+    }
+    //增加或减少，提交后台
+    function doAction(type){
+    	var con=type=='add'?getSelectedListCon():getRelatedListCon(),resArr=[];
+    	con.find('input[type="checkbox"]').each(function(){
+    		if($(this).attr("checked")=='checked'){
+    			var r=$(this).parent().data('data');
+    			resArr.push(r.id);
+    		}
+    	});
+    	var chks=getGroupTree().getCheckedNodes(true),
+	    maxPathNode=null;
+		for(var i=0;i<chks.length;i++){
+			if(chks[i].isParent){
+	    		var  a=chks[i],
+	    		     maxPathNode=a;
+	    		maxPathNode=maxPathNode.path>a.path?maxPathNode:a;
+			}
+		}
+		if($.isFunction(Gv.resouceGroupSelecterUrl.actionHandler)){
+		    var groupId=maxPathNode?maxPathNode.id:'';
+	   	    Gv.resouceGroupSelecterUrl.actionHandler(resArr,groupId,type);
+	    }
+    }
+    //保存信息-暂时不用
+    function save(){
+    	var con=getRelatedListCon(),resArr=[];
+    	con.find('input[type="checkbox"]').each(function(){
+    		if($(this).attr("checked")=='checked'){
+    			var r=$(this).parent().data('data');
+    			resArr.push(r.id);
+    		}
+    	});
+    	var chks=getGroupTree().getCheckedNodes(true),
+    	    maxPathNode=null;
+    	for(var i=0;i<chks.length;i++){
+    		if(chks[i].isParent){
+	    		var  a=chks[i],
+	    		     maxPathNode=a;
+	    		maxPathNode=maxPathNode.path>a.path?maxPathNode:a;
+    		}
+    	}
+    	if($.isFunction(Gv.resouceGroupSelecterUrl.actionHandler)){
+    	    var groupId=maxPathNode?maxPathNode.id:'';
+       	    Gv.resouceGroupSelecterUrl.actionHandler(resArr,groupId);
+        }
+    }
+    function getResTree(){
+    	return getTree('gv-plugin-res-grp-selector-resTree');
+    }
+    function getGroupTree(){
+    	return getTree('gv-plugin-res-grp-selector-groupTree');
+    }
+    function getTree(id) {
+        return  $.fn.zTree.getZTreeObj(id);
+    }
+    init();
+
+
+
+
+
+
+
+})
+</script>
+</head>
+
+<body>
+<div class="pd10 cl"  style="display: inline-block;">
+	<div class="pd10 fl">
+    	<div class="page-select-tree">
+        	<div class="page-select-tree-title">
+            	<h3>资源类型和资源</h3>
+            </div>
+            <div class="page-select-tree-body cl">
+            	<div class="page-select-tree-l">
+                	<div class="side-tool">
+                        <i class="icon-refresh" id="gv-plugin-res-grp-selector-resTree-refresh"></i>
+                        <i class="icon-check" id="gv-plugin-res-grp-selector-resTree-check"></i>
+                        <i class="icon-check-empty"  id="gv-plugin-res-grp-selector-resTree-empty"></i>
+                    </div>
+                    <div class="page-select-tree-con ztree" id="gv-plugin-res-grp-selector-resTree">
+
+                    </div>
+                </div>
+                <div class="page-select-tree-r bdl">
+                	<div class="side-tool">
+                        <i class="icon-refresh"  id="gv-plugin-res-grp-selector-selectedRes-refresh"></i>
+                        <i class="icon-check"  id="gv-plugin-res-grp-selector-selectedRes-check"></i>
+                        <i class="icon-check-empty"  id="gv-plugin-res-grp-selector-selectedRes-empty"></i>
+                    </div>
+                    <div class="page-select-tree-con" id="gv-plugin-res-grp-selector-seleted-list">
+					</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="pd10 fl">
+    	<div class="page-select-tree-btn">
+        	<button id='gv-selector-arrow-right'><i class="icon-circle-arrow-right"></i></button>
+            <button id='gv-selector-arrow-left' ><i class="icon-circle-arrow-left"></i></button><!-- class="disabled" -->
+        </div>
+    </div>
+    <div class="pd10 fl">
+    	<div class="page-select-tree">
+        	<div class="page-select-tree-title posi-right">
+            	<h3>组及关联关系</h3>
+            </div>
+            <div class="page-select-tree-body cl">
+                <div class="page-select-tree-r">
+                	<div class="side-tool">
+                        <i class="icon-refresh"   id="gv-plugin-res-grp-selector-relatedRes-refresh"></i>
+                        <i class="icon-check"   id="gv-plugin-res-grp-selector-relatedRes-check"></i>
+                        <i class="icon-check-empty"    id="gv-plugin-res-grp-selector-relatedRes-empty"></i>
+                    </div>
+                    <div class="page-select-tree-con" id='gv-plugin-res-grp-selector-related-list'>
+
+                    </div>
+                </div>
+                <div class="page-select-tree-l bdl">
+                	<div class="side-tool">
+                		<i class="icon-refresh"   id="gv-plugin-res-grp-selector-groupTree-refresh"></i>
+                		<i class="icon-check-empty"   id="gv-plugin-res-grp-selector-groupTree-empty"></i>
+                    </div>
+                	<div class="page-select-tree-con  ztree" id='gv-plugin-res-grp-selector-groupTree'>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
