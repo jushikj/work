@@ -255,10 +255,11 @@ var global_jobscheduler_general = {
             renderTo: 'page-portal-fluent-bmp-case-file',
             fieldLabel: 'Cas File',
             allowBlank: true,
-            regex:/.cas$/i,
+            regex:/.+.cas$/i,
             //regex:/.*(?!\.cas)$/,
 			disabled:false,
-            regexText:'非法cas文件'
+            regexText:'非法cas文件',
+            emptyText:'文件后缀为.cas,不区分大小写'
             //width: 540
         });
         this.fluent_params.push(input_case_file);
@@ -268,8 +269,16 @@ var global_jobscheduler_general = {
             var r = input_case_file.validate();
             if(r){
                 var obj = input_case_file.value();
+                if(Gv.isEmpty(obj)){
+                    input_data_save.value('');
+                    input_data_save.validate();
+                    input_data_save.disabled(true);
+                    return;
+                }
                 var n = obj.substring(obj.lastIndexOf('/')+1,obj.lastIndexOf('.')) + '.dat';
                 input_data_save.value(n);
+                input_data_save.validate();
+                input_data_save.disabled(false);
             }
 		});
 		//cas file buttion
@@ -307,8 +316,11 @@ var global_jobscheduler_general = {
 		input_data_file = new Gv.form.TextField({
             renderTo: 'page-portal-fluent-bmp-data-file',
             fieldLabel: 'Dat File',
+            regex:/.+.dat$/i,
+            regexText:'非法dat文件',
             allowBlank: true,
-			disabled:false
+			disabled:false,
+            emptyText:'文件后缀为.dat,不区分大小写'
             //width: 540
         });
         this.fluent_params.push(input_data_file);
@@ -414,13 +426,15 @@ var global_jobscheduler_general = {
         });
         this.fluent_params.push(input_max_iterations);
 		global_jobscheduler_general.input_max_iterations=input_max_iterations;
-		//data save
+		//dat save
 		input_data_save = new Gv.form.TextField({
             renderTo: 'page-portal-fluent-data-save',
-            fieldLabel: 'Data Save',
+            fieldLabel: 'Dat Save',
             allowBlank: true,
-			disabled:false,
-            emptyText:'文件名与cas文件名相同'
+            regex:/.+.dat$/i,
+            regexText:'非法文件后缀',
+			disabled:true,
+            emptyText:'文件名与cas文件名相同,后缀为.dat'
             
         });
         this.fluent_params.push(input_data_save);
