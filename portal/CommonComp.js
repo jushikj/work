@@ -107,7 +107,7 @@ var global_portal = {
             type: 'text',
             renderTo: 'page-portal-Nnodes',
             name: 'portal-Nnodes',
-            fieldLabel: 'Nnodes',
+            fieldLabel: '<font color="#FF0000">*</font>Nnodes',
             allowBlank: false,
             value: numnodes,
             maxLength: 6,
@@ -177,7 +177,7 @@ var global_portal = {
             renderTo: 'page-portal-Cores',
             name: 'portal-Cores',
             value: numppn,
-            fieldLabel: 'Cores/Node',
+            fieldLabel: '<font color="#FF0000">*</font>Cores/Node',
             allowBlank: false,
             regex: /^[\d]+$/,
             maxLength: 6,
@@ -240,7 +240,7 @@ var global_portal = {
         var timeText = new Gv.form.TextField({
             id: 'portal-pbs-params-time',
             renderTo: 'page-portal-Time',
-            fieldLabel: 'Wall Time:',
+            fieldLabel: '<font color="#FF0000">*</font>Wall Time:',
             allowBlank: true,
             //width:180,
             value: hours + ":" + minutes + ":" + seconds,
@@ -298,7 +298,7 @@ var global_portal = {
             id: 'portal-pbs-params-queue',
             renderTo: 'page-portal-Queue',
             name: 'portal-Queue',
-            fieldLabel: 'Queue',
+            fieldLabel: '<font color="#FF0000">*</font>Queue',
             data: queueJsonData,
             autoLoad: false,
             //设置参数
@@ -312,7 +312,7 @@ var global_portal = {
         var Name = new Gv.form.TextField({
             id: 'portal-pbs-params-name',
             renderTo: 'page-portal-Name',
-            fieldLabel: 'Name',
+            fieldLabel: '<font color="#FF0000">*</font>Name',
             allowBlank: false,
             value: PORTALNAM + "_" + portal_time_stamp,
             listeners: {
@@ -385,7 +385,7 @@ var global_portal = {
             id: 'portal-pbs-params-interval',
             renderTo: 'page-portal-Interval',
             name: 'portal-Interval',
-            fieldLabel: 'Interval(minutes)',
+            fieldLabel: '<font color="#FF0000">*</font>Interval(minutes)',
             value: interval,
             labelWidth: '125', //不写就是用默认值
             width: '250', //不写就是用默认值
