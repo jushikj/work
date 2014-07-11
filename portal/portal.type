@@ -1,0 +1,30 @@
+GridviewHome /opt/gridview
+
+basic  clusnap       1
+basic  general       1
+basic  mpi           1
+basic  serial        1
+
+CAE    ABAQUS        0
+CAE    ANSYS         0
+CAE    ANSYS_LSDYNA  0 
+CAE    CFX           0
+CAE    COMSOL        0
+CAE    FLUENT        0
+
+QM     VASP          0
+QM     ABINIT        0
+QM     GAUSSIAN      0 
+QM     PWSCF         0
+
+
+MD     AMBER         0
+MD     CHARMM        0
+MD     GROMACS       0
+MD     NAMD          0
+MD     LAMMPS        0
+
+BIO    DOCK          0
+BIO    MPIBLAST      0
+
+

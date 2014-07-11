@@ -261,12 +261,14 @@ gen_time_identify_string = function() {
                           <span id='page-portal-ansys-input' style="display: inline-block;"></span>
                           <a id='page-portal-ansys-input-btn' style="display: inline-block; vertical-align: middle;"></a>
                         </div>
+                        <!--
                         <span id='page-portal-ansys-inp-file'/>
+                        -->
                         <span id='page-portal-ansys-log-file'></span> 
                       </div>
                       <div class="fl">
-                        <span id='page-portal-ansys-use-custom-memory-setting'/><br/>
                         <span>Parallel Mode:</span><span id="page-portal-ansys-hpc-run"/>
+                        <span id='page-portal-ansys-use-custom-memory-setting'/><br/>
                         <span id='page-portal-ansys-database'></span>
                         <span id='page-portal-ansys-total-workspace'></span>
                       </div>

@@ -1,0 +1,11 @@
+Intall:
+1 modify portal.type file
+  set value as 1 for the portals to install,set value as 0 for the portals not to install.
+2 run ./install.sh .
+ 
+
+Uninstall:
+  run ./install.sh -uninstall
+
+Modify and pack
+  sh setConfigure.sh

@@ -1,0 +1,640 @@
+#!/bin/bash 
+Usage()
+{
+echo "
+createpbs -h
+createpbs -t Type [-o logfile] [-pbs pbsfile]
+         -prog Program  [-proarg Program Argment] 
+        [-nnodes NodeNum] [-ppn PPN] [-wtime WallTime] [-name JobName] [-wdir WorkDir] [-q queque] [ -pbsoption 'option1 ... option2 ... optionN' ]
+        [-envfile envfile1 envfile2 ... envfileN] 
+        [-precommand 'command1 ... command2 ... commandN'] [ -postcommand 'command1 ... command2 ... commandN' )
+        [-vnc]
+        [-mpirun mpirun command] [-net Network] [-r ssh/rsh] [-bindcore] [-mpiarg MPIRUN Argment] 
+        [-cri CheckPoint Interval(Minitues)] [-ocpg Old CheckPoint Group name] [-ncpg New CheckPoint Group name] [-ncp number CheckPoints]
+ Type should be serial,openmpi,intelmpi,cr_mpi,mvapich2,mpich2
+ Network should be tcp,ib,memory,ib_memory,tcp_memory
+ "
+exit 0
+}
+if [ $# -eq 0 ];then
+echo "try  createpbs -h to get help"
+exit -1
+fi
+
+while [ $# -gt 0 ];do
+  var=$1
+  shift 
+  case $var in
+      -h|--help|-help)
+      Usage;;
+### 1 General Options
+      -t)
+      export CTP_Type=$1
+      shift;;
+      -o)
+      export CTP_LogFile=$1
+      shift;;
+      -pbs)
+      export CTP_PbsFile=$1
+      shift;;
+### 2 Program Options
+     -prog)
+      export CTP_Program=$1
+      shift;;
+     -proarg)
+      export CTP_Program_Arg=$1
+      shift;;
+### 3 Pbs Options
+      -nnodes)
+      export CTP_NodeNum=$1
+      shift;;
+     -ppn)
+      export CTP_PPN=$1
+      shift;;
+     -wtime)
+      export CTP_WallTime=$1
+      shift;;
+     -name)
+      export CTP_Name=$1
+      shift;;
+     -wdir)
+      export CTP_WorkDir=$1
+      shift;;
+     -q)
+      export CTP_Queue=$1
+      shift;;
+     -pbsoption)
+      export CTP_Pbsoption=$1
+      shift;;
+
+### 4 env Options
+     -envfile)
+      var2=$1
+      while [ "${var2:0:1}" != - ];do
+         if [ -z "$CTP_EnvFiles" ];then
+         export CTP_EnvFiles=$1
+         else
+         export CTP_EnvFiles="${CTP_EnvFiles} $1 "
+         fi
+         shift
+         var2=$1
+         if [ -z  "$var2" ];then
+         break
+         fi
+      done;;
+     -precommand)
+       export CTP_Precommand=$1
+#       echo $1
+#       echo ${CTP_Precommand[*]}
+#       echo ${CTP_Precommand[0]}
+#       echo ${CTP_Precommand[1]}
+       shift;;
+      -postcommand)
+       export CTP_Postcommand=$1
+       shift;;
+  
+
+### 4 vnc Options
+      -vnc)
+       export CTP_Vnc=1;;
+### 5 mpirun Options
+      -mpirun)
+      export CTP_MPIRUN=$1
+      shift;;
+     -net)
+      export CTP_Network=$1
+      shift;;
+     -r)
+      export CTP_RemoteSh=$1
+      shift;;
+     -bindcore)
+      export CTP_Bindcore=1;;
+     -mpiarg)
+      export CTP_Mpirun_Arg=$1
+      shift;;
+### 6 checkpoint Options
+     -cri)
+      export CTP_CRInterval=$1
+      shift;;
+     -ocpg)
+      export CTP_Old_CPGroup=$1
+      shift;;
+     -ncpg)
+      export CTP_New_CPGroup=$1
+      shift;;
+     -ncp)
+      export CTP_NumCP=$1
+      shift;;
+     -fromcp)
+      export CTP_FromCP=$1
+      shift;;
+      *)
+      Operation="$var $*"
+      shift $#;;
+    esac
+done
+ 
+if ! [ -z "$Operation" ];then
+echo "Error: Unknow Option $Operation"
+echo "Try createpbs -h to get help"
+exit -1
+fi
+#========1.General Options=====
+if [ -z "$CTP_Type" ];then
+echo "Error: please input the type of pbs file"
+echo "Try CreatePbs -h to get help"
+exit -1
+fi
+
+if [ -z "$CTP_LogFile" ];then
+   export CTP_LogFile=${CTP_Type}.log
+fi
+
+if [ -z "$CTP_PbsFile" ];then
+   export CTP_PbsFile=${CTP_Type}.pbs
+fi
+#========2 Program Options=====
+if [ $CTP_Type != cr_mpi_restart ] || [ $CTP_Type != cr_s_restart ];then
+ if [ -z "$CTP_Program" ];then
+   echo "Error:please input program name by -prog"
+   exit -1  
+ fi
+fi
+
+#========3 Pbs Options=====
+if [ -z "$CTP_NodeNum" ];then
+   export CTP_NodeNum=1
+fi
+if [ -z "$CTP_PPN" ];then
+   if [ "$CTP_Type" == serial ];then
+   export CTP_PPN=1
+   else 
+   export CTP_PPN=8
+   fi
+fi
+if [ -z "$CTP_WallTime" ];then
+   export CTP_WallTime=2:00:00
+fi
+if [ -z "$CTP_Name" ];then
+   export CTP_Name=$CTP_Type
+fi
+#========4 env Options =========
+#=======5 mpirun options=========
+if [ -z "$CTP_MPIRUN" ];then
+   case "$CTP_Type" in
+      mvapich2)
+      export CTP_MPIRUN=mpiexec.hydra
+      shift;;
+      mpich2)
+      export CTP_MPIRUN=mpiexec.hydra
+      shift;;
+      cr_mpi)
+      export CTP_MPIRUN=cr_mpi_run
+      shift;;
+      *)
+      export CTP_MPIRUN=mpirun
+      shift;;
+   esac
+fi
+if [ -z "$CTP_WorkDir" ];then
+   export CTP_WorkDir=`pwd`
+ 
+fi
+
+if [ -z "$CTP_RemoteSh" ];then
+   export CTP_RemoteSh=ssh
+fi
+if [ -z "$CTP_Bindcore" ];then
+   export CTP_Bindcore=0
+fi
+
+
+#=======5 CR options=========
+if [ -z "$CTP_CRInterval" ];then
+   export CTP_CRInterval=60
+fi
+if [ -z "$CTP_New_CPGroup" ];then
+   export CTP_New_CPGroup=${CTP_Type}.ckps
+fi
+if [ -z "$CTP_NumCP" ];then
+   export CTP_NumCP=2
+fi
+
+
+#echo "CTP env varable is following:"
+#env|grep CTP
+
+PrintVar()
+{
+echo "
+======1 General Variables==
+CTP_Type=$CTP_Type
+CTP_LogFile=$CTP_LogFile
+CTP_PbsFile=$CTP_PbsFile
+
+======2 Program Variables===
+CTP_Program=$CTP_Program
+CTP_Program_Arg=$CTP_Program_Arg
+
+======3 PBS Variables===
+CTP_NodeNum=$CTP_NodeNum
+CTP_PPN=$CTP_PPN
+CTP_WallTime=$CTP_WallTime
+CTP_Name=$CTP_Name
+CTP_WorkDir=$CTP_WorkDir
+CTP_Queue=$CTP_Queue
+
+=====4 Env Variables
+CTP_EnvFiles=$CTP_EnvFiles 
+
+====5 Mpi varialbels
+CTP_MPIRUN=$CTP_MPIRUN
+CTP_Network=$CTP_Network
+CTP_RemoteSh=$CTP_RemoteSh
+CTP_Bindcore=$CTP_Bindcore
+CTP_Mpirun_Arg=$CTP_Mpirun_Arg
+
+===6 CR varialbels 
+CTP_CRInterval=$CTP_CRInterval
+CTP_Old_CPGroup=$CTP_Old_CPGroup
+CTP_New_CPGroup=$CTP_New_CPGroup
+CTP_NumCP=$CTP_NumCP 
+
+"
+}
+#PrintVar
+
+export dollar=$
+export danyinhao="'"
+CreatePbs_Begin()
+{
+#==================Begin===================
+
+echo "
+#PBS -N ${CTP_Name}
+#PBS -l nodes=${CTP_NodeNum}:ppn=${CTP_PPN} 
+#PBS -j oe
+#PBS -l walltime=${CTP_WallTime}" >${CTP_PbsFile}
+if ! [ -z "$CTP_Queue" ];then
+echo "#PBS -q $CTP_Queue" >>${CTP_PbsFile}
+fi
+if ! [ -z "$CTP_Pbsoption" ];then
+  echo $CTP_Pbsoption|awk -F'\\.\\.\\.' '{for(i=1;i<=NF;i++) printf("#PBS %s \n",$i)}'  >>${CTP_PbsFile}
+fi
+echo "cd ${CTP_WorkDir}" >>${CTP_PbsFile}
+echo "
+echo my job id is ${dollar}PBS_JOBID | tee  ${CTP_LogFile}
+echo run nodes is following: | tee -a ${CTP_LogFile}
+cat ${dollar}PBS_NODEFILE | tee  -a ${CTP_LogFile}
+
+" >>${CTP_PbsFile}
+echo 'echo begin time is `date` | tee -a ' ${CTP_LogFile} >>${CTP_PbsFile}
+
+echo 'id=`echo $PBS_JOBID|awk -F.' $danyinhao'{print $1}'$danyinhao '`' >>${CTP_PbsFile}
+echo 'NP=`cat $PBS_NODEFILE|wc -l`' >>${CTP_PbsFile}
+if ! [ -z "$CTP_EnvFiles" ];then
+ for i in ${CTP_EnvFiles};do
+ echo "source $i"  >>${CTP_PbsFile}
+ done
+fi 
+if ! [ -z "$CTP_Precommand" ];then
+  echo $CTP_Precommand|awk -F'\\.\\.\\.' '{for(i=1;i<=NF;i++) printf("%s \n",$i)}'  >>${CTP_PbsFile}
+fi
+
+if [ "$CTP_Vnc" == 1 ];then
+cat <<EOF >>${CTP_PbsFile} 
+source /usr/local/vnc/conf/vncfunction
+session_id=\`vnc_start \$PBS_JOBID\`
+RET=\$?
+if [ \$RET -ne 0 ]; then
+        echo "start bad, job failed to start"
+        exit 1
+fi
+export DISPLAY=\$VNC_HOSTNAME:\$session_id
+trap "source /usr/local/vnc/conf/vncfunction; vnc_stop \$session_id" 1 2 9 15
+trap "source /usr/local/vnc/conf/vncfunction; vnc_stop \$session_id" EXIT
+EOF
+fi
+}
+
+CreatePbs_End()
+{
+#====================end==================
+if ! [ -z "$CTP_Postcommand" ];then
+   echo $CTP_Postcommand|awk -F'\\.\\.\\.' '{for(i=1;i<=NF;i++) printf("%s \n",$i)}'  >>${CTP_PbsFile}
+fi
+#if [ "$CTP_Vnc" == 1 ];then
+#cat <<EOF >>${CTP_PbsFile}
+#vnc_stop \$session_id
+#EOF
+#fi
+
+echo 'echo end time is `date` | tee -a ' ${CTP_LogFile} >>${CTP_PbsFile}
+#echo 'echo end time is `date`  '  >>${CTP_PbsFile}
+}
+
+
+CreatePbs_Openmpi()
+{
+CreatePbs_Begin
+#====================openmpi==================
+CTP_RemoteSh_Arg="--mca orte_rsh_agent $CTP_RemoteSh"
+
+if [ -z "$CTP_Network"  ];then
+CTP_Network_Arg=""
+elif [ "$CTP_Network" = tcp ];then
+CTP_Network_Arg=" --mca btl self,sm,tcp"
+elif [ "$CTP_Network" = ib  ];then
+CTP_Network_Arg=" --mca btl self,sm,openib"
+elif [ "$CTP_Network" = memory ];then
+CTP_Network_Arg=" --mca btl self,sm"
+elif  [ "$CTP_Network" = ib_memory  ];then
+CTP_Network_Arg="--mca btl self,sm,openib"
+elif  [ "$CTP_Network" = tcp_memory  ];then
+CTP_Network_Arg=" --mca btl self,sm,tcp"
+else
+echo "Error: Network is Error,you should input tcp,ib,memory,ib_memory,tcp_memory"
+fi
+
+if [ "$CTP_Bindcore" = 1 ];then
+cat <<EOF >>${CTP_PbsFile}
+qstat -f1 \$PBS_JOBID | grep exec_host | awk '{print \$3}' | tr '+/' '\n ' | awk '{printf("rank %d=%s slot=%d\n",NR-1,\$1,\$2)}' >rankfile.\${id}
+EOF
+CTP_Bindcore_Arg='--rankfile rankfile.$id'
+fi
+
+echo " 
+
+${CTP_MPIRUN} -np ${dollar}NP -machinefile ${dollar}PBS_NODEFILE ${CTP_RemoteSh_Arg} ${CTP_Network_Arg} ${CTP_Bindcore_Arg} ${CTP_Mpirun_Arg} ${CTP_Program} ${CTP_Program_Arg} 2>&1 | tee -a ${CTP_LogFile}
+
+" >>${CTP_PbsFile}
+CreatePbs_End
+}
+
+CreatePbs_Serial()
+{
+CreatePbs_Begin
+#====================Serial==================
+echo "
+${CTP_Program} ${CTP_Program_Arg} 2>&1 | tee -a ${CTP_LogFile} 
+
+" >>${CTP_PbsFile}
+CreatePbs_End
+}
+
+CreatePbs_General()
+{
+CreatePbs_Begin
+#====================General==================
+echo "
+${CTP_Program}  2>&1 | tee -a ${CTP_LogFile} 
+
+" >>${CTP_PbsFile}
+CreatePbs_End
+}
+
+CreatePbs_Mvapich2()
+{
+CreatePbs_Begin
+#====================Mvapich2==================
+CTP_RemoteSh_Arg="-launcher ${CTP_RemoteSh}"
+
+if [ "$CTP_Bindcore" = 1 ];then
+cat <<EOF >>${CTP_PbsFile}
+qstat -f1 \$PBS_JOBID | grep exec_host | awk '{print \$3}' | tr '+/' '\n ' | awk 'NR==1 {node=\$1; count=1; core[count]=\$2; next}; \$1==node {count++; core[count]=\$2}; \$1!=node {printf("%s:%d binding=user:",node,count); for(i=1;i<count;i++) printf("%d,",core[i]); printf("%d\n",core[count]); node=\$1; count=1; core[count]=\$2}; END {printf("%s:%d binding=user:",node,count); for(i=1;i<count;i++) printf("%d,",core[i]); printf("%d\n",core[count])}' >rankfile.\${id}
+EOF
+CTP_Bindcore_Arg='-f rankfile.$id'
+else
+CTP_Bindcore_Arg='-f $PBS_NODEFILE'
+fi
+
+echo " 
+
+${CTP_MPIRUN} ${CTP_Mpirun_Arg} -n ${dollar}NP ${CTP_RemoteSh_Arg} ${CTP_Bindcore_Arg} ${CTP_Program} ${CTP_Program_Arg} 2>&1 | tee -a ${CTP_LogFile}
+
+" >>${CTP_PbsFile}
+CreatePbs_End
+}
+
+CreatePbs_Mpich2()
+{
+CreatePbs_Begin
+#====================Mpich2==================
+CTP_RemoteSh_Arg="-launcher ${CTP_RemoteSh}"
+
+if [ "$CTP_Bindcore" = 1 ];then
+cat <<EOF >>${CTP_PbsFile}
+qstat -f1 \$PBS_JOBID | grep exec_host | awk '{print \$3}' | tr '+/' '\n ' | awk 'NR==1 {node=\$1; count=1; core[count]=\$2; next}; \$1==node {count++; core[count]=\$2}; \$1!=node {printf("%s:%d binding=user:",node,count); for(i=1;i<count;i++) printf("%d,",core[i]); printf("%d\n",core[count]); node=\$1; count=1; core[count]=\$2}; END {printf("%s:%d binding=user:",node,count); for(i=1;i<count;i++) printf("%d,",core[i]); printf("%d\n",core[count])}' >rankfile.\${id}
+EOF
+CTP_Bindcore_Arg='-f rankfile.$id'
+else
+CTP_Bindcore_Arg='-f $PBS_NODEFILE'
+fi
+
+
+echo "
+${CTP_MPIRUN} ${CTP_Mpirun_Arg} -n ${dollar}NP ${CTP_RemoteSh_Arg} ${CTP_Bindcore_Arg} ${CTP_Program} ${CTP_Program_Arg} 2>&1 | tee -a ${CTP_LogFile}
+
+" >>${CTP_PbsFile}
+CreatePbs_End
+}
+
+CreatePbs_Intelmpi()
+{
+CreatePbs_Begin
+#====================Intelmpi==================
+CTP_RemoteSh_Arg="-r ${CTP_RemoteSh}"
+
+if [ -z "$CTP_Network"  ];then
+CTP_Network_Arg=""
+elif [ "$CTP_Network" = tcp ];then
+CTP_Network_Arg="I_MPI_DEVICE sock"
+elif [ "$CTP_Network" = ib  ];then
+CTP_Network_Arg="I_MPI_DEVICE rdma"
+elif [ "$CTP_Network" = memory ];then
+CTP_Network_Arg="I_MPI_DEVICE shm"
+elif [ "$CTP_Network" = ib_memory ];then
+CTP_Network_Arg="I_MPI_DEVICE rdssm"
+elif [ "$CTP_Network" = tcp_memory ];then
+CTP_Network_Arg="I_MPI_DEVICE ssm"
+else
+echo "Error: Network is Error,you should input tcp,ib or memory,ib_memory,tcp_memory"
+fi
+
+if [ "$CTP_Bindcore" = 1 ];then
+cat <<EOF >>${CTP_PbsFile}
+qstat -f1 \$PBS_JOBID | grep exec_host | awk '{print \$3}' | tr '+/' '\n ' | awk -v prog="${CTP_Program} ${CTP_Program_Arg}" -v net="${CTP_Network_Arg}" 'NR==1 {node=\$1; count=1; core[count]=\$2; next}; \$1==node {count++; core[count]=\$2}; \$1!=node {printf("-n %d -host %s -env %s -env I_MPI_PIN_PROCESSOR_LIST ",count,node,net); for(i=1;i<count;i++) printf("%d,",core[i]); printf("%d %s\n",core[count],prog); node=\$1; count=1; core[count]=\$2}; END {printf("-n %d -host %s -env %s -env I_MPI_PIN_PROCESSOR_LIST ",count,node,net); for(i=1;i<count;i++) printf("%d,",core[i]); printf("%d %s\n",core[count],prog)}' >rankfile.\${id}
+EOF
+CTP_Bindcore_Arg='-configfile rankfile.$id'
+else
+CTP_Bindcore_Arg="-genv ${CTP_Network_Arg} -n ${dollar}NP ${CTP_Program} ${CTP_Program_Arg}"
+fi
+
+echo "
+${CTP_MPIRUN} ${CTP_Mpirun_Arg} ${CTP_RemoteSh_Arg} -f ${dollar}PBS_NODEFILE ${CTP_Bindcore_Arg}  2>&1 | tee -a ${CTP_LogFile}
+
+" >>${CTP_PbsFile}
+
+CreatePbs_End
+}
+
+CreatePbs_Fluent()
+{
+CreatePbs_Begin
+#====================Fluent==================
+CTP_RemoteSh_Arg=-${CTP_RemoteSh}
+if [ "$CTP_Network" = ib ];then
+CTP_Network_Arg=" -pib.ibv"
+else
+CTP_Network_Arg=""
+fi
+
+
+echo "
+${CTP_Program} $CTP_RemoteSh_Arg $CTP_Network_Arg  -t${dollar}NP -conf=${dollar}PBS_NODEFILE ${CTP_Program_Arg} 2>&1 | tee -a ${CTP_LogFile}
+
+" >>${CTP_PbsFile}
+CreatePbs_End
+}
+
+CreatePbs_cr_mpi()
+{
+CreatePbs_Begin
+#====================cr_mpi_run==================
+CTP_RemoteSh_Arg="-$CTP_RemoteSh"
+ 
+if [ -z "$CTP_Network"  ];then
+  CTP_Network_Arg=""
+elif [ "$CTP_Network" = tcp ];then
+CTP_Network_Arg=" -net tcp "
+elif [ "$CTP_Network" = ib  ];then
+CTP_Network_Arg=" -net ib "
+elif [ "$CTP_Network" = memory ];then
+CTP_Network_Arg= " -net sm "
+else
+echo "Error: Network is Error,you should input tcp,ib or memory"
+fi
+echo "
+
+${CTP_MPIRUN} -np ${dollar}NP -machinefile ${dollar}PBS_NODEFILE ${CTP_RemoteSh_Arg} ${CTP_Network_Arg} ${CTP_Mpirun_Arg} -i $CTP_CRInterval -f $CTP_New_CPGroup -n $CTP_NumCP   ${CTP_Program} ${CTP_Program_Arg} 2>&1 | tee -a ${CTP_LogFile}
+
+cr_clean --all -f $CTP_New_CPGroup
+" >>${CTP_PbsFile}
+CreatePbs_End
+}
+
+CreatePbs_cr_mpi_run()
+{
+CreatePbs_Begin
+#====================cr_mpi_run==================
+CTP_RemoteSh_Arg="-$CTP_RemoteSh"
+ 
+if [ -z "$CTP_Network"  ];then
+  CTP_Network_Arg=""
+elif [ "$CTP_Network" = tcp ];then
+CTP_Network_Arg=" -net tcp "
+elif [ "$CTP_Network" = ib  ];then
+CTP_Network_Arg=" -net ib "
+elif [ "$CTP_Network" = memory ];then
+CTP_Network_Arg= " -net sm "
+else
+echo "Error: Network is Error,you should input tcp,ib or memory"
+fi
+echo "
+
+cr_mpi_run -np ${dollar}NP -machinefile ${dollar}PBS_NODEFILE ${CTP_RemoteSh_Arg} ${CTP_Network_Arg} ${CTP_Mpirun_Arg} -i $CTP_CRInterval -f $CTP_New_CPGroup -n $CTP_NumCP   ${CTP_Program} ${CTP_Program_Arg} 2>&1 | tee -a ${CTP_LogFile}
+
+
+" >>${CTP_PbsFile}
+CreatePbs_End
+}
+
+CreatePbs_cr_s_run()
+{
+CreatePbs_Begin
+#====================cr_s_run==================
+echo "
+
+cr_s_run -i $CTP_CRInterval -f $CTP_New_CPGroup -n $CTP_NumCP ${CTP_Mpirun_Arg}  ${CTP_Program} ${CTP_Program_Arg} 2>&1 | tee -a ${CTP_LogFile}
+
+
+" >>${CTP_PbsFile}
+CreatePbs_End
+}
+
+CreatePbs_cr_s_restart()
+{
+CreatePbs_Begin
+#====================cr_s_restart==================
+if [ -z "$CTP_Old_CPGroup" ];then
+   echo "please input Ckps using restart by -ocpg"
+   exit -1
+fi
+if [ "${CTP_FromCP}" != newest ];then
+CTP_FromArg="-from ${CTP_FromCP}"
+else
+CTP_FromArg=""
+fi
+echo "
+
+cr_s_restart  ${CTP_Mpirun_Arg} -i $CTP_CRInterval -f $CTP_New_CPGroup  -n $CTP_NumCP $CTP_FromArg $CTP_Old_CPGroup 2>&1 | tee -a ${CTP_LogFile}
+
+
+" >>${CTP_PbsFile}
+CreatePbs_End
+}
+
+
+CreatePbs_cr_mpi_restart()
+{
+CreatePbs_Begin
+#====================cr_mpi_restart==================
+if [ -z "$CTP_Old_CPGroup" ];then
+      echo "please input Ckps using restart by -ocpg"
+   exit -1
+fi
+if [ "${CTP_FromCP}" != newest ];then
+CTP_FromArg="-from ${CTP_FromCP}"
+else
+CTP_FromArg=""
+fi
+echo "
+
+cr_mpi_restart ${CTP_Mpirun_Arg} -machinefile ${dollar}PBS_NODEFILE  -i $CTP_CRInterval -f $CTP_New_CPGroup ${CTP_FromArg} -n $CTP_NumCP $CTP_Old_CPGroup 2>&1 | tee -a ${CTP_LogFile}
+
+
+" >>${CTP_PbsFile}
+CreatePbs_End
+}
+
+
+
+case $CTP_Type in
+   openmpi)
+   CreatePbs_Openmpi;;
+   serial)
+   CreatePbs_Serial;;
+   general)
+   CreatePbs_General;;
+   mvapich2)
+   CreatePbs_Mvapich2;;
+   intelmpi)
+   CreatePbs_Intelmpi;;
+   mpich2)
+   CreatePbs_Mpich2;;
+   fluent)
+   CreatePbs_Fluent;;
+   cr_mpi)
+   CreatePbs_cr_mpi;;
+   cr_mpi_run)
+   CreatePbs_cr_mpi_run;;
+   cr_mpi_restart)
+   CreatePbs_cr_mpi_restart;;
+   cr_s_run)
+   CreatePbs_cr_s_run;;
+   cr_s_restart)
+   CreatePbs_cr_s_restart;;
+   *)
+   echo "Error Type  "
+   exit -1;;
+esac

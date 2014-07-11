@@ -1,0 +1,32 @@
+## disk quota info, run 'quota -uv' to check it
+nfs_quota_available=1
+nfs_root_squash=1
+nfs_quota_filesystem=node22:/home
+
+## pbs setting
+queue_default=batch
+nnodes_default=1
+ppn_default=1
+hours_default=1
+
+## run setting
+mpi_default=intelmpi
+mpi_list=openmpi:intelmpi:mvapich2:cr_mpi:mpich2
+ib_available=1
+
+## vnc_setting
+vnc_available=1
+
+## checkpoint setting
+checkpoint_availabel=1
+checkpoint_default=0
+interval_default=240
+min_interval=5
+
+## runfile setting
+openmpi_ENVFILE=/public/software/profile.d/ompi142-intel-env.sh
+intelmpi_ENVFILE=/public/software/profile.d/impi-env.sh
+mpich2_ENVFILE=/opt/soft/mpi/mpich2-1.4-gnu.sh
+cr_mpi_ENVFILE=/checkpoints/bin/cr_vars.sh
+mvapich2_ENVFILE=/opt/soft/mpi/mvapich2-1.7-gnu.sh
+debug=1

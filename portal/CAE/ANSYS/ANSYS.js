@@ -2,6 +2,33 @@
 
   ansys_components:[], //store component that need to be validate
   ansys_runp_components:[],//run parameters components
+  ansys_bin_data:[],
+
+  controlRunParameters:function(){
+    $('#page-portal-ansys-run-parameters-group').removeClass('active');
+    $('#page-portal-ansys-run-parameters-group i').attr('class','icon-chevron-sign-down');
+    //clear run parameters value and disable it,then close
+    for(var i in global_jobscheduler_portal_ansys.ansys_runp_components){
+        var o = global_jobscheduler_portal_ansys.ansys_runp_components[i];
+        if($.isFunction(o.value)){
+            o.value('');
+        }
+        $("#page-portal-ansys-input-type-inp")[0].checked=true;
+        if($("#"+global_jobscheduler_portal_ansys.ansys_use_custom.getId())[0].checked){
+            $("#"+global_jobscheduler_portal_ansys.ansys_use_custom.getId())[0].checked=false;
+        }
+        $("#page-portal-ansys-hpc-run-smp")[0].checked=true;
+        if($.isFunction(o.removeError)){
+            o.removeError();
+        }
+        if($.isFunction(o.removeErrorTips)){
+            o.removeErrorTips();
+        }
+        o.disabled(true);
+
+    }
+  },
+
   buildEnvPComponent:function(){
     //build Environment Parameters Components
     //run mode
@@ -12,13 +39,7 @@
       handler:function(d,v){
         if($('#'+ansys_run_mode.getId())[0].checked){
           
-          $('#page-portal-ansys-run-parameters-group').removeClass('active');
-          $('#page-portal-ansys-run-parameters-group i').attr('class','icon-chevron-sign-down');
-          //clear run parameters value and disable it,then close
-          for(var i in global_jobscheduler_portal_ansys.ansys_runp_components){
-            var o = global_jobscheduler_portal_ansys.ansys_runp_components[i];
-            o.disabled(true);
-          }
+          global_jobscheduler_portal_ansys.controlRunParameters();
           
         }else {
           $('#page-portal-ansys-run-parameters-group').addClass('active');
@@ -41,6 +62,7 @@
           }
         }
     }
+    global_jobscheduler_portal_ansys.ansys_bin_data=global_jobscheduler_portal_ansys.ansys_bin_data.concat(o_mpiProg);
     ansys_ansys_bin_input=new Gv.form.ComboBox({
             renderTo: 'page-portal-ansys-bin',
             fieldLabel: 'ANSYS Bin',
@@ -160,7 +182,7 @@
     ansys_job_name_input=new Gv.form.TextField({
             renderTo: 'page-portal-ansys-job-name',
             fieldLabel: 'Job Name',
-            allowBlank: true
+            allowBlank: false
     });
     this.ansys_job_name_input = ansys_job_name_input;
     this.ansys_components.push(ansys_job_name_input);
@@ -195,6 +217,7 @@
   buildRunPComponent:function(){
     //build all run parameters components
     //inp file
+    /*
     ansys_inp_file_input=new Gv.form.TextField({
             renderTo: 'page-portal-ansys-inp-file',
             fieldLabel: 'Inp File',
@@ -203,7 +226,7 @@
     });
     this.ansys_inp_file_input=ansys_inp_file_input;
     this.ansys_runp_components.push(ansys_inp_file_input);
-
+    */
     //use custom memory settings
     ansys_use_custom=new Gv.form.Checkbox({
       renderTo:'page-portal-ansys-use-custom-memory-setting',
@@ -258,12 +281,12 @@
     //total workspace
     ansys_total_workspace_input=new Gv.form.TextField({
             renderTo: 'page-portal-ansys-total-workspace',
-            fieldLabel: 'Total Workspace(MB)',
+            fieldLabel: '<font color="#FF0000">*</font>Total Workspace(MB)',
             allowBlank: false,
-            regex:/^(?!(0[0-9]{0,}$))[0-9]{1,}[.]{0,}[0-9]{0,}$/,
-            regexText:'只能输入大于0的数字',
-            labelWidth:145,
-            emptyText:'请输入大于0的数字',
+            regex:/^\d+$/,
+            regexText:'只能输入正整数',
+            labelWidth:150,
+            emptyText:'请输入正整数',
             disabled:true
     });
     this.ansys_total_workspace_input=ansys_total_workspace_input;
@@ -272,12 +295,12 @@
     //database
     ansys_database_input=new Gv.form.TextField({
             renderTo: 'page-portal-ansys-database',
-            fieldLabel: 'Database(MB)',
+            fieldLabel: '<font color="#FF0000">*</font>Database(MB)',
             allowBlank: false,
-            regex:/^(?!(0[0-9]{0,}$))[0-9]{1,}[.]{0,}[0-9]{0,}$/,
-            regexText:'只能输入大于0的数字',
-            labelWidth:145,
-            emptyText:'请输入大于0的数字',
+            regex:/^\d+$/,
+            regexText:'只能输入正整数',
+            labelWidth:150,
+            emptyText:'请输入正整数',
             disabled:true
     });
     this.ansys_database_input=ansys_database_input;
@@ -286,7 +309,7 @@
     //input file
     ansys_input_file_input=new Gv.form.TextField({
             renderTo: 'page-portal-ansys-input',
-            fieldLabel: 'Input File',
+            fieldLabel: '<font color="#FF0000">*</font>Input File',
             allowBlank: false,
             disabled:true
     });
@@ -322,7 +345,7 @@
     //log file
     ansys_log_file_input=new Gv.form.TextField({
             renderTo: 'page-portal-ansys-log-file',
-            fieldLabel: 'Log File',
+            fieldLabel: '<font color="#FF0000">*</font>Log File',
             allowBlank: false,
             disabled:true
     });
@@ -341,12 +364,23 @@
           submit_enable = false;
         }
       }
-      //ansys run parameters validate
+      //ansys environment parameters validate
       for(var o in global_jobscheduler_portal_ansys.ansys_components){
         if(!global_jobscheduler_portal_ansys.ansys_components[o].validate()){
           submit_enable=false;
         }
       }
+      //ansys run parameters validate
+      var isWindow = $("#"+global_jobscheduler_portal_ansys.ansys_run_mode.getId())[0].checked;
+      if(!isWindow){
+        //if not window
+        for(var i in global_jobscheduler_portal_ansys.ansys_runp_components){
+            if(!global_jobscheduler_portal_ansys.ansys_runp_components[i].validate()){
+                submit_enable=false;
+            }
+        }
+      }
+
       if(!submit_enable){
         Gv.msg.error({
           html : "作业提交失败,请检查作业调度参数是否完全符合要求！"
@@ -361,17 +395,26 @@
         "GAP_WALL_TIME": Gv.get("portal-pbs-params-time").val(),
         "GAP_QUEUE": Gv.get("portal-pbs-params-queue").val(),
         "GAP_NAME": Gv.get("portal-pbs-params-name").val(),
-        //run parameters
-        "GAP_MPI_LIC_TYPE"     : global_jobscheduler_portal_ansys.ansys_license_select.value(),
+        //environment parameters
+        //"GAP_MPI_LIC_TYPE"     : global_jobscheduler_portal_ansys.ansys_license_select.value(),
         "GAP_MPI_REMOTE_SHELL" : global_jobscheduler_portal_ansys.ansys_remote_shell_radio.value()[0].value,
         "GAP_MPI_MPIRUNTYPE"   : global_jobscheduler_portal_ansys.ansys_mpi_type_radio.value()[0].value,
-        "GAP_MPI_PARAMODE"     : global_jobscheduler_portal_ansys.ansys_hpc_run_radio.value()[0].value,
-        "GAP_MPI_INPUTTYPE"    : global_jobscheduler_portal_ansys.ansys_input_type_radio.value()[0].value,
         "GAP_MPI_PROGRAM"      : global_jobscheduler_portal_ansys.ansys_ansys_bin_input.value(),
-        "GAP_MPI_PROGRAM_ARG"  : global_jobscheduler_portal_ansys.ansys_arguments_input.value(),
         "GAP_MPI_WORK_DIR"     : global_jobscheduler_portal_ansys.ansys_work_dir_input.value(),
-        "GAP_MPI_INPUT"        : global_jobscheduler_portal_ansys.ansys_input_file_input.value(),
-        "GAP_MPI_OUTPUT"       : global_jobscheduler_portal_ansys.ansys_output_file_input.value(),
+        "GAP_MPI_PROGRAM_ARG"  : global_jobscheduler_portal_ansys.ansys_arguments_input.value(),
+        "GAP_JOB_NAME"         : global_jobscheduler_portal_ansys.ansys_job_name_input.value(),
+
+        //run parameters
+        "GAP_MPI_INPUTTYPE"    : isWindow?'':global_jobscheduler_portal_ansys.ansys_input_type_radio.value()[0].value,
+        "GAP_USE_CUSTOM_MEM_SET":isWindow?false:$("#"+global_jobscheduler_portal_ansys.ansys_use_custom.getId())[0].checked,
+        "GAP_MPI_INPUT"        : isWindow?'':global_jobscheduler_portal_ansys.ansys_input_file_input.value(),
+        "GAP_MPI_PARAMODE"     : isWindow?'':global_jobscheduler_portal_ansys.ansys_hpc_run_radio.value()[0].value,
+        //"GAP_INP_FILE"         : isWindow?'':global_jobscheduler_portal_ansys.ansys_inp_file_input.value(),
+        "GAP_LOG_FILE"         : isWindow?'':global_jobscheduler_portal_ansys.ansys_log_file_input.value(),
+        "GAP_DATABASE"         : isWindow?'':global_jobscheduler_portal_ansys.ansys_database_input.value(),
+        "GAP_TOTAL_WORKSPACE"  : isWindow?'':global_jobscheduler_portal_ansys.ansys_total_workspace_input.value(),
+
+        //"GAP_MPI_OUTPUT"       : global_jobscheduler_portal_ansys.ansys_output_file_input.value(),
         
         //Remote Visualization Parameters
         "GAP_VNC": "\'" + Gv.get("portal-pbs-params-vnc").val()+"\'",
@@ -452,19 +495,24 @@
       $("#portal-pbs-params-time").val(hours + ":" + minutes + ":" + seconds);
       $("#portal-pbs-params-queue").val(queueJsonData[0].text);
       $("#portal-pbs-params-name").val(PORTALNAM + "_" + portal_reset_timestamp);
-      //run parameters
+      //environment parameters
+
       $("#page-portal-ansys-mpi-type-hpmpi")[0].checked=true;
-      $("#page-portal-ansys-hpc-run-smp")[0].checked=true;
       $("#page-portal-ansys-remote-shell-ssh")[0].checked=true;
-      $("#page-portal-ansys-input-type-inp")[0].checked=true;
-
-      global_jobscheduler_portal_ansys.ansys_license_select.value(lictype);
-      global_jobscheduler_portal_ansys.ansys_work_dir_input.value(workdir);
-      global_jobscheduler_portal_ansys.ansys_ansys_bin_input.value(file);
-      global_jobscheduler_portal_ansys.ansys_input_file_input.value('');
+      //global_jobscheduler_portal_ansys.ansys_license_select.value(lictype);
       global_jobscheduler_portal_ansys.ansys_arguments_input.value('');
-      global_jobscheduler_portal_ansys.ansys_output_file_input.value(PORTALNAM + "_" + portal_reset_timestamp + '.txt');
-
+      global_jobscheduler_portal_ansys.ansys_ansys_bin_input.data(global_jobscheduler_portal_ansys.ansys_bin_data);
+      console.log(global_jobscheduler_portal_ansys.ansys_bin_data);
+      global_jobscheduler_portal_ansys.ansys_ansys_bin_input.value(file);
+      global_jobscheduler_portal_ansys.ansys_work_dir_input.value(workdir);
+      global_jobscheduler_portal_ansys.ansys_job_name_input.value('');
+      //global_jobscheduler_portal_ansys.ansys_input_file_input.value('');
+      //global_jobscheduler_portal_ansys.ansys_output_file_input.value(PORTALNAM + "_" + portal_reset_timestamp + '.txt');
+      if(!$("#"+global_jobscheduler_portal_ansys.ansys_run_mode.getId())[0].checked){
+        $("#"+global_jobscheduler_portal_ansys.ansys_run_mode.getId())[0].checked=true;
+        global_jobscheduler_portal_ansys.controlRunParameters();
+      }
+      
       //Remote Visualization Parameters
       if($("#portal-pbs-params-vnc")[0]){
         $("#portal-pbs-params-vnc")[0].checked=false;

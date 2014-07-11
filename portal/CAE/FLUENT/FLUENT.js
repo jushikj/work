@@ -192,7 +192,7 @@ var global_jobscheduler_general = {
             id: 'portal-pbs-params-output',
             renderTo: 'page-portal-OutputFile',
             fieldLabel: 'Output File',
-            allowBlank: true,
+            allowBlank: false,
             value: PORTALNAM + "_" + portal_time_stamp + '.txt',
             bodyStyle: '',
             //width: 540,
