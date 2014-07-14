@@ -39,7 +39,6 @@ get_portal_default()
   echo var min_interval=\"$min_interval\"\;
   echo var current_time=\"$QTIMESTAMP\"\;
 }
-
 ##program info
 get_program_info()
 {
@@ -55,6 +54,9 @@ get_program_info()
   echo 'var s_mpiProg=mpiProgList.split(":")'\;
   echo var programarg=\"$programarg_default\"\;
   echo 'var workdir=workdir_list.split(":")[0]'\;
+  echo var mpi_def=\"$mpi_default\"\;
+  echo var mpi_list=\"$mpi_list\"\;
+  echo 'var s_mpilist=mpi_list.split(":")'\;
 
   ##old params,but no use now
   echo var ib_available=\"$ib_available\"\;

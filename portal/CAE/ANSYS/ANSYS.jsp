@@ -231,16 +231,12 @@ gen_time_identify_string = function() {
                         <span id='page-portal-ansys-arguments'></span>
                       </div>
                       <div class="fl">
-                        <span>MPI Type:</span><span id="page-portal-ansys-mpi-type"/>
                         <span>Remote Shell:</span><span id='page-portal-ansys-remote-shell'/>
+                        <span id="page-portal-ansys-mpi-type"/>
                         <div>
                           <span id='page-portal-ansys-work-dir' style="display: inline-block;"></span>
                           <a id='page-portal-ansys-workdir-btn' style="display: inline-block; vertical-align: middle;"></a>
-                        </div>
-                        <div>
-                          <span id='page-portal-ansys-job-name' style="display: inline-block;"></span>
-                          <a id='page-portal-ansys-job-name-btn' style="display: inline-block; vertical-align: middle;"></a>
-                        </div>                   
+                        </div>                 
                       </div>
                     </div>
               </div> 

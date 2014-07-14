@@ -70,13 +70,13 @@
             }]
     });
     this.ansys_hpc_run_radio = ansys_hpc_run_radio;
-    this.ansys_components.push(ansys_hpc_run_radio);
+
     //bind click event
     $("#"+ansys_hpc_run_radio.getId()+" input").bind('click',function(){
         if(this.value=='dmp'){
-            ansys_mpi_type_radio.disabled(false);
+            ansys_mpi_type_select.disabled(false);
         } else {
-            ansys_mpi_type_radio.disabled(true);
+            ansys_mpi_type_select.disabled(true);
         }
     });
 
@@ -93,7 +93,7 @@
     global_jobscheduler_portal_ansys.ansys_bin_data=global_jobscheduler_portal_ansys.ansys_bin_data.concat(o_mpiProg);
     ansys_ansys_bin_input=new Gv.form.ComboBox({
             renderTo: 'page-portal-ansys-bin',
-            fieldLabel: 'ANSYS Bin',
+            fieldLabel: '<font color="#FF0000">*</font>ANSYS Bin',
             allowBlank:false,
             value: file,
             autoLoad:false,
@@ -129,24 +129,25 @@
             }
     });
     //mpi type
-    ansys_mpi_type_radio=new Gv.form.RadioGroup({
-            id:'page-portal-ansys-mpi-type-radio',
-            renderTo: 'page-portal-ansys-mpi-type',
-            defualtName: 'mpitype',
-            items: [{
-                id: 'page-portal-ansys-mpi-type-intelmpi',
-                value: 'intelmpi',
-                fieldLabel: 'Intelmpi',
-                disabled:true
-            }, {
-                id: 'page-portal-ansys-mpi-type-hpmpi',
-                value: 'hpmpi',
-                fieldLabel: 'PCmpi',
-                checked:true,
-                disabled:true
-            }]
+    var o_mpi=[];
+    if(!Gv.isEmpty(s_mpilist)){
+        for(var i in s_mpilist){
+            o_mpi.push({id:s_mpilist[i],text:s_mpilist[i]});
+        }
+    }
+    ansys_mpi_type_select = new Gv.form.ComboBox({
+        renderTo: 'page-portal-ansys-mpi-type',
+        fieldLabel: '<font color="#FF0000">*</font>MPI Type',
+        readOnly: false,
+        allowBlank:false,
+        //width: 540,
+        value: mpi_def,
+        autoLoad:false,
+        data:o_mpi,
+        disabled:true
     });
-    this.ansys_mpi_type_radio = ansys_mpi_type_radio;
+    this.ansys_mpi_type_select=ansys_mpi_type_select;
+    this.ansys_components.push(ansys_mpi_type_select);
     //remote shell
     ansys_remote_shell_radio=new Gv.form.RadioGroup({
             id:'page-portal-ansys-remote-shell-radio',
@@ -176,7 +177,7 @@
     //working dir
     ansys_work_dir_input=new Gv.form.TextField({
             renderTo: 'page-portal-ansys-work-dir',
-            fieldLabel: 'Working DIR',
+            fieldLabel: '<font color="#FF0000">*</font>Working DIR',
             allowBlank: false,
             value:workdir
     });
@@ -196,40 +197,6 @@
                         handler: function(obj) {
                             ansys_work_dir_input.value(obj);
                             ansys_work_dir_input.validate();
-                            workdirRunFilePanel.close();
-                        }
-                    }, {
-                        text: '关闭',
-                        handler: function() {
-                            workdirRunFilePanel.close();
-                        }
-                    }]
-                });
-            }
-    });
-
-    //job name
-    ansys_job_name_input=new Gv.form.TextField({
-            renderTo: 'page-portal-ansys-job-name',
-            fieldLabel: 'Job Name',
-            allowBlank: false
-    });
-    this.ansys_job_name_input = ansys_job_name_input;
-    this.ansys_components.push(ansys_job_name_input);
-    //working dir browse...
-    new Gv.Button({
-            renderTo: 'page-portal-ansys-job-name-btn',
-            cls:'button',
-            text:'Browse...',
-            handler: function() {
-                var workdirRunFilePanel = new Gv.SelectFileWindow({
-                    defaultPath: Gv.get('portal-pbs-params-workdir').val(),
-                    isDir: true,
-                    tbar: [{
-                        text: '确定',
-                        handler: function(obj) {
-                            ansys_job_name_input.value(obj);
-                            ansys_job_name_input.validate();
                             workdirRunFilePanel.close();
                         }
                     }, {
@@ -407,7 +374,7 @@
         //environment parameters
         //"GAP_MPI_LIC_TYPE"     : global_jobscheduler_portal_ansys.ansys_license_select.value(),
         "GAP_MPI_REMOTE_SHELL" : global_jobscheduler_portal_ansys.ansys_remote_shell_radio.value()[0].value,
-        "GAP_MPI_MPIRUNTYPE"   : global_jobscheduler_portal_ansys.ansys_mpi_type_radio.value()[0].value,
+        "GAP_MPI_MPIRUNTYPE"   : global_jobscheduler_portal_ansys.ansys_mpi_type_select.value(),
         "GAP_MPI_PROGRAM"      : global_jobscheduler_portal_ansys.ansys_ansys_bin_input.value(),
         "GAP_MPI_WORK_DIR"     : global_jobscheduler_portal_ansys.ansys_work_dir_input.value(),
         "GAP_MPI_PROGRAM_ARG"  : global_jobscheduler_portal_ansys.ansys_arguments_input.value(),
@@ -504,16 +471,18 @@
       $("#portal-pbs-params-name").val(PORTALNAM + "_" + portal_reset_timestamp);
       //environment parameters
 
-      $("#page-portal-ansys-mpi-type-hpmpi")[0].checked=true;
+      //$("#page-portal-ansys-mpi-type-hpmpi")[0].checked=true;
       $("#page-portal-ansys-remote-shell-ssh")[0].checked=true;
       $("#page-portal-ansys-hpc-run-smp")[0].checked=true;
+      global_jobscheduler_portal_ansys.ansys_mpi_type_select.value(mpi_def);
+      global_jobscheduler_portal_ansys.ansys_mpi_type_select.disabled(true);
       //global_jobscheduler_portal_ansys.ansys_license_select.value(lictype);
       global_jobscheduler_portal_ansys.ansys_arguments_input.value('');
       global_jobscheduler_portal_ansys.ansys_ansys_bin_input.data(global_jobscheduler_portal_ansys.ansys_bin_data);
-      console.log(global_jobscheduler_portal_ansys.ansys_bin_data);
+      //console.log(global_jobscheduler_portal_ansys.ansys_bin_data);
       global_jobscheduler_portal_ansys.ansys_ansys_bin_input.value(file);
       global_jobscheduler_portal_ansys.ansys_work_dir_input.value(workdir);
-      global_jobscheduler_portal_ansys.ansys_job_name_input.value('');
+      
       //global_jobscheduler_portal_ansys.ansys_input_file_input.value('');
       //global_jobscheduler_portal_ansys.ansys_output_file_input.value(PORTALNAM + "_" + portal_reset_timestamp + '.txt');
       if(!$("#"+global_jobscheduler_portal_ansys.ansys_run_mode.getId())[0].checked){

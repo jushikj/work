@@ -32,7 +32,7 @@ var global_jobscheduler_general = {
         }
         fluent_bin = new Gv.form.ComboBox({
             renderTo: 'page-portal-fluent-bin-path',
-            fieldLabel: 'Fluent Bin',
+            fieldLabel: '<font color="#FF0000">*</font>Fluent Bin',
             allowBlank:false,
             value: program,
             autoLoad:false,
@@ -77,7 +77,7 @@ var global_jobscheduler_general = {
         };
 		dimension_select = new Gv.form.ComboBox({
             renderTo: 'page-portal-fluent-version',
-            fieldLabel: 'Dimension',
+            fieldLabel: '<font color="#FF0000">*</font>Dimension',
             readOnly: false,
 			allowBlank:false,
             //width: 540,
@@ -113,7 +113,7 @@ var global_jobscheduler_general = {
         }
 		mpitype_select = new Gv.form.ComboBox({
             renderTo: 'page-portal-fluent-mpi-type',
-            fieldLabel: 'MPI Type',
+            fieldLabel: '<font color="#FF0000">*</font>MPI Type',
             readOnly: false,
 			allowBlank:false,
             //width: 540,
@@ -153,7 +153,7 @@ var global_jobscheduler_general = {
 		//work dir
 		input_workdir = new Gv.form.TextField({
             renderTo: 'page-portal-WorkingDIR',
-            fieldLabel: 'Working DIR',
+            fieldLabel: '<font color="#FF0000">*</font>Working DIR',
             allowBlank: true,
             value: workdir,
             bodyStyle: ''
@@ -191,7 +191,7 @@ var global_jobscheduler_general = {
         var outputFile = new Gv.form.TextField({
             id: 'portal-pbs-params-output',
             renderTo: 'page-portal-OutputFile',
-            fieldLabel: 'Output File',
+            fieldLabel: '<font color="#FF0000">*</font>Output File',
             allowBlank: false,
             value: PORTALNAM + "_" + portal_time_stamp + '.txt',
             bodyStyle: '',
@@ -209,7 +209,7 @@ var global_jobscheduler_general = {
 		//jou file input
 		input_jou_file = new Gv.form.TextField({
             renderTo: 'page-portal-fluent-bmp-jou-file-input',
-            fieldLabel: 'Jou File',
+            fieldLabel: '<font color="#FF0000">*</font>Jou File',
             allowBlank: false,
             value: PORTALNAM + "_" + portal_time_stamp + '.jou',
             bodyStyle: '',
@@ -364,7 +364,7 @@ var global_jobscheduler_general = {
 		//time step
 		input_time_step = new Gv.form.TextField({
             renderTo: 'page-portal-fluent-time-step-input',
-            fieldLabel: 'Time Step Size(s)',
+            fieldLabel: '<font color="#FF0000">*</font>Time Step Size(s)',
             allowBlank: false,
 			labelWidth:195,
             value: '0.01',
@@ -379,7 +379,7 @@ var global_jobscheduler_general = {
 		//time_step_number
 		input_time_step_num = new Gv.form.TextField({
             renderTo: 'page-portal-fluent-time-step-number',
-            fieldLabel: 'Number of Time Steps',
+            fieldLabel: '<font color="#FF0000">*</font>Number of Time Steps',
             allowBlank: false,
 			labelWidth:195,
             value: '1000',
@@ -394,7 +394,7 @@ var global_jobscheduler_general = {
 		//iteration_step_number
 		input_iteration_step_num = new Gv.form.TextField({
             renderTo: 'page-portal-fluent-iteration-step-number',
-            fieldLabel: 'Number of Iterations',
+            fieldLabel: '<font color="#FF0000">*</font>Number of Iterations',
             allowBlank: false,
 			labelWidth:195,
             value: '1000',
@@ -409,7 +409,7 @@ var global_jobscheduler_general = {
 		//auto_save_step_number
 		input_autosave_step_num = new Gv.form.TextField({
             renderTo: 'page-portal-fluent-autosave-step-number',
-            fieldLabel: 'AutoSave Every(Time Steps)',
+            fieldLabel: '<font color="#FF0000">*</font>AutoSave Every(Time Steps)',
             allowBlank: false,
 			labelWidth:195,
             value: '100',
@@ -424,7 +424,7 @@ var global_jobscheduler_general = {
 		//max iteartions
 		input_max_iterations = new Gv.form.TextField({
             renderTo: 'page-portal-fluent-max-iteration-time-steps',
-            fieldLabel: 'Max Iterations/Time Step',
+            fieldLabel: '<font color="#FF0000">*</font>Max Iterations/Time Step',
             allowBlank: false,
 			labelWidth:195,
             value: '20',
