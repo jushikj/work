@@ -17,7 +17,7 @@
         if($("#"+global_jobscheduler_portal_ansys.ansys_use_custom.getId())[0].checked){
             $("#"+global_jobscheduler_portal_ansys.ansys_use_custom.getId())[0].checked=false;
         }
-        $("#page-portal-ansys-hpc-run-smp")[0].checked=true;
+        //$("#page-portal-ansys-hpc-run-smp")[0].checked=true;
         if($.isFunction(o.removeError)){
             o.removeError();
         }
@@ -52,6 +52,34 @@
       }
     });
     global_jobscheduler_portal_ansys.ansys_run_mode=ansys_run_mode;
+
+    //Parallel Mode(hpc run)
+    ansys_hpc_run_radio=new Gv.form.RadioGroup({
+            id:'page-portal-ansys-hpc-run-radio',
+            renderTo: 'page-portal-ansys-hpc-run',
+            defualtName: 'hpcrun',
+            items: [{
+                id: 'page-portal-ansys-hpc-run-mpp',
+                value: 'dmp',
+                fieldLabel: 'MPP'
+            }, {
+                id: 'page-portal-ansys-hpc-run-smp',
+                value: 'smp',
+                fieldLabel: 'SMP',
+                checked:true
+            }]
+    });
+    this.ansys_hpc_run_radio = ansys_hpc_run_radio;
+    this.ansys_components.push(ansys_hpc_run_radio);
+    //bind click event
+    $("#"+ansys_hpc_run_radio.getId()+" input").bind('click',function(){
+        if(this.value=='dmp'){
+            ansys_mpi_type_radio.disabled(false);
+        } else {
+            ansys_mpi_type_radio.disabled(true);
+        }
+    });
+
 
     //ansys bin
     var o_mpiProg = [];
@@ -108,12 +136,14 @@
             items: [{
                 id: 'page-portal-ansys-mpi-type-intelmpi',
                 value: 'intelmpi',
-                fieldLabel: 'Intelmpi'
+                fieldLabel: 'Intelmpi',
+                disabled:true
             }, {
                 id: 'page-portal-ansys-mpi-type-hpmpi',
                 value: 'hpmpi',
-                fieldLabel: 'HPmpi',
-                checked:true
+                fieldLabel: 'PCmpi',
+                checked:true,
+                disabled:true
             }]
     });
     this.ansys_mpi_type_radio = ansys_mpi_type_radio;
@@ -257,27 +287,6 @@
     this.ansys_input_type_radio = ansys_input_type_radio;
     this.ansys_runp_components.push(ansys_input_type_radio);
 
-    //Parallel Mode(hpc run)
-    ansys_hpc_run_radio=new Gv.form.RadioGroup({
-            id:'page-portal-ansys-hpc-run-radio',
-            renderTo: 'page-portal-ansys-hpc-run',
-            defualtName: 'hpcrun',
-            items: [{
-                id: 'page-portal-ansys-hpc-run-mpp',
-                value: 'dmp',
-                fieldLabel: 'MPP',
-                disabled:true
-            }, {
-                id: 'page-portal-ansys-hpc-run-smp',
-                value: 'smp',
-                fieldLabel: 'SMP',
-                checked:true,
-                disabled:true
-            }]
-    });
-    this.ansys_hpc_run_radio = ansys_hpc_run_radio;
-    this.ansys_runp_components.push(ansys_hpc_run_radio);
-
     //total workspace
     ansys_total_workspace_input=new Gv.form.TextField({
             renderTo: 'page-portal-ansys-total-workspace',
@@ -345,7 +354,7 @@
     //log file
     ansys_log_file_input=new Gv.form.TextField({
             renderTo: 'page-portal-ansys-log-file',
-            fieldLabel: '<font color="#FF0000">*</font>Log File',
+            fieldLabel: '<font color="#FF0000">*</font>Output File',
             allowBlank: false,
             disabled:true
     });
@@ -410,11 +419,9 @@
         "GAP_MPI_INPUT"        : isWindow?'':global_jobscheduler_portal_ansys.ansys_input_file_input.value(),
         "GAP_MPI_PARAMODE"     : isWindow?'':global_jobscheduler_portal_ansys.ansys_hpc_run_radio.value()[0].value,
         //"GAP_INP_FILE"         : isWindow?'':global_jobscheduler_portal_ansys.ansys_inp_file_input.value(),
-        "GAP_LOG_FILE"         : isWindow?'':global_jobscheduler_portal_ansys.ansys_log_file_input.value(),
+        "GAP_MPI_OUTPUT"         : isWindow?'':global_jobscheduler_portal_ansys.ansys_log_file_input.value(),
         "GAP_DATABASE"         : isWindow?'':global_jobscheduler_portal_ansys.ansys_database_input.value(),
         "GAP_TOTAL_WORKSPACE"  : isWindow?'':global_jobscheduler_portal_ansys.ansys_total_workspace_input.value(),
-
-        //"GAP_MPI_OUTPUT"       : global_jobscheduler_portal_ansys.ansys_output_file_input.value(),
         
         //Remote Visualization Parameters
         "GAP_VNC": "\'" + Gv.get("portal-pbs-params-vnc").val()+"\'",
@@ -499,6 +506,7 @@
 
       $("#page-portal-ansys-mpi-type-hpmpi")[0].checked=true;
       $("#page-portal-ansys-remote-shell-ssh")[0].checked=true;
+      $("#page-portal-ansys-hpc-run-smp")[0].checked=true;
       //global_jobscheduler_portal_ansys.ansys_license_select.value(lictype);
       global_jobscheduler_portal_ansys.ansys_arguments_input.value('');
       global_jobscheduler_portal_ansys.ansys_ansys_bin_input.data(global_jobscheduler_portal_ansys.ansys_bin_data);
