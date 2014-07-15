@@ -26,10 +26,10 @@ programarg_default=' '
 PORTAL_PREDEFINE_LIST='{"Default Program List":"program_list", "Default Work Dir": "workdir_list"}'
 
 ## vnc_setting
-vnc_available=1
+vnc_available=0
 
 ## checkpoint setting
-checkpoint_availabel=0
+checkpoint_availabel=1
 interval_default=240
 min_interval=5
 

@@ -474,6 +474,7 @@ var global_jobscheduler_general = {
 				});
 				return false;
 			}
+            var isWindow = $("#"+global_jobscheduler_general.run_mode.getId())[0].checked;
 			//提交参数
 			var patest = {
 				//Job Schedule Parameters
@@ -504,7 +505,8 @@ var global_jobscheduler_general = {
 				"GAP_AUTO_SAVE_TIME_STEP":global_jobscheduler_general.input_autosave_step_num.value(),
 				"GAP_MAX_ITERATIONS":global_jobscheduler_general.input_max_iterations.value(),
 				//Remote Visualization Parameters
-				"GAP_VNC": "\'" + Gv.get("portal-pbs-params-vnc").val()+"\'",
+				//"GAP_VNC": "\'" + Gv.get("portal-pbs-params-vnc").val()+"\'",
+                "GAP_VNC":isWindow?1:0,
 				//Checkpoint/Restart Parameters
 				"GAP_CHECK_POINT": "\'" + Gv.get("portal-pbs-params-checkpoint").val()+"\'",
 				"GAP_INTERVAL": "\'" + Gv.get("portal-pbs-params-interval").val() + "\'",

@@ -391,7 +391,8 @@
         "GAP_TOTAL_WORKSPACE"  : isWindow?'':global_jobscheduler_portal_ansys.ansys_total_workspace_input.value(),
         
         //Remote Visualization Parameters
-        "GAP_VNC": "\'" + Gv.get("portal-pbs-params-vnc").val()+"\'",
+        //"GAP_VNC": "\'" + Gv.get("portal-pbs-params-vnc").val()+"\'",
+        "GAP_VNC":isWindow?1:0,
         //Checkpoint/Restart Parameters
         "GAP_CHECK_POINT": "\'" + Gv.get("portal-pbs-params-checkpoint").val()+"\'",
         "GAP_INTERVAL": "\'" + Gv.get("portal-pbs-params-interval").val() + "\'",
