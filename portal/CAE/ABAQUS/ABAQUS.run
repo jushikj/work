@@ -1,9 +1,10 @@
-#!/bin/bash
+#!/bin/bash 
+
 get_portal_input()
 {
 	QTIMESTAMP=`date +%G%m%d_%H%M`
 	PORTALVAR=/tmp/clusportal_$USER$QTIMESTAMP.var
-	#touch $PORTALVAR
+	##touch $PORTALVAR
 	dos2unix -n $1 $PORTALVAR 2>/dev/null
 	source $PORTALVAR
 
@@ -33,37 +34,25 @@ get_portal_input()
 	#GAP_MPI_PBS_OPT='#PBS -j oe:#PBS -m zj@sugon.com'
 	#GAP_MPI_PRE_CMD='echo $HOME:echo $USER'
 	#GAP_MPI_POST_CMD='echo $JOB_ID:echo $PATH'
+
 }
 
 get_basic_params()
 {
 	## ANSYS Input check
-
-	source /opt/gridview/gridviewAppTemplate/CAE/ANSYS/ANSYS.setting
+	source /opt/gridview/gridviewAppTemplate/CAE/ABAQUS/ABAQUS.setting
 	### runfile setting
 	#openmpi_ENVFILE intelmpi_ENVFILE mpich2_ENVFILE cr_mpi_ENVFILE mvapich2_ENVFILE debug
 
 	##prefix=`basename $1|awk -F. '{print $1}'`
 	time=`date +%m%d%H%M%S`
 	username=`whoami`
-	#pbsfile=${username}_${time}.pbs
 	pbsfile=${GAP_MPI_NAME}.pbs
 }
 
 parse_portal_params()
 {
 	# PRODUCTID Check
-	# TODO GAP_MPI_LIC_TYPE not exist now!!!
-	case "${GAP_MPI_LIC_TYPE}" in
-	ANSYS_Mechanical*) PRODUCTID=ANSYS;;
-	ANSYS_Multiphysics*) PRODUCTID=ANE3FL;;
-	ANSYS_Structural*) PRODUCTID=STRUCT;;
-	ANSYS_Emag*) PRODUCTID=EMAG;;
-	ANSYS_FLOTRAN*) PRODUCTID=FLOTRAN;;
-	*) PRODUCTID=ANSYS;
-	esac
-	PRODUCT="-p $PRODUCTID"
-
 	if [ "null$GAP_MPI_MPI_OPT" == "null" ];then
 	 GAP_MPI_MPI_OPT=" "
 	fi
@@ -77,68 +66,63 @@ parse_portal_params()
 	 GAP_MPI_POST_CMD=" "
 	fi
 
-	## remote shell option
 
-	if [ "$GAP_MPI_REMOTE_SHELL" == "ssh" ];then
-		RSH="-usessh"
-	else
-		RSH=""
-	fi
-	cd ${GAP_MPI_WORK_DIR}
-
-	## MPI Type optios
-
-	if [ ${GAP_MPI_MPIRUNTYPE}=="hpmpi" ];then
-		MPIINPUT="-mpi HPMPI"
-	else
-		MPIINPUT="-mpi INTELMPI"
-	fi
-
-	## input type option
-	if [ ${GAP_MPI_INPUT} != "" ];then
-		FILE=${GAP_MPI_INPUT}
-		FILE=${FILE##/*/}
-	if [ ${GAP_MPI_INPUTTYPE} == "inp" ];then
-		dos2unix ${FILE} >& /dev/null &
-		INPUT=${FILE}
-	else
-		FILE=${FILE%%.*}
-		echo "resume,$FILE,db,,,
-	/solu
-	SOLVE" > ${FILE}.inp
-		INPUT=${FILE}.inp
-	fi
-	INP="-i ${INPUT}"
-	else
-	INP=""
-	fi
-
-	##VNC options
-	if [ "$GAP_VNC" == 1 ];then
-	 VNC_OPTION="-vnc"
-	 ANSYS_VNC="-g"
-	else
-	 VNC_OPTION=""
-	 ANSYS_VNC=""
-	fi
 
 	## hpc run option	
-	if [ ${GAP_MPI_PARAMODE} == dmp ];then
-		PRECMD='hostlist="";for node in `cat $PBS_NODEFILE | uniq`;do num=`cat $PBS_NODEFILE | grep $node | wc -l`;if [ -z $hostlist ];then hostlist=$nodeGridViewPortalColon$num;else hostlist=$hostlistGridViewPortalColon$nodeGridViewPortalColon$num;fi;done'
+	PRECMD='hostlist="";for node in `cat $PBS_NODEFILE | uniq`;do num=`cat $PBS_NODEFILE | grep $node | wc -l`;if [ -z $hostlist ];then hostlist=[\GridViewPortalQuotes$node\GridViewPortalQuotes,$num];else hostlist=$hostlist,[\GridViewPortalQuotes$node\GridViewPortalQuotes,$num];fi;done;hostlist=[$hostlist];'
+	RUNLIST="cpus=\$NP"
 
-		RUNLIST='-dis -machines $hostlist'
-	else
-		PRECMD='num=`cat $PBS_NODEFILE | wc -l`;'
-		RUNLIST='-np $num'
-	fi
+
+
+	##Other options
+	PRECMD2="echo \"mp_host_list=\${hostlist}\" > abaqus_v6.env;echo ask_delete=OFF >> abaqus_v6.env;echo mp_mode=${GAP_MPI_PARAMODE} >> abaqus_v6.env;rm *.lck -rf >& /dev/null;"
+
 
 
 	## gpu acc option
+	echo ${GAP_MPI_GPUACC} > abc
+	echo ${GAP_MPI_GPUTYPE} > abc
 
-	if [ ${GAP_MPI_GPUACC} = '1' -a ${GAP_MPI_GPUTYPE} != "null" ];then
-		GPUACC="-acc ${GAP_MPI_GPUTYPE}"
+	if [ "$GAP_MPI_GPUACC" = '1' -a "$GAP_MPI_GPUTYPE" != "null" ];then
+	        GPUACC="gpu=${GAP_MPI_GPUTYPE}"
 	else
-		GPUACC=""
+	        GPUACC=""
+	fi
+
+	## vnc option
+	cd ${GAP_MPI_WORK_DIR}
+
+	if [ ${GAP_MPI_INPUT} != "" ];then
+	        FILE=${GAP_MPI_INPUT}
+	        FILE=${FILE##/*/}
+	        dos2unix ${FILE} >& /dev/null &
+	        INPUT=${FILE}
+			INP="job=${INPUT}"
+	else
+		INP=""
+	fi
+
+	if [[ ${GAP_MPI_SUB} != "" ]];then
+	##if [ -n ${GAP_MPI_SUB} ];then
+	        FILE=${GAP_MPI_SUB}
+	        FILE=${FILE##/*/}
+	        FILE=${FILE##*.}
+	#	if [ ${FILE} == "f" -o ${FILE} == "o" ]
+		{
+		if [[ ${FILE} == 'f' ]]
+			then
+		FILE1=${GAP_MPI_SUB}
+		FILE1=${FILE1##/*/}
+		FILE1=${FILE1%.*}
+		SUB="user=${FILE1}"
+			else
+	#		exit -1
+	echo "The user subroutine not with suffix .f or .o can't accept by ABAQUS, please rename the subroutine file ${GAP_MPI_SUB}"
+	exit -1
+		fi
+		}
+	else
+		SUB=""
 	fi
 	cd ${GAP_MPI_WORK_DIR}
 }
@@ -159,10 +143,10 @@ create_pbs_script()
 	##############################################################################################################################################
 
 
-	/opt/gridview/gridviewAppTemplate/createpbs -t serial -o "${GAP_MPI_OUTPUT}" -pbs ${pbsfile} -precommand "${PRECMD}" -prog "${GAP_MPI_PROGRAM}" -proarg "${PRODUCT} ${MPIINPUT} ${INP} ${RUNLIST} ${RSH} ${GPUACC} ${ANSYS_VNC} -dir ${GAP_MPI_WORK_DIR} ${GAP_MPI_PROGRAM_ARG}" -envfile "${ANSYS_ENVFILE}" ${VNC_OPTION}  -nnodes   "${GAP_MPI_NNODES}" -ppn "${GAP_MPI_PPN}" -wtime "${GAP_MPI_WALL_TIME}" -name "${GAP_MPI_NAME}" -wdir "${GAP_MPI_WORK_DIR}" -q "${GAP_MPI_QUEUE}" -pbsoption "${GAP_MPI_PBS_OPT}" 
-	sed -i 's/GridViewPortalColon/:/g' ${pbsfile}
+	/opt/gridview/gridviewAppTemplate/createpbs -t serial -o "${GAP_MPI_OUTPUT}" -pbs ${pbsfile} -precommand "${PRECMD} ${PRECMD2}" -prog "${GAP_MPI_PROGRAM}" -proarg "${MPIINPUT} ${INP} ${SUB} ${RUNLIST} ${GPUACC} ${GAP_MPI_PROGRAM_ARG} interactive" -envfile "${ABAQUS_ENVFILE}" ${VNC_OPTION}  -nnodes   "${GAP_MPI_NNODES}" -ppn "${GAP_MPI_PPN}" -wtime "${GAP_MPI_WALL_TIME}" -name "${GAP_MPI_NAME}" -wdir "${GAP_MPI_WORK_DIR}" -q "${GAP_MPI_QUEUE}" -pbsoption "${GAP_MPI_PBS_OPT}"
+	sed -i "s/GridViewPortalQuotes/'/g" ${pbsfile} 
 	#/opt/gridview/gridviewAppTemplate/createpbs -t "${GAP_MPI_MPI_TYPE}" -o "${GAP_MPI_OUTPUT}" -pbs ${pbsfile} \
-	#            -prog "${GAP_MPI_PROGRAM}" -proarg "${FLUENT_VNC}" "${GAP_MPI_PROGRAM_ARG}"\
+	#            -prog "${GAP_MPI_PROGRAM}" -proarg "${GAP_MPI_PROGRAM_ARG}"\
 	#            -envfile  "${ANSYS_ENVFILE}"     \
 	#            -precommand "${GAP_MPI_PRE_CMD}" -postcommand "${GAP_MPI_POST_CMD}" \
 	#            ${VNC_OPTION}  \
@@ -173,8 +157,7 @@ create_pbs_script()
 	#
 }
 
-submit_job()
-{
+submit_job(){
 	jobid=`qsub $pbsfile`
 	return $?
 }
@@ -225,4 +208,3 @@ main()
 	output_result ${job_status}
 }
 main "$@"
-

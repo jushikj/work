@@ -323,7 +323,8 @@
             renderTo: 'page-portal-ansys-log-file',
             fieldLabel: '<font color="#FF0000">*</font>Output File',
             allowBlank: false,
-            disabled:true
+            disabled:true,
+            value:PORTALNAM + "_" + portal_time_stamp + '.txt'
     });
     this.ansys_log_file_input=ansys_log_file_input;
     this.ansys_runp_components.push(ansys_log_file_input);
@@ -378,7 +379,7 @@
         "GAP_MPI_PROGRAM"      : global_jobscheduler_portal_ansys.ansys_ansys_bin_input.value(),
         "GAP_MPI_WORK_DIR"     : global_jobscheduler_portal_ansys.ansys_work_dir_input.value(),
         "GAP_MPI_PROGRAM_ARG"  : global_jobscheduler_portal_ansys.ansys_arguments_input.value(),
-        "GAP_JOB_NAME"         : global_jobscheduler_portal_ansys.ansys_job_name_input.value(),
+        //"GAP_JOB_NAME"         : global_jobscheduler_portal_ansys.ansys_job_name_input.value(),
 
         //run parameters
         "GAP_MPI_INPUTTYPE"    : isWindow?'':global_jobscheduler_portal_ansys.ansys_input_type_radio.value()[0].value,
@@ -451,7 +452,7 @@
           }
           new_time_stamp = gen_time_identify_string();
           $("#portal-pbs-params-name").val(PORTALNAM+"_"+new_time_stamp);
-          global_jobscheduler_portal_ansys.ansys_output_file_input.value(PORTALNAM + "_" + new_time_stamp + '.txt');
+          global_jobscheduler_portal_ansys.ansys_log_file_input.value(PORTALNAM + "_" + new_time_stamp + '.txt');
         },
 
         failure: function(response, options) {
@@ -485,7 +486,7 @@
       global_jobscheduler_portal_ansys.ansys_work_dir_input.value(workdir);
       
       //global_jobscheduler_portal_ansys.ansys_input_file_input.value('');
-      //global_jobscheduler_portal_ansys.ansys_output_file_input.value(PORTALNAM + "_" + portal_reset_timestamp + '.txt');
+      global_jobscheduler_portal_ansys.ansys_log_file_input.value(PORTALNAM + "_" + portal_reset_timestamp + '.txt');
       if(!$("#"+global_jobscheduler_portal_ansys.ansys_run_mode.getId())[0].checked){
         $("#"+global_jobscheduler_portal_ansys.ansys_run_mode.getId())[0].checked=true;
         global_jobscheduler_portal_ansys.controlRunParameters();
