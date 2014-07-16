@@ -35,10 +35,6 @@ get_portal_input()
 	#GAP_MPI_POST_CMD='echo $JOB_ID:echo $PATH'
 }
 
-create_inp_file(){
-	#TODO
-}
-
 get_basic_params()
 {
 	## ANSYS Input check
