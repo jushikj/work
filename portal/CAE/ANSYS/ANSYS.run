@@ -47,22 +47,22 @@ get_basic_params()
 	time=`date +%m%d%H%M%S`
 	username=`whoami`
 	#pbsfile=${username}_${time}.pbs
-	pbsfile=${GAP_MPI_NAME}.pbs
+	pbsfile=${GAP_NAME}.pbs
 }
 
 parse_portal_params()
 {
 	# PRODUCTID Check
 	# TODO GAP_MPI_LIC_TYPE not exist now!!!
-	case "${GAP_MPI_LIC_TYPE}" in
-	ANSYS_Mechanical*) PRODUCTID=ANSYS;;
-	ANSYS_Multiphysics*) PRODUCTID=ANE3FL;;
-	ANSYS_Structural*) PRODUCTID=STRUCT;;
-	ANSYS_Emag*) PRODUCTID=EMAG;;
-	ANSYS_FLOTRAN*) PRODUCTID=FLOTRAN;;
-	*) PRODUCTID=ANSYS;
-	esac
-	PRODUCT="-p $PRODUCTID"
+	#case "${GAP_MPI_LIC_TYPE}" in
+	#ANSYS_Mechanical*) PRODUCTID=ANSYS;;
+	#ANSYS_Multiphysics*) PRODUCTID=ANE3FL;;
+	#ANSYS_Structural*) PRODUCTID=STRUCT;;
+	#ANSYS_Emag*) PRODUCTID=EMAG;;
+	#ANSYS_FLOTRAN*) PRODUCTID=FLOTRAN;;
+	#*) PRODUCTID=ANSYS;
+	#esac
+	PRODUCT="-p ANSYS"
 
 	if [ "null$GAP_MPI_MPI_OPT" == "null" ];then
 	 GAP_MPI_MPI_OPT=" "
@@ -88,24 +88,55 @@ parse_portal_params()
 
 	## MPI Type optios
 
-	if [ ${GAP_MPI_MPIRUNTYPE}=="hpmpi" ];then
-		MPIINPUT="-mpi HPMPI"
+	if [ "${GAP_MPI_MPIRUNTYPE}" == "pc" ];then
+		MPIINPUT="-mpi PCMPI"
 	else
 		MPIINPUT="-mpi INTELMPI"
 	fi
 
+	## hpc run option	
+	if [ "${GAP_MPI_PARAMODE}" == dmp ];then
+		PRECMD='hostlist="";for node in `cat $PBS_NODEFILE | uniq`;do num=`cat $PBS_NODEFILE | grep $node | wc -l`;if [ -z $hostlist ];then hostlist=$nodeGridViewPortalColon$num;else hostlist=$hostlistGridViewPortalColon$nodeGridViewPortalColon$num;fi;done'
+
+		RUNLIST='-dis -machines $hostlist'
+	else
+		PRECMD='num=`cat $PBS_NODEFILE | wc -l`;'
+		RUNLIST='-np $num'
+		#no mpi
+		MPIINPUT=""
+	fi
+
+	## not window
+	if [ "$GAP_VNC" == 0 ];then
+		## use custom setting
+		if [ "$GAP_USE_CUSTOM_MEM_SET" == 1 ];then
+			DATABASE="-db $GAP_DATABASE"
+			TOTAO_WORKSPACE="-m $GAP_TOTAL_WORKSPACE"
+		else 
+			DATABASE=""
+			TOTAO_WORKSPACE=""
+		fi
+	else
+		DATABASE=""
+		TOTAO_WORKSPACE=""
+	fi
+
+
 	## input type option
-	if [ ${GAP_MPI_INPUT} != "" ];then
+	if [ "${GAP_MPI_INPUT}" != "" ];then
 		FILE=${GAP_MPI_INPUT}
 		FILE=${FILE##/*/}
-	if [ ${GAP_MPI_INPUTTYPE} == "inp" ];then
+	if [ "${GAP_MPI_INPUTTYPE}" == "inp" ];then
 		dos2unix ${FILE} >& /dev/null &
 		INPUT=${FILE}
 	else
 		FILE=${FILE%%.*}
 		echo "resume,$FILE,db,,,
 	/solu
-	SOLVE" > ${FILE}.inp
+	SOLVE
+	y
+	save,all
+	finish" > ${FILE}.inp
 		INPUT=${FILE}.inp
 	fi
 	INP="-i ${INPUT}"
@@ -122,20 +153,11 @@ parse_portal_params()
 	 ANSYS_VNC=""
 	fi
 
-	## hpc run option	
-	if [ ${GAP_MPI_PARAMODE} == dmp ];then
-		PRECMD='hostlist="";for node in `cat $PBS_NODEFILE | uniq`;do num=`cat $PBS_NODEFILE | grep $node | wc -l`;if [ -z $hostlist ];then hostlist=$nodeGridViewPortalColon$num;else hostlist=$hostlistGridViewPortalColon$nodeGridViewPortalColon$num;fi;done'
-
-		RUNLIST='-dis -machines $hostlist'
-	else
-		PRECMD='num=`cat $PBS_NODEFILE | wc -l`;'
-		RUNLIST='-np $num'
-	fi
-
+	
 
 	## gpu acc option
 
-	if [ ${GAP_MPI_GPUACC} = '1' -a ${GAP_MPI_GPUTYPE} != "null" ];then
+	if [ "${GAP_MPI_GPUACC}" = '1' -a "${GAP_MPI_GPUTYPE}" != "null" ];then
 		GPUACC="-acc ${GAP_MPI_GPUTYPE}"
 	else
 		GPUACC=""
@@ -159,7 +181,7 @@ create_pbs_script()
 	##############################################################################################################################################
 
 
-	/opt/gridview/gridviewAppTemplate/createpbs -t serial -o "${GAP_MPI_OUTPUT}" -pbs ${pbsfile} -precommand "${PRECMD}" -prog "${GAP_MPI_PROGRAM}" -proarg "${PRODUCT} ${MPIINPUT} ${INP} ${RUNLIST} ${RSH} ${GPUACC} ${ANSYS_VNC} -dir ${GAP_MPI_WORK_DIR} ${GAP_MPI_PROGRAM_ARG}" -envfile "${ANSYS_ENVFILE}" ${VNC_OPTION}  -nnodes   "${GAP_MPI_NNODES}" -ppn "${GAP_MPI_PPN}" -wtime "${GAP_MPI_WALL_TIME}" -name "${GAP_MPI_NAME}" -wdir "${GAP_MPI_WORK_DIR}" -q "${GAP_MPI_QUEUE}" -pbsoption "${GAP_MPI_PBS_OPT}" 
+	/opt/gridview/gridviewAppTemplate/createpbs -t serial -o "${GAP_MPI_OUTPUT}" -pbs ${pbsfile} -precommand "${PRECMD}" -prog "${GAP_MPI_PROGRAM}" -proarg "${DATABASE} ${TOTAO_WORKSPACE} ${PRODUCT} ${MPIINPUT} ${INP} ${RUNLIST} ${RSH} ${GPUACC} ${ANSYS_VNC} -dir ${GAP_MPI_WORK_DIR} ${GAP_MPI_PROGRAM_ARG}" -envfile "${ANSYS_ENVFILE}" ${VNC_OPTION}  -nnodes   "${GAP_NNODES}" -ppn "${GAP_PPN}" -wtime "${GAP_WALL_TIME}" -name "${GAP_NAME}" -wdir "${GAP_WORK_DIR}" -q "${GAP_QUEUE}" -pbsoption "${GAP_PBS_OPT}" 
 	sed -i 's/GridViewPortalColon/:/g' ${pbsfile}
 	#/opt/gridview/gridviewAppTemplate/createpbs -t "${GAP_MPI_MPI_TYPE}" -o "${GAP_MPI_OUTPUT}" -pbs ${pbsfile} \
 	#            -prog "${GAP_MPI_PROGRAM}" -proarg "${FLUENT_VNC}" "${GAP_MPI_PROGRAM_ARG}"\
@@ -198,7 +220,6 @@ checkpoint_func()
 clean_tmp_file()
 {
     if [ "$debug" != "1" ];then
-    	rm -f $pbsfile
     	rm -f /tmp/${prefix}.var
     	rm -f /tmp/${prefix}.runvar
     	rm -f $PORTALVAR
@@ -221,7 +242,7 @@ main()
 	submit_job
 	job_status=$?
 	checkpoint_func
-	clean_tmp_file
+	#clean_tmp_file
 	output_result ${job_status}
 }
 main "$@"

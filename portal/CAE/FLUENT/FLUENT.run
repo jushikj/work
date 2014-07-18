@@ -25,7 +25,7 @@ exit" >${jou_file_path}
 /solve/set/time-step ${GAP_TIME_STEP}
 /solve/dual-time-iterate ${GAP_NUM_TIME_STEP} ${GAP_MAX_ITERATIONS}
 /parallel/timer/usage
-/file/write-data ${GAP_DAT_FILE}
+/file/write-data ${jou_file_path%.*}_${GAP_TIME}_"end.dat"
 ok 
 exit" >${jou_file_path}
     fi
@@ -90,7 +90,7 @@ create_pbs_script()
     dololor=$
     /opt/gridview/gridviewAppTemplate/createpbs -t serial -o "${GAP_OUTPUT}" -pbs ${pbsfile} \
 		-prog "${GAP_PROGRAM}" \
-		-proarg "${GAP_VERSION} ${FLUENT_VNC} -t${dollor}NP -cnf=${dollor}PBS_NODEFILE ${rsh_option} -mpi=${GAP_MPI_TYPE} ${GAP_PROGRAM_ARG} -i ${GAP_INPUT}" \
+		-proarg "${GAP_DIMENSION} ${FLUENT_VNC} -t${dollor}NP -cnf=${dollor}PBS_NODEFILE ${rsh_option} -mpi=${GAP_MPI_TYPE} ${GAP_PROGRAM_ARG} -i ${GAP_INPUT}" \
 		-envfile  "${Fluent_ENVFILE}"     \
 		-precommand "${GAP_PRE_CMD}" -postcommand "${GAP_POST_CMD}" \
 		${VNC_OPTION}  \

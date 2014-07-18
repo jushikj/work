@@ -246,7 +246,7 @@
             }, {
                 id: 'page-portal-ansys-input-type-inp',
                 value: 'inp',
-                fieldLabel: 'INP',
+                fieldLabel: 'INP/CDB',
                 checked:true,
                 disabled:true
             }]
@@ -383,7 +383,7 @@
 
         //run parameters
         "GAP_MPI_INPUTTYPE"    : isWindow?'':global_jobscheduler_portal_ansys.ansys_input_type_radio.value()[0].value,
-        "GAP_USE_CUSTOM_MEM_SET":isWindow?false:$("#"+global_jobscheduler_portal_ansys.ansys_use_custom.getId())[0].checked,
+        "GAP_USE_CUSTOM_MEM_SET":isWindow?0:$("#"+global_jobscheduler_portal_ansys.ansys_use_custom.getId())[0].checked?1:0,
         "GAP_MPI_INPUT"        : isWindow?'':global_jobscheduler_portal_ansys.ansys_input_file_input.value(),
         "GAP_MPI_PARAMODE"     : isWindow?'':global_jobscheduler_portal_ansys.ansys_hpc_run_radio.value()[0].value,
         //"GAP_INP_FILE"         : isWindow?'':global_jobscheduler_portal_ansys.ansys_inp_file_input.value(),
