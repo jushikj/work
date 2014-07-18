@@ -88,7 +88,7 @@ parse_portal_params()
 
 	## MPI Type optios
 
-	if [ "${GAP_MPI_MPIRUNTYPE}" == "pc" ];then
+	if [ "${GAP_MPI_MPIRUNTYPE}" == "pcmpi" ];then
 		MPIINPUT="-mpi PCMPI"
 	else
 		MPIINPUT="-mpi INTELMPI"

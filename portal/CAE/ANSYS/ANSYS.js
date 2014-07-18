@@ -48,6 +48,8 @@
             var o = global_jobscheduler_portal_ansys.ansys_runp_components[i];
             o.disabled(false);
           }
+          global_jobscheduler_portal_ansys.ansys_database_input.disabled(true);
+          global_jobscheduler_portal_ansys.ansys_total_workspace_input.disabled(true);
         };
       }
     });
@@ -229,7 +231,21 @@
       renderTo:'page-portal-ansys-use-custom-memory-setting',
       fieldLabel:'Use custom memory settings',
       checked:false,
-      disabled:true
+      disabled:true,
+      handler:function(d,v){
+        if($("#"+ansys_use_custom.getId())[0].checked){
+            global_jobscheduler_portal_ansys.ansys_database_input.disabled(false);
+            global_jobscheduler_portal_ansys.ansys_total_workspace_input.disabled(false);
+        }else {
+            global_jobscheduler_portal_ansys.ansys_database_input.value('');
+            global_jobscheduler_portal_ansys.ansys_total_workspace_input.value('');
+            global_jobscheduler_portal_ansys.ansys_database_input.validate();
+            global_jobscheduler_portal_ansys.ansys_total_workspace_input.validate();
+            global_jobscheduler_portal_ansys.ansys_database_input.disabled(false);
+            global_jobscheduler_portal_ansys.ansys_total_workspace_input.disabled(false);
+        }
+        
+      }
     });
     this.ansys_use_custom=ansys_use_custom;
     this.ansys_runp_components.push(ansys_use_custom);
@@ -257,8 +273,8 @@
     //total workspace
     ansys_total_workspace_input=new Gv.form.TextField({
             renderTo: 'page-portal-ansys-total-workspace',
-            fieldLabel: '<font color="#FF0000">*</font>Total Workspace(MB)',
-            allowBlank: false,
+            fieldLabel: 'Total Workspace(MB)',
+            allowBlank: true,
             regex:/^\d+$/,
             regexText:'只能输入正整数',
             labelWidth:150,
@@ -271,8 +287,8 @@
     //database
     ansys_database_input=new Gv.form.TextField({
             renderTo: 'page-portal-ansys-database',
-            fieldLabel: '<font color="#FF0000">*</font>Database(MB)',
-            allowBlank: false,
+            fieldLabel: 'Database(MB)',
+            allowBlank: true,
             regex:/^\d+$/,
             regexText:'只能输入正整数',
             labelWidth:150,
@@ -352,7 +368,8 @@
       if(!isWindow){
         //if not window
         for(var i in global_jobscheduler_portal_ansys.ansys_runp_components){
-            if(!global_jobscheduler_portal_ansys.ansys_runp_components[i].validate()){
+
+            if($.isFunction(global_jobscheduler_portal_ansys.ansys_runp_components[i].validate) && !global_jobscheduler_portal_ansys.ansys_runp_components[i].validate()){
                 submit_enable=false;
             }
         }

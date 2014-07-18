@@ -154,7 +154,7 @@ var global_jobscheduler_general = {
 		input_workdir = new Gv.form.TextField({
             renderTo: 'page-portal-WorkingDIR',
             fieldLabel: '<font color="#FF0000">*</font>Working DIR',
-            allowBlank: true,
+            allowBlank: false,
             value: workdir,
             bodyStyle: ''
             //width: 540

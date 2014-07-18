@@ -70,6 +70,13 @@ parse_portal_params()
     if [ "${GAP_WORK_DIR}" == "" ];then
 	   GAP_WORK_DIR=$(readlink -f ~)
     fi
+
+    #dimension and precision
+    if [ "${GAP_PRECISION}" == "double" ];then
+        GAP_DIMENSION_PRECISION="${GAP_DIMENSION}dp"
+    else
+        GAP_DIMENSION_PRECISION="${GAP_DIMENSION}"
+    fi
     cd ${GAP_WORK_DIR}
 }
 
@@ -90,7 +97,7 @@ create_pbs_script()
     dololor=$
     /opt/gridview/gridviewAppTemplate/createpbs -t serial -o "${GAP_OUTPUT}" -pbs ${pbsfile} \
 		-prog "${GAP_PROGRAM}" \
-		-proarg "${GAP_DIMENSION} ${FLUENT_VNC} -t${dollor}NP -cnf=${dollor}PBS_NODEFILE ${rsh_option} -mpi=${GAP_MPI_TYPE} ${GAP_PROGRAM_ARG} -i ${GAP_INPUT}" \
+		-proarg "${GAP_DIMENSION_PRECISION} ${FLUENT_VNC} -t${dollor}NP -cnf=${dollor}PBS_NODEFILE ${rsh_option} -mpi=${GAP_MPI_TYPE} ${GAP_PROGRAM_ARG} -i ${GAP_INPUT}" \
 		-envfile  "${Fluent_ENVFILE}"     \
 		-precommand "${GAP_PRE_CMD}" -postcommand "${GAP_POST_CMD}" \
 		${VNC_OPTION}  \
