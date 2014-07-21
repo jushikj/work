@@ -484,7 +484,7 @@ var global_jobscheduler_general = {
 				"GAP_QUEUE": Gv.get("portal-pbs-params-queue").val(),
 				"GAP_NAME": Gv.get("portal-pbs-params-name").val(),
 				//run parameters
-				"GAP_RUN_MODE":$("#"+global_jobscheduler_general.run_mode.getId())[0].checked, //true or false
+				//"GAP_RUN_MODE":$("#"+global_jobscheduler_general.run_mode.getId())[0].checked, //true or false
 				"GAP_PROGRAM":global_jobscheduler_general.fluent_bin.value(),
 				"GAP_DIMENSION":global_jobscheduler_general.dimension_select.value(),
 				"GAP_PRECISION":global_jobscheduler_general.precision_radio.value()[0].value,
