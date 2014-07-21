@@ -13,13 +13,13 @@ name_prefix=`echo ${PORTALNAM}|tr [A-Z] [a-z]`
 hours_default=1
 
 ## run setting
-prog_default=/public/software/ansys_inc/v121/fluent/bin/fluent
-prog_list=/public/software/ansys_inc/v121/fluent/bin/fluent:
+prog_default=/public/software/ansys_inc/v140/fluent/bin/fluent
+prog_list=/public/software/ansys_inc/v140/fluent/bin/fluent:
 version_default=2d
 #version_list=2d:3d:2ddp:3ddp
 version_list=2d:3d
 mpi_default=hp
-mpi_list=hp:intel:openmpi
+mpi_list=pcmpi:intel:openmpi
 output_prefix=`echo ${PORTALNAM}|tr [A-Z] [a-z]`
 programarg_default=' '
 

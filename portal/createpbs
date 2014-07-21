@@ -294,6 +294,7 @@ echo 'id=`echo $PBS_JOBID|awk -F.' $danyinhao'{print $1}'$danyinhao '`' >>${CTP_
 echo 'NP=`cat $PBS_NODEFILE|wc -l`' >>${CTP_PbsFile}
 if ! [ -z "$CTP_EnvFiles" ];then
  for i in ${CTP_EnvFiles};do
+ #echo "source $i"  >>${CTP_PbsFile}
  echo "source $i"  >>${CTP_PbsFile}
  done
 fi 
@@ -305,14 +306,16 @@ if [ "$CTP_Vnc" == 1 ];then
 cat <<EOF >>${CTP_PbsFile} 
 source /usr/local/vnc/conf/vncfunction
 session_id=\`vnc_start \$PBS_JOBID\`
+PROXY_HOSTNAME=\$(echo \${session_id}|cut -d':' -f 2)
+PROXY_SID=\$(echo \${session_id}|cut -d':' -f 1)
 RET=\$?
 if [ \$RET -ne 0 ]; then
         echo "start bad, job failed to start"
         exit 1
 fi
-export DISPLAY=\$VNC_HOSTNAME:\$session_id
-trap "source /usr/local/vnc/conf/vncfunction; vnc_stop \$session_id" 1 2 9 15
-trap "source /usr/local/vnc/conf/vncfunction; vnc_stop \$session_id" EXIT
+export DISPLAY=\${PROXY_HOSTNAME}:\${PROXY_SID}
+trap "source /usr/local/vnc/conf/vncfunction; vnc_stop \$PROXY_SID \$PROXY_HOSTNAME" 1 2 9 15
+trap "source /usr/local/vnc/conf/vncfunction; vnc_stop \$PROXY_SID \$PROXY_HOSTNAME" EXIT
 EOF
 fi
 }

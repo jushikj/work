@@ -94,7 +94,7 @@ create_pbs_script()
     #       Type should be serial,openmpi,intelmpi cr_mpi, mvapich2,mpich2
     #       Network should be tcp,ib,memory,ib_memory,tcp_memory #
     ##############################################################################################################################    ####################
-    dololor=$
+    dollor=$
     /opt/gridview/gridviewAppTemplate/createpbs -t serial -o "${GAP_OUTPUT}" -pbs ${pbsfile} \
 		-prog "${GAP_PROGRAM}" \
 		-proarg "${GAP_DIMENSION_PRECISION} ${FLUENT_VNC} -t${dollor}NP -cnf=${dollor}PBS_NODEFILE ${rsh_option} -mpi=${GAP_MPI_TYPE} ${GAP_PROGRAM_ARG} -i ${GAP_INPUT}" \
