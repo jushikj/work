@@ -1,0 +1,146 @@
+## main ##
+
+## $1 is UserName
+if [ -z $1 ];then
+    CHECKUSER='root'
+else
+    CHECKUSER=$1
+fi
+
+export DIRNAM=$(cd "$(dirname "$0")"; pwd)
+export PORTALNAM=`echo $DIRNAM|awk -F/ '{print $NF}'`
+PORTALTYPE=`dirname $DIRNAM|awk -F/ '{print $NF}'`
+echo var PORTALNAM=\"$PORTALNAM\"\;
+echo var PORTALTYPE=\"$PORTALTYPE\"\;
+QTIMESTAMP=`date +%g%m%d_%H%M`
+
+#
+## echo Common var
+#
+source ${DIRNAM}/../../CommonCheck.sh
+
+#
+## echo Private var
+#
+
+echo var userhome=\"`finger -mlp $CHECKUSER |head -n2|tail -n1|awk '{print $2}'`\"\;
+
+## define the temp files
+QTMPDIR=/tmp/que$CHECKUSER$QTIMESTAMP
+mkdir -p $QTMPDIR
+QUEDIAGN=$QTMPDIR/queueDiagN$QTIMESTAMP
+QUEDIAGT=$QTMPDIR/queueDiagT$QTIMESTAMP
+QUERATE=$QTMPDIR/queueRate$QTIMESTAMP
+
+/opt/gridview/pbs/dispatcher-sched/bin/diagnose -n -v > $QUEDIAGN 2>&1
+/opt/gridview/pbs/dispatcher-sched/bin/diagnose -t > $QUEDIAGT 2>&1
+
+touch $QUERATE
+/opt/gridview/clusquota/bin/goldsh ChargeRate Query |grep 'NBM  Queue' > $QUERATE 2>&1
+if [ $? -eq 0 ];then
+## print the ClusQuota info
+  varUserCqSec=`/opt/gridview/clusquota/bin/cqlist -u $CHECKUSER |tail -n1|awk '{print $7}'`
+  let varUserCqHour=$varUserCqSec/3600
+  echo var dUserCqSec=$varUserCqSec\;
+  echo var dUserCqHour=$varUserCqHour\;
+  echo var clusquota_available=1\;
+else
+  echo var dUserCqSec=235929600\;
+  echo var dUserCqHour=65536\;
+  echo var clusquota_available=0\;
+fi
+
+queList=`qmgr -c 'p s'|grep 'create queue' |awk '{print $3}'`
+## print the Accessible Queue list
+queAcceList="["
+## get the Queue Status
+funcQueStat
+queAcceList=$queAcceList]
+echo var aQueList=$queAcceList\;
+
+## User Home Path
+echo var UserHomePath=\"`finger -mlp $CHECKUSER |head -n2|tail -n1|awk '{print $2}'`\"\;
+
+## Read config file
+source $DIRNAM/ANSYS_LSDYNA.setting
+
+## print the disk quota info
+if [ $nfs_quota_available -eq 1 ];then
+  DSKQUOTAF=$QTMPDIR/diskquotaf$QTIMESTAMP
+  DSKUSER=$CHECKUSER
+  if [ $DSKUSER = 'root' ];then
+    if [ $nfs_root_squash ];then
+       DSKUSER='nobody'
+    fi
+  fi
+  quota -uv $DSKUSER |grep "$nfs_quota_filesystem" > $DSKQUOTAF
+  diskUsed=`awk '{print $2}' $DSKQUOTAF`
+  diskLimits=`awk '{print $3}' $DSKQUOTAF`
+  let diskLimitsGb=diskLimits/1048576
+  echo var diskfilesystem=\"$nfs_quota_filesystem\"\;
+  echo var diskused=$diskUsed\;
+  echo var disklimits=$diskLimits\;
+  echo var disklimitsgb=$diskLimitsGb\;
+  echo var diskquota_available=1\;
+else
+  echo var diskfilesystem=null\;
+  echo var diskused=\"0\"\;
+  echo var disklimits=\"0\"\;
+  echo var disklimitsgb=\"0\"\;
+  echo var diskquota_available=0\;
+fi
+
+## print the Selected Queue
+if [ -z `echo $queAcceList |grep $queue_default` ];then
+	queAcceFirst=`echo $queAcceList |awk -F\" '{print $2}'`
+  echo var queSelected=\"$queAcceFirst\"\;
+else
+  echo var queSelected=\"$queue_default\"\;
+fi
+echo var numnodes=\"$nnodes_default\"\;
+echo var numppn=\"1\"\;
+# numppn(QuqueRelateRefresh)
+echo var name=\"${name_prefix}\"\;
+echo var hours=\"$hours_default\"\;
+echo var minutes=\"0\"\;
+echo var seconds=\"0\"\;
+
+echo var lictype=\"$lic_default\"\;
+echo var mpiruntype=\"hpmpi\"\;
+echo var seconds=\"0\"\;
+echo var liclist=\"$lic_list\"\;
+echo 'var s_lic=liclist.split(":")'\;
+echo var remoteshell=\"ssh\"\;
+echo var ib_available=\"$ib_available\"\;
+if [ "$ib_available" == 1 ];then
+echo var network=\"ib\"\;
+else
+echo var network=\"tcp\"\;
+fi
+echo var paramode=\"smp\"\;
+echo var inputtype=\"db\"\;
+echo var sharemem=\"0\"\;
+echo var cpubind=\"0\"\;
+echo var file=\"$mpiprog_default\"\;
+echo var mpiProgList=\"$mpiprog_list\"\;
+echo 'var s_mpiProg=mpiProgList.split(":")'\;
+echo var programarg=\"$programarg_default\"\;
+echo var workdir=\"`finger -mlp $CHECKUSER |head -n2|tail -n1|awk '{print $2}'`\"\;
+echo var output=\"${output_prefix}\"\;
+
+echo var vnc_available=\"$vnc_available\"\;
+echo var vnc=\"0\"\;
+
+echo var gputype=\"nvidia\"\;
+echo var gpuacc_available=\"$gpuacc_available\"\;
+echo var gpuacc=\"0\"\;
+
+
+rm -rf $QTMPDIR
+
+echo var userhome=\"`finger -mlp $CHECKUSER |head -n2|tail -n1|awk '{print $2}'`\"\;
+
+echo var portal_version=\"${version}\"\;
+echo var imgName=\"${PORTALNAM}.png\"\;
+
+

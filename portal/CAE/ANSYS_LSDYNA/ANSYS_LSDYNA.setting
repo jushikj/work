@@ -1,0 +1,26 @@
+version=20131229
+
+## disk quota info
+## run 'quota -uv' to check it
+nfs_quota_available=0
+nfs_root_squash=1
+nfs_quota_filesystem=node22:/home
+
+## pbs setting
+queue_default=test
+nnodes_default=4
+name_prefix=`echo ${PORTALNAM}|tr [A-Z] [a-z]`
+hours_default=1
+
+## run setting
+ output_prefix=`echo ${PORTALNAM}|tr [A-Z] [a-z]`
+mpiprog_default=/public/software/ansys_inc/v121/ansys/bin/ansys121
+mpiprog_list=/public/software/ansys_inc/v121/ansys/bin/ansys121
+programarg_default=' '
+
+## vnc_setting
+vnc_available=0
+
+## runfile setting
+ANSYS_ENVFILE=/public/software/profile.d/ansys-env.sh
+debug=1
