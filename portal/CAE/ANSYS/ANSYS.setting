@@ -21,8 +21,9 @@ ib_available=1
 mpiprog_default=/public/software/ansys_inc/v121/ansys/bin/ansys121
 mpiprog_list=/public/software/ansys_inc/v121/ansys/bin/ansys121:
 programarg_default=' '
-mpi_default=pc
-mpi_list=intelmpi:pcmpi
+mpi_default=pcmpi
+mpi_list=pcmpi:intelmpi
+
 ## vnc_setting
 vnc_available=0
 
