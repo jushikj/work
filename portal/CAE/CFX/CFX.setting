@@ -1,0 +1,33 @@
+version=20131229
+
+## disk quota info
+## run 'quota -uv' to check it
+nfs_quota_available=0
+nfs_root_squash=1
+nfs_quota_filesystem=node22:/home
+
+## pbs setting
+queue_default=test
+nnodes_default=4
+name_prefix=`echo ${PORTALNAM}|tr [A-Z] [a-z]`
+hours_default=1
+
+## run setting
+prog_default=/public/software/ansys_inc/v140/CFX/bin/cfx5solve
+prog_list=/public/software/ansys_inc/v140/CFX/bin/cfx5solve:
+output_prefix=`echo ${PORTALNAM}|tr [A-Z] [a-z]`
+programarg_default=' '
+mpi_default=hpmpi
+mpi_list=hpmpi:mpich
+
+## vnc_setting
+vnc_available=0
+
+## checkpoint setting
+checkpoint_availabel=1
+interval_default=240
+min_interval=5
+
+## runfile setting
+cfx_envfile=/public/software/profile.d/ansys-env.sh 
+debug=1

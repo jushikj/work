@@ -1,0 +1,186 @@
+#!/bin/bash 
+
+get_portal_input()
+{
+  QTIMESTAMP=`date +%G%m%d_%H%M`
+  PORTALVAR=/tmp/cfx_CFX$USER$QTIMESTAMP.var
+
+  dos2unix -n $1 $PORTALVAR 2>/dev/null
+  source $PORTALVAR
+  #GAP_PPN=12
+  #GAP_INTERVAL=null
+  #GAP_PBS_OPT=''
+  #GAP_PRECISION=single
+  #GAP_INPUT='/public/users/mashj/cfx-test/Benchmark.def'
+  #GAP_CKECK_POINT=null
+  #GAP_METHOD='HP MPI'
+  #GAP_PRE_CMD=''
+  #GAP_MODE=Distributed
+  #GAP_NAME=cfx_1002_165029
+  #GAP_REMOTE_SHELL=ssh
+  #GAP_PROGRAM_ARG=
+  #GAP_VNC=null
+  #GAP_POST_CMD=''
+  #GAP_PROGRAM='/public/software/ansys_inc/v121/CFX/bin/cfx5solve'
+  #GAP_NNODES=4
+  #GAP_WALL_TIME=1:0:0
+  #GAP_QUEUE=I_cb60
+  #GAP_OUTPUT=cfx_1002_165029.txt
+  #GAP_WORK_DIR='/public/users/mashj/cfx-test'
+
+}
+
+get_basic_params()
+{
+  ## CFX Input check
+  source /opt/gridview/gridviewAppTemplate/CAE/CFX/CFX.setting
+  ### runfile setting
+  pbsfile=${GAP_NAME}.pbs
+  time=`date +%m%d%H%M%S`
+  username=`whoami`
+}
+
+parse_portal_params()
+{
+  dollor=$
+  if [ "$GAP_PRECISION" == double ];then
+     PRECISION_ARG="-double"
+     else
+     PRECISION_ARG=""
+  fi
+  GAP_MODE="Distributed"
+  if [ "${GAP_MPI_TYPE}" == "hpmpi" ];then
+    GAP_METHOD="HP MPI"
+  else
+    GAP_METHOD="MPICH"
+  fi
+
+
+  if [ "$GAP_VNC" == 1 ];then
+     VNC_OPTION="-vnc"
+     CFX_ARG="  "
+     GAP_DEF_INPUT=""
+     GAP_RES_INPUT=""
+  else
+     if [ "${GAP_DEF_FILE}" != "" ];then
+        GAP_DEF_INPUT="-def ${GAP_DEF_FILE}"
+     else
+        GAP_DEF_INPUT=""
+     fi
+     if [ "${GAP_TIME}" == "transient" ];then
+        if [ "${GAP_RES_FILE}" != "" ];then
+           GAP_RES_INPUT="-continue-from-file ${GAP_RES_FILE}"
+        else
+           GAP_RES_INPUT=""
+        fi
+     else
+        GAP_RES_INPUT=""
+     fi
+  fi
+
+  Para_ARG="-par-dist ${dollor}hostlist -start-method  '${GAP_METHOD} ${GAP_MODE} Parallel' "
+  CFX_ARG=" ${GAP_DEF_INPUT} ${GAP_RES_INPUT} ${PRECISION_ARG} ${GAP_ARGUMENTS} $Para_ARG"
+
+
+  #if [ "$GAP_VNC" == 1 ];then
+  #   VNC_OPTION="-vnc"
+  #   CFX_ARG="  "
+  # else
+  #  VNC_OPTION=""
+  #  if [ "$GAP_MODE" == serial ];then
+  #    CFX_ARG=" -def ${GAP_INPUT} ${PRECISION_ARG} ${GAP_PROGRAM_ARG}"
+  #  elif [ "$GAP_MODE" == Local ];then
+  #    Para_ARG="-partition ${dollor}NP -start-method  '${GAP_METHOD} ${GAP_MODE} Parallel ' "
+  #    CFX_ARG=" -def ${GAP_INPUT} ${PRECISION_ARG} ${GAP_PROGRAM_ARG} $Para_ARG"
+  # else
+  #   Para_ARG="-par-dist ${dollor}hostlist -start-method  '${GAP_METHOD} ${GAP_MODE} Parallel' "
+  #    CFX_ARG=" -def ${GAP_INPUT} ${PRECISION_ARG} ${GAP_PROGRAM_ARG} $Para_ARG"
+  #  fi
+  #fi
+
+  if [ "$GAP_REMOTE_SHELL" == ssh ];then
+    rshcommand='export CFX5RSH=ssh'
+  else
+    rshcommand='export CFX5RSH=rsh'
+  fi
+
+  hostlistcommand='hostlist=""...for node in `cat $PBS_NODEFILE | uniq`;do...num=`cat $PBS_NODEFILE | grep $node | wc -l`...if [ -z $hostlist ];then... hostlist=$node*$num...else...hostlist=$hostlist,$node*$num...fi...done'
+  cd ${GAP_WORK_DIR}
+}
+
+create_pbs_script()
+{
+  ##############################################################################################################################################oi#
+  #createpbs -t Type [-o logfile] [-pbs pbsfile]
+  #        -prog Program  [-proarg Program Argment] 
+  #       [-nnodes NodeNum] [-ppn PPN] [-wtime WallTime] [-name JobName] [-wdir WorkDir] [-q queque] [ -pbsoption 'option1:option2: ... :optionN' ]
+  #       [-envfile envfile1 envfile2 ... envfileN] 
+  #       [-precommand 'command1:command2: ... commandN'] [ -postcommand 'command1:command2: ... :commandN' )
+  #       [-vnc]
+  #       [-mpirun mpirun command] [-net Network] [-r ssh/rsh] [-bindcore] [-mpiarg MPIRUN Argment] 
+  #       [-cri CheckPoint Interval(Minitues)] [-ocpg Old CheckPoint Group name] [-ncpg Old CheckPoint Group name] [-ncp number CheckPoints]
+  #       Type should be serial,openmpi,intelmpi cr_mpi, mvapich2,mpich2
+  #       Network should be tcp,ib,memory,ib_memory,tcp_memory #
+  ##############################################################################################################################################
+
+  /opt/gridview/gridviewAppTemplate/createpbs -t serial -o "${GAP_OUTPUT}" -pbs ${pbsfile} \
+              -prog "${GAP_PROGRAM}" -proarg "${CFX_ARG}"\
+              -envfile  "${cfx_envfile}"     \
+              -precommand "${rshcommand}...${hostlistcommand}...echo hostlist is ${dollor}hostlist|tee -a ${GAP_OUTPUT}...${GAP_PRE_CMD}" -postcommand "${GAP_POST_CMD}" \
+              ${VNC_OPTION}  \
+              -nnodes   "${GAP_NNODES}" -ppn "${GAP_PPN}" -wtime "${GAP_WALL_TIME}" -name "${GAP_NAME}" -wdir "${GAP_WORK_DIR}" -q "${GAP_QUEUE}"  \
+               -pbsoption "${GAP_PBS_OPT}" \
+              -ncpg '$id.ckps' -cri "${GAP_INTERVAL}" -ncp 2 
+}
+
+submit_job()
+{
+  jobid=`qsub $pbsfile`
+  return $?
+}
+
+checkpoint_func()
+{
+  if [ "${GAP_CHECK_POINT}" == 1 ];then
+      id=`echo $jobid|awk -F. '{print $1}' `
+      echo "Jobid:${id}
+      Cr_type:mpi_system
+      User_name:`whoami`
+      Work_dir:${wdir}
+      Job_batch:autocr.${id}.pbs
+      Cr_batch:autocr.${id}.pbs
+      Cr_interval:${cri}
+      Num_CP_save:${ncp}
+      " >/checkpoints/autocr/spoolautocr.${id}.Q
+    fi
+}
+
+clean_tmp_file()
+{
+    if [ "$debug" != "1" ];then
+      rm -f /tmp/${prefix}.var
+      rm -f /tmp/${prefix}.runvar
+      rm -f $PORTALVAR
+    fi
+}
+output_result()
+{
+    if [ "$1" == "0" ];then
+     echo $jobid | grep "^[0-9]*\.\w*" || exit 1
+    else
+     echo "Job Submit Error: ${jobid}" && exit 1
+    fi
+}
+main()
+{
+  get_portal_input $@
+  get_basic_params $@
+  parse_portal_params
+  create_pbs_script
+  submit_job
+  job_status=$?
+  checkpoint_func
+  clean_tmp_file
+  output_result ${job_status}
+}
+main "$@"

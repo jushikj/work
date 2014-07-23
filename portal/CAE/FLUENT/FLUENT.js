@@ -220,7 +220,7 @@ var global_jobscheduler_general = {
 		global_jobscheduler_general.input_jou_file=input_jou_file;
 		//jou file radio
 		radio_jou_file = new Gv.form.RadioGroup({
-	    id:'portal_fluent_batch_mode_parames_time_type',
+	        id:'portal_fluent_batch_mode_parames_time_type',
             renderTo: 'page-portal-fluent-bmp-jou-file-radio',
             defualtName: 'jou-file',
             items: [{

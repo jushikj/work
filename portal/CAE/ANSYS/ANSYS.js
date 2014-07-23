@@ -241,8 +241,8 @@
             global_jobscheduler_portal_ansys.ansys_total_workspace_input.value('');
             global_jobscheduler_portal_ansys.ansys_database_input.validate();
             global_jobscheduler_portal_ansys.ansys_total_workspace_input.validate();
-            global_jobscheduler_portal_ansys.ansys_database_input.disabled(false);
-            global_jobscheduler_portal_ansys.ansys_total_workspace_input.disabled(false);
+            global_jobscheduler_portal_ansys.ansys_database_input.disabled(true);
+            global_jobscheduler_portal_ansys.ansys_total_workspace_input.disabled(true);
         }
         
       }
@@ -316,7 +316,7 @@
             handler: function() {
                 var workdirRunFilePanel = new Gv.SelectFileWindow({
                     defaultPath: Gv.get('portal-pbs-params-workdir').val(),
-                    isDir: true,
+                    isDir: false,
                     tbar: [{
                         text: '确定',
                         handler: function(obj) {
