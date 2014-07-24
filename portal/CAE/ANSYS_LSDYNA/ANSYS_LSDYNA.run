@@ -109,19 +109,20 @@ parse_portal_params()
 	fi
 	## memory
 	if [ "${GAP_MEMORY}" != "" ];then
-		MEMORY="-memory ${GAP_MEMORY}m"
+		MEMORY="memory=${GAP_MEMORY}m"
 	else
 		MEMORY=""
 	fi
 	## gpu acc option
 
 	## vnc option
+	NCPUS="ncpus=${GAP_PPN}"
 	cd ${GAP_WORK_DIR}
 }
 
 create_lsdyna_script()
 {
-	/opt/gridview/gridviewAppTemplate/createpbs -t serial -o "${GAP_MPI_OUTPUT}" -pbs ${pbsfile} -precommand "${PRECMD}" -prog "${GAP_PROGRAM}" -proarg "${MPIINPUT} ${MPP} ${INP} ${MEMORY} ${PRECISION} ${RUNLIST} ${RSH} ${GAP_ARGUMENTS}" -envfile "${ANSYS_ENVFILE}"  -nnodes   "${GAP_NNODES}" -ppn "${GAP_PPN}" -wtime "${GAP_WALL_TIME}" -name "${GAP_NAME}" -wdir "${GAP_WORK_DIR}" -q "${GAP_QUEUE}" -pbsoption "${GAP_PBS_OPT}" 
+	/opt/gridview/gridviewAppTemplate/createpbs -t serial -o "${GAP_MPI_OUTPUT}" -pbs ${pbsfile} -precommand "${PRECMD}" -prog "${GAP_PROGRAM}" -proarg "${MPIINPUT} ${MPP} ${NCPUS} ${INP} ${MEMORY} ${PRECISION} ${RUNLIST} ${RSH} ${GAP_ARGUMENTS}" -envfile "${ANSYS_ENVFILE}"  -nnodes   "${GAP_NNODES}" -ppn "${GAP_PPN}" -wtime "${GAP_WALL_TIME}" -name "${GAP_NAME}" -wdir "${GAP_WORK_DIR}" -q "${GAP_QUEUE}" -pbsoption "${GAP_PBS_OPT}" 
 	sed -i 's/GridViewPortalColon/:/g' ${pbsfile}
 }
 
