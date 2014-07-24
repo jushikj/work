@@ -72,9 +72,9 @@ parse_portal_params()
 	fi
 
 	## MPI Type optios
-	if [ "${GAP_MPI_MPIRUNTYPE}" == "pcmpi" ];then
+	if [ "${GAP_MPI_TYPE}" == "pcmpi" ];then
 		MPIINPUT="-mpi PCMPI"
-	elif [ "${GAP_MPI_MPIRUNTYPE}" == "intelmpi" ]
+	elif [ "${GAP_MPI_MPIRUNTYPE}" == "intelmpi" ];then
 		MPIINPUT="-mpi INTELMPI"
 	else 
 		MPIINPUT="-mpi HPMPI"
@@ -106,7 +106,7 @@ parse_portal_params()
 		#no mpi
 		MPIINPUT=""
 		MPP=""
-
+	fi
 	## memory
 	if [ "${GAP_MEMORY}" != "" ];then
 		MEMORY="-memory ${GAP_MEMORY}m"
@@ -127,7 +127,7 @@ create_lsdyna_script()
 
 create_tclsdyna_script()
 {
-
+	echo "nothing" >> /dev/null
 }
 
 create_pbs_script()
