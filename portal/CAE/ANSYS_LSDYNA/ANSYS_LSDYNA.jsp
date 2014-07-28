@@ -223,14 +223,15 @@ gen_time_identify_string = function() {
                     <div class="cl">
                       <div class="fl" style="display:inline; margin-right:20px;">
                         <span id="page-portal-ansys-lsdyna-version"/>
-                        <span id="page-portal-ansys-lsdyna-mpi-type"/>
+                        <span>Remote Shell:</span><span id='page-portal-ansys-lsdyna-remote-shell'/>
                         <span id='page-portal-ansys-lsdyna-arguments'></span>
                         <span id='page-portal-ansys-lsdyna-memory'></span>
+                        <span id='page-portal-ansys-lsdyna-output-log'></span>
                       </div>
                       <div class="fl">
                         <span>Parallel Mode:</span><span id="page-portal-ansys-lsdyna-parallel-mode"/>
                         <span>Precision:</span><span id="page-portal-ansys-lsdyna-precision"/><br/>
-                        <span>Remote Shell:</span><span id='page-portal-ansys-lsdyna-remote-shell'/>
+                        <span id="page-portal-ansys-lsdyna-mpi-type"/>
                         <div>
                           <span id='page-portal-ansys-lsdyna-ansys-bin' style="display: inline-block;"></span>
                           <a id='page-portal-ansys-lsdyna-ansys-bin-btn' style="display: inline-block; vertical-align: middle;"></a>

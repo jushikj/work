@@ -37,6 +37,7 @@
     });
     this.ansys_lsdyna_parallel_mode=ansys_lsdyna_parallel_mode;
 
+    /*
     $("#"+ansys_lsdyna_parallel_mode.getId()+" input").bind('click',function(){
         if(this.value=='dmp'){
             ansys_lsdyna_mpi_type.disabled(false);
@@ -44,7 +45,7 @@
             ansys_lsdyna_mpi_type.disabled(true);
         }
     });
-
+    */
     // precission
     ansys_lsdyna_precission = new Gv.form.RadioGroup({
             id:'page-portal-ansys-lsdyna-precision-radio',
@@ -145,7 +146,7 @@
         value: mpi_def,
         autoLoad:false,
         data:o_mpi,
-        disabled:true
+        disabled:false
     });
     this.ansys_lsdyna_mpi_type=ansys_lsdyna_mpi_type;
     this.ansys_lsdyna_env_params.push(ansys_lsdyna_mpi_type);
@@ -202,6 +203,16 @@
     });
     this.ansys_lsdyna_memory=ansys_lsdyna_memory;
     this.ansys_lsdyna_env_params.push(ansys_lsdyna_memory);
+    // output log
+    ansys_lsdyna_output_log = new Gv.form.TextField({
+            renderTo: 'page-portal-ansys-lsdyna-output-log',
+            fieldLabel: '<font color="#FF0000">*</font>Output Log',
+            allowBlank: false,
+            disabled:false,
+            value:PORTALNAM + "_" + portal_time_stamp + '.log'
+    });
+    this.ansys_lsdyna_output_log=ansys_lsdyna_output_log;
+    this.ansys_lsdyna_env_params.push(ansys_lsdyna_output_log);
 
     // keyword file
     ansys_lsdyna_keyword_file = new Gv.form.TextField({
@@ -280,6 +291,7 @@
         "GAP_WORK_DIR":"\'" +global_portal_ansys_lsdyna.ansys_lsdyna_work_dir.value()+ "\'",
         "GAP_MEMORY":"\'" +global_portal_ansys_lsdyna.ansys_lsdyna_memory.value()+ "\'",
         "GAP_KEYWORD_FILE":"\'" +global_portal_ansys_lsdyna.ansys_lsdyna_keyword_file.value()+ "\'",
+        "GAP_OUTPUT":"\'" +global_portal_ansys_lsdyna.ansys_lsdyna_output_log.value()+ "\'",
 
         //Remote Visualization Parameters
         "GAP_VNC": "\'" + Gv.get("portal-pbs-params-vnc").val()+"\'",

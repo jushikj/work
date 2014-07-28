@@ -122,13 +122,17 @@ parse_portal_params()
 
 create_lsdyna_script()
 {
-	/opt/gridview/gridviewAppTemplate/createpbs -t serial -o "${GAP_MPI_OUTPUT}" -pbs ${pbsfile} -precommand "${PRECMD}" -prog "${GAP_PROGRAM}" -proarg "${MPIINPUT} ${MPP} ${NCPUS} ${INP} ${MEMORY} ${PRECISION} ${RUNLIST} ${RSH} ${GAP_ARGUMENTS}" -envfile "${ANSYS_ENVFILE}"  -nnodes   "${GAP_NNODES}" -ppn "${GAP_PPN}" -wtime "${GAP_WALL_TIME}" -name "${GAP_NAME}" -wdir "${GAP_WORK_DIR}" -q "${GAP_QUEUE}" -pbsoption "${GAP_PBS_OPT}" 
+	/opt/gridview/gridviewAppTemplate/createpbs -t serial -o "${GAP_OUTPUT}" -pbs ${pbsfile} -precommand "${PRECMD}" -prog "${GAP_PROGRAM}" -proarg "${MPIINPUT} ${MPP} ${NCPUS} ${INP} ${MEMORY} ${PRECISION} ${RUNLIST} ${RSH} ${GAP_ARGUMENTS}" -envfile "${ANSYS_ENVFILE}"  -nnodes   "${GAP_NNODES}" -ppn "${GAP_PPN}" -wtime "${GAP_WALL_TIME}" -name "${GAP_NAME}" -wdir "${GAP_WORK_DIR}" -q "${GAP_QUEUE}" -pbsoption "${GAP_PBS_OPT}" 
 	sed -i 's/GridViewPortalColon/:/g' ${pbsfile}
 }
 
 create_tclsdyna_script()
 {
-	echo "nothing" >> /dev/null
+	NPSUM=$[${GAP_NNODES}*${GAP_PPN}]
+	np="-np ${NPSUM}"
+
+	/opt/gridview/gridviewAppTemplate/createpbs -t serial -o "${GAP_OUTPUT}" -pbs ${pbsfile} -precommand "${PRECMD}" -prog "${GAP_PROGRAM}" -proarg "${MPIINPUT} ${np} ${INP} ${MEMORY} 2>&1|tee ./${GAP_OUTPUT} & ${RUNLIST} ${RSH} ${GAP_ARGUMENTS}" -envfile "${ANSYS_ENVFILE}"  -nnodes   "${GAP_NNODES}" -ppn "${GAP_PPN}" -wtime "${GAP_WALL_TIME}" -name "${GAP_NAME}" -wdir "${GAP_WORK_DIR}" -q "${GAP_QUEUE}" -pbsoption "${GAP_PBS_OPT}" 
+	sed -i 's/GridViewPortalColon/:/g' ${pbsfile}
 }
 
 create_pbs_script()
