@@ -11,17 +11,17 @@
             readOnly: false,
             width: 540,
             value: program,
-	        autoLoad:false,
+	    autoLoad:false,
             data:program_list.split(":")
         });
         program_button = new Gv.Button({
             renderTo: 'page-portal-Program-Select',
             cls:'button',
-            text:'程序选择',
+            text:'Browse...',
             handler: function() {
                 var programRunFilePanel = new Gv.SelectFileWindow({
                     defaultPath: Gv.get('portal-pbs-params-program').val(),
-                    isDir: true,
+                    isDir: false,
                     tbar: [{
                         text: '确定',
                         handler: function(obj) {

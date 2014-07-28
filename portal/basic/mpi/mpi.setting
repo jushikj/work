@@ -14,12 +14,21 @@ hours_default=1
 source $(dirname $(readlink -f $BASH_SOURCE))/common_functions
 
 openmpi_envfile=$(find_software_env mpi_openmpi-intel)
+: ${openmpi_envfile:=/public/software/profile.d/mpi_openmpi-1.6.5-intel.sh}
+openmpi_dir=$(find_software_dir mpi_openmpi-intel)
+: ${openmpi_dir:=/public/software/mpi/openmpi/1.6.5/intel}
 mvapich2_envfile=$(find_software_env mpi_mvapich2-intel)
+: ${mvapich2_envfile:=/public/software/profile.d/mpi_mvapich2-1.9-intel.sh}
+mvapich2_dir=$(find_software_dir mpi_mvapich2-intel)
+: ${mvapich2_dir:=/public/software//mpi/mvapich2/1.9/intel}
 mpich_envfile=$(find_software_env mpi_mpich-intel)
+: ${mpich_envfile=/public/software/profile.d/mpi_mpich-3.0.4-intel.sh}
+mpich_dir=$(find_software_dir mpi_mpich-intel)
+: ${mpich_dir:=/public/software/mpi/mpich/3.0.4/intel}
 
 mpi_list=openmpi:mvapich2:mpich2
 
-program_list=$(find_software_dir mpi_openmpi-intel)/examples/cpi:$(find_software_dir mpi_openmpi-gnu)/examples/cpi
+program_list=${openmpi_dir}/examples/cpi
 program_argument_list=''
 
 ib_available=1
@@ -27,13 +36,16 @@ ib_available=1
 output_prefix=`echo ${PORTALNAM}|tr [A-Z] [a-z]`
 
 #for predefine
-PORTAL_PREDEFINE_LIST='{"Default Program List":"program_list", "Default Work Dir List": "workdir_list",
-"Default Program Argument List":"program_argument_list", "MPI List":"mpi_list"}'
+PORTAL_PREDEFINE_LIST='{"MPI List":"mpi_list", "Default Program List":"program_list",
+"Default MPI Env Files":"mpi_envfile_list",
+"Default Work Dir List": "workdir_list","Default Program Argument List":"program_argument_list",  
+"Default PBS Options":"portal_pbsoptions", "Default MPI Options": "portal_mpioptions", 
+"Default PreCommands": "portal_precommands", "Default PostCommands": "portal_postcommands"}'
 
 ## vnc_setting
 vnc_available=0
 
 ## checkpoint setting
-checkpoint_availabel=1
+checkpoint_availabel=0
 interval_default=240
 min_interval=5

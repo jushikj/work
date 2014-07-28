@@ -12,7 +12,7 @@ hours_default=1
 
 ## run setting
 output_prefix=`echo ${PORTALNAM}|tr [A-Z] [a-z]`
-program_list='hostname:'
+program_list='/bin/hostname:sleep 500:gedit'
 program_argument_list=':'
 
 ## vnc_setting
@@ -24,5 +24,9 @@ interval_default=240
 min_interval=5
 
 ## runfile setting
-PORTAL_PREDEFINE_LIST='{"Default Program List":"program_list", "Default Work Dir": "workdir_list",
-"Default Program Arguments":"program_argument_list"}'
+PORTAL_PREDEFINE_LIST='{"Default Program List":"program_list", 
+"Default Program Arguments":"program_argument_list",
+"Default Work Dir": "workdir_list",
+"Default PBS Options":"portal_pbsoptions",
+"Default PreCommands": "portal_precommands",
+"Default PostCommands": "portal_postcommands"}'

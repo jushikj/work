@@ -6,6 +6,12 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>作业提交</title>
+<style>
+	.ov {
+	overflow:auto !important;
+}
+
+</style>
 <script type="text/javascript">
 $(function(){
     $(".form-group").each(function(index, element) {
@@ -33,11 +39,11 @@ $(function(){
 			if($(this).find("i").attr("class")=="icon-caret-left"){
 				$(this).find("i").attr("class","icon-caret-right");
 				$(".page-portal-main").animate({"marginRight":300},200);
-				$(".page-portal-side").animate({"width":299},200);
+				$(".page-portal-side").animate({"width":299},200).addClass("ov");
 			}else{
 				$(this).find("i").attr("class","icon-caret-left");
 				$(".page-portal-main").animate({"marginRight":10},200);
-				$(".page-portal-side").animate({"width":9},200);
+				$(".page-portal-side").animate({"width":9},200).removeClass("ov");
 			};
 		});
     }else{
@@ -47,11 +53,11 @@ $(function(){
 			if($(this).find("i").attr("class")=="icon-caret-left"){
 				$(this).find("i").attr("class","icon-caret-right");
 				$(".page-portal-main").animate({"marginRight":300},200);
-				$(".page-portal-side").animate({"width":299},200);
+				$(".page-portal-side").animate({"width":299},200).addClass("ov");
 			}else{
 				$(this).find("i").attr("class","icon-caret-left");
 				$(".page-portal-main").animate({"marginRight":10},200);
-				$(".page-portal-side").animate({"width":9},200);
+				$(".page-portal-side").animate({"width":9},200).removeClass("ov");
 			};
 		});
     };
@@ -287,16 +293,14 @@ gen_time_identify_string = function() {
             <div class="portal-sideMenu">
                 <h3 class="on">Introduction</h3>
                 <div class="portal-sideMenu-help" id="page-portal-tips-introduction"> </div>
-                <h3>Run Tips</h3>
-                <div class="portal-sideMenu-help" id="page-portal-tips-run"> </div>
-                <h3>Resource Tips</h3>
+                <h3>Available Resource Tips</h3>
                 <div class="portal-sideMenu-help" id="page-portal-tips-resource"> </div>
                 <h3>Job Schedule Tips</h3>
                 <div class="portal-sideMenu-help" id="page-portal-tips-sched"> </div>
+                <h3>Run Tips</h3>
+                <div class="portal-sideMenu-help" id="page-portal-tips-run"> </div>
                 <h3>Remote Visualiztion Tips</h3>
                 <div class="portal-sideMenu-help" id="page-portal-tips-vnc"> </div>
-                <h3>Checkpoint Start/Restart Tips</h3>
-                <div class="portal-sideMenu-help" id="page-portal-tips-checkpoint"> </div>
                 <h3>Advanced Parameter Tips</h3>
                 <div class="portal-sideMenu-help" id="page-portal-tips-adv"> </div>
             </div>
@@ -309,8 +313,8 @@ gen_time_identify_string = function() {
 <script type="text/javascript" src="/jm_as/basic/serial/serial.help.js"></script>
 <script type="text/javascript" src="/jm_as/basic/serial/serial.js"></script>
 <div class="jobupdate-floatdiv-bottom">
-<span id="job-Submission-do" onClick="mySubmit()"></span>
 <span id="job-Submission-preset" onClick="formPredefine()"></span>
+<span id="job-Submission-do" onClick="mySubmit()"></span>
 <span id="job-Submission-close" onClick="formReset()"></span>
 </div>
 </body>

@@ -8,7 +8,7 @@ var introduction_desc="\
 
 var run_tips_desc="\
 <p>\
-    <br />MPI Type:<br />\
+    <br />Program:<br />\
     <br />选择本次计算任务的可执行程序。 \
 </p>\
 <p>\
@@ -25,9 +25,9 @@ var run_tips_desc="\
     <p>&nbsp;</p>\
 </p>";
 
-var resource_tips_desc="\
+var resource_tips_desc = "\
 <p>\
-    <br />Queue Status:<br />\
+    <br />Cluster Queue Information:<br />\
     <br />列出当前集群上的工作队列及其可用资源。 \
 </p>\
 <p>\
@@ -68,6 +68,8 @@ var job_sched_tips_desc="\
 <p>\
     <br />Manage Job File:<br />\
     <br />启动WinSCP程序上传/下载计算任务的输入输出文件。\
+    <br />Web File Manager:<br />\
+    <br />Gridview界面下的文件管理，可以上传下载和修改文件。\
 </p>\
 <p>&nbsp;</p>";
 
@@ -95,11 +97,6 @@ var checkpoint_tips_desc="\
 
 var adv_tips_desc="\
 <p>\
-    <br />MPI Options:<br />\
-    <br />如果需要手动添加MPI并行时的高级参数，可在此处设置，\
-    这些参数将被传递成为mpirun命令行参数的一部分。该选项默认无需设置。\
-</p>\
-<p>\
     <br />PBS Options:<br />\
     <br />如果需要手动添加PBS作业的高级参数，可在此处设置。\
     这类参数的行首必须包含“#PBS”关键字，将被加到PBS脚本文件的开始处。该选项默认无需设置。\
@@ -123,5 +120,4 @@ $("#page-portal-tips-run").append(run_tips_desc);
 $("#page-portal-tips-resource").append(resource_tips_desc);
 $("#page-portal-tips-sched").append(job_sched_tips_desc);
 $("#page-portal-tips-vnc").append(vnc_tips_desc);
-$("#page-portal-tips-checkpoint").append(checkpoint_tips_desc);
 $("#page-portal-tips-adv").append(adv_tips_desc);

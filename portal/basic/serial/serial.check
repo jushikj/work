@@ -26,7 +26,7 @@ get_user_info()
 get_portal_default()
 {
     echo "var numnodes=\"$nnodes_default\";"
-    echo "var numppn=\"$ppn_default\";"
+    echo "var numppn=\"1\";"
     echo "var name=\"${name_prefix}\";"
     echo "var hours=\"$hours_default\";"
     echo "var minutes=\"0\";"
@@ -39,6 +39,9 @@ get_portal_default()
     echo "var interval_def=\"$interval_default\";"
     echo "var min_interval=\"$min_interval\";"
     echo "var current_time=\"$QTIMESTAMP\";"
+    echo "var portal_pbsoptions=\"$portal_pbsoptions\";"
+    echo "var portal_precommands=\"$portal_precommands\";"
+    echo "var portal_postcommands=\"$portal_postcommands\";"
     echo "var portal_predefine_list=$PORTAL_PREDEFINE_LIST;"
 }
 
@@ -47,7 +50,7 @@ get_program_info()
     if [ "${workdir_list}" == "" ];then
         workdir_list="${user_home}:"
     fi
-    echo "var program_list=\"$program_list\";"
+    echo "var program_list='$program_list';"
     echo "var program=program_list.split(':')[0];"
     echo "var program_argument_list=\"$program_argument_list\";"
     echo "var program_argument=program_argument_list.split(':')[0];"

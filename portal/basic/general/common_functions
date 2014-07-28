@@ -150,6 +150,44 @@ export CP_LOG_FILE=${CP_LOG_FILE}
 EOF
 }
 
+#this function will get software manager record file path from cfg for user
+get_software_manager_cfg_params_user()
+{
+    
+    if [ -f "/root/.gridview/conf/softwaremanagement/smconf/softwaremanager.properties" ];then
+        SOFTWARE_MANAGER_PROPERTIES="/root/.gridview/conf/softwaremanagement/smconf/softwaremanager.properties"
+    fi
+    if [ ! -z $SOFTWARE_MANAGER_PROPERTIES ] && [ -f ${SOFTWARE_MANAGER_PROPERTIES} ];then
+        source ${SOFTWARE_MANAGER_PROPERTIES} 
+    fi
+    if [ "$UID" == "0" ];then
+        : ${DEPOT_PATH:=/opt/gridview/software_depot}
+	: ${PUBLIC_PATH:=/soft}
+        : ${INSTALL_RECORD:=${PUBLIC_PATH}/.gridview/record/software_manager}
+        : ${OPERATE_LOG_PATH:=${PUBLIC_PATH}/.gridview/log/software_manager}
+        : ${ICONS_PATH:=${PUBLIC_PATH}/.gridview/icons/software_manager}
+    else
+        : ${DEPOT_PATH:=$(readlink -f ${BASH_SOURCE})../../../}
+        INSTALL_RECORD=${HOME}/.gridview/record/software_manager
+        OPERATE_LOG_PATH=${HOME}/.gridview/log/software_manager
+        : ${ICONS_PATH:=/soft/.gridview/icons/software_manager}
+    fi
+}
+
+#this function will get software manager record file path from cfg for all
+get_software_manager_cfg_params_all()
+{
+    if [ -f "/root/.gridview/conf/softwaremanagement/smconf/softwaremanager.properties" ];then
+        software_manager_properties="/root/.gridview/conf/softwaremanagement/smconf/softwaremanager.properties"
+    fi
+    if [ -f "${SOFTWARE_MANAGER_PROPERTIES}" ];then
+        source ${SOFTWARE_MANAGER_PROPERTIES} 
+    else
+        INSTALL_RECORD=/public/.gridview/record/software_manager
+        OPERATE_LOG_PATH=/public/.gridview/log/software_manager
+    fi
+}
+
 #this function will make software install record file
 #input $@
 make_install_record()
@@ -160,39 +198,37 @@ make_install_record()
         make_software_cfg
     fi
     source ${CP_CFG_FILE}
-    current_user=$(whoami);
-    if [ $current_user == "root" ];then
-        userhome=/public
-    else
-        userhome=${HOME}
-    fi
-    mkdir -p ${userhome}/.gridview/record/software_manager
-    record_file=${userhome}/.gridview/record/software_manager/${CP_CFG_FILE##*/};
-    record_file=${record_file%.*}.log;
-    if [ -f ${record_file} ];then
-        return;
-    fi
+
+    get_software_manager_cfg_params_user
+    mkdir -p ${INSTALL_RECORD}
+
+    soft_cfg_prefix=$(source ${CP_ROOT_DIR}/clussoft.cfg && echo ${CP_CFG_FILE})
+    soft_cfg_prefix=${soft_cfg_prefix##*/}
+    soft_cfg_prefix=${soft_cfg_prefix%.*}
+
+    record_file=${INSTALL_RECORD}/${soft_cfg_prefix}.log
     if [ "${CP_ROOT_DIR}" == "" ];then
-        CP_ROOT_DIR=$(readlink -f $(dirname $0))
+        CP_ROOT_DIR=$(readlink -f $(dirname $BASH_SOURCE))
     fi
-    software_prefix=$(cat ${CP_ROOT_DIR}/clussoft.cfg|grep CP_CFG_FILE|awk -F"=" '{print $2}')
-    software_prefix=${software_prefix##*/}
-    software_prefix=${software_prefix%.*}
+
+    #if [ -f ${record_file} ];then
+    #    return;
+    #fi
 cat <<EOF > ${record_file}
-OPERATELOG_PATH=${userhome}/.gridview/log/${software_prefix}
-INSTALL_CFG_PATH=${CP_CFG_FILE}
+OPERATELOG_PATH=${OPERATE_LOG_PATH}/${soft_cfg_prefix}
+INSTALL_CFG_PATH=${HOME}/.gridview/conf/software_manager/${CP_CFG_FILE##*/}
 INSTALLED_TYPE=${INSTALL_TYPE}
 SETENV_NODES=${SETENV_NODES}
 INSTALLED_ENVFILE=${CP_SOFT_ENV}
 REMARK=$(whoami) install it!
 $(cat $CP_ROOT_DIR/description.info|grep DESCRIPTION)
-INSTALL_TIME=$(date +%F" "%H":"%m":"%S)
+INSTALL_TIME=$(date +%F" "%H":"%M":"%S)
 RECORD_PATH=${record_file}
 INSTALLED_PATH=${CP_SOFT_DIR}
 INSTALLER=$(whoami)
 INSTALLED_NODES=${INSTALL_NODES}
-ICON_PATH=/public/.gridview/icons/software_manager/$(echo ${CP_CFG_FILE##*/}|awk -F"." '{print $1}')_icon.png
-UNINSTALL_PATH=/opt/gridview/software_depot/uninstall.sh
+ICON_PATH=${ICONS_PATH}/${soft_cfg_prefix}_icon.png
+UNINSTALL_PATH=${DEPOT_PATH}/uninstall.sh
 $(cat $CP_ROOT_DIR/description.info|grep NAME)
 $(cat $CP_ROOT_DIR/description.info|grep VERSION)
 EOF
@@ -205,26 +241,34 @@ find_software_env()
         echo "Usage: find_software_env type_name"
         exit 1;
     fi
-    #find intel env file from /public/.gridview/record files
-    software_env_file=`find /public/.gridview/record -name $1\*log\
-        | head -n1|xargs cat|grep 'INSTALLED_ENVFILE'|cut -d= -f2`
-    if [ $? -eq 0 ] && [ ! -z $software_env_file ] && [ -f $software_env_file ];then
-        echo "$software_env_file"
-        return 0;
-    fi
 
     #find intel env file from ~/.gridview/conf/software_manager file
-    if [ ! -d ~/.gridview/record ];then
-        return 1;
-    fi
-    software_env_file=`find ~/.gridview/record -name $1\*log\
-        | head -n1|xargs cat|grep 'INSTALLED_ENVFILE'|cut -d= -f2`
-    if [ $? -eq 0 ] && [ ! -z $software_env_file ] && [ -f $software_env_file ];then
+    get_software_manager_cfg_params_user
+    software_env_file=$(ls -1t ${INSTALL_RECORD}/$1*log 2>/dev/null \
+        | head -n1 \
+        | xargs cat \
+        | grep 'INSTALLED_ENVFILE' \
+        | cut -d= -f2)
+    if [ $? -eq 0 ] && [ ! -z "$software_env_file" ] && [ -f $software_env_file ];then
         echo "$software_env_file"
         return 0;
     fi
 
-    return 1;
+    #find intel env file from INSTALL_RECORD like /soft/.gridview/record files
+
+    get_software_manager_cfg_params_all
+    software_env_file=$(ls -1t ${INSTALL_RECORD}/$1*log 2>/dev/null \
+        | head -n1 \
+        | xargs cat \
+        | grep 'INSTALLED_ENVFILE' \
+        | cut -d= -f2)
+
+    if [ $? -eq 0 ] && [ ! -z "$software_env_file" ] && [ -f $software_env_file ];then
+        echo "$software_env_file"
+        return 0
+    fi
+
+    return 1
 }
 
 find_software_dir()
@@ -233,20 +277,26 @@ find_software_dir()
         echo "Usage: find_software_dir type_name"
         exit 1;
     fi
-    #find intel env file from /public/.gridview/record files
-    software_dir=`find /public/.gridview/record -name $1\*log\
-        | head -n1|xargs cat|grep 'INSTALLED_PATH'|cut -d= -f2`
+
+    #find install dir from ~/.gridview/conf/software_manager file
+    get_software_manager_cfg_params_user
+    software_dir=$(ls -1t ${INSTALL_RECORD}/$1*log 2>/dev/null \
+        | head -n1 \
+        | xargs cat \
+        | grep 'INSTALLED_PATH' \
+        | cut -d= -f2)
     if [ $? -eq 0 ] && [ ! -z $software_dir ] && [ -d $software_dir ];then
         echo "$software_dir"
         return 0;
     fi
 
-    #find intel env file from ~/.gridview/conf/software_manager file
-    if [ ! -d ~/.gridview/record ];then
-        return 1;
-    fi
-    software_dir=`find ~/.gridview/record -name $1\*log\
-        | head -n1|xargs cat|grep 'INSTALLED_PATH'|cut -d= -f2`
+    #find intall dir from INSTALL_RECORD like /soft/.gridview/record files
+    get_software_manager_cfg_params_all
+    software_dir=$(ls -1t ${INSTALL_RECORD}/$1*log 2>/dev/null \
+        | head -n1 \
+        | xargs cat \
+        | grep 'INSTALLED_PATH' \
+        | cut -d= -f2)
     if [ $? -eq 0 ] && [ ! -z $software_dir ] && [ -d $software_dir ];then
         echo "$software_dir"
         return 0;

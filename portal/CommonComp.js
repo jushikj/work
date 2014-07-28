@@ -422,15 +422,21 @@ var global_portal = {
             name: 'portal-PBSOptions',
             fieldLabel: 'PBS Options',
             allowBlank: true,
+            value: portal_pbsoptions,
+            maxLength: 12,
             labelWidth: 125, //不写就是用默认值
-            width: 540 //不写就是用默认值
+            width: 540, //不写就是用默认值
+            emptyText:"-l mem=30MB /n -V"
         });
+	$("#page-portal-PBSOptions div span").html("-l mem=30MB<br/>-v");
         var PreCommands = new Gv.form.TextArea({
             id: 'portal-pbs-params-preCommands',
             renderTo: 'page-portal-PreCommands',
             //name: 'portal-PBSOptions',
             fieldLabel: 'Pre Commands:',
             allowBlank: true,
+            value: portal_precommands,
+            maxLength: 12,
             labelWidth: 125, //不写就是用默认值
             width: 540 //不写就是用默认值
         });
@@ -441,11 +447,10 @@ var global_portal = {
             //name: 'portal-PBSOptions',
             fieldLabel: 'Post Commands:',
             allowBlank: true,
+            value: portal_postcommands,
+            maxLength: 12,
             labelWidth: 125, //不写就是用默认值
-            width: 540, //不写就是用默认值
-	    emptyText:'t <br/>'+
-
-			' is the example!'
+            width: 540 //不写就是用默认值
         });
 
     },

@@ -10,25 +10,27 @@ queue_default=test
 nnodes_default=1
 name_prefix=`echo ${PORTALNAM}|tr [A-Z] [a-z]`
 hours_default=1
-ppn_default=1
 
 ## run setting
 source $(dirname $(readlink -f $BASH_SOURCE))/common_functions
 
 openmpi_envfile=$(find_software_env mpi_openmpi-intel)
-program_list="source ${openmpi_envfile};\nmpirun -np $NP -machinefile $PBS_NODEFILE ./myprogram:"
+: ${openmpi_envfile:=/public/software/profile.d/mpi_openmpi-1.6.5-intel.sh}
+program_list='mpirun -np $NP -machinefile $PBS_NODEFILE ./myprogram:sleep 500'
 ib_available=1
 
 output_prefix=`echo ${PORTALNAM}|tr [A-Z] [a-z]`
 
 #for predefine
-PORTAL_PREDEFINE_LIST='{"Default Program List":"program_list", "Default Work Dir": "workdir_list"}'
+PORTAL_PREDEFINE_LIST='{"Default Program List":"program_list", "Default Work Dir": "workdir_list"
+,"Default PBS Options":"portal_pbsoptions", "Default PreCommands": "portal_precommands",
+"Default PostCommands": "portal_postcommands"}'
 
 
 ## vnc_setting
 vnc_available=1
 
 ## checkpoint setting
-checkpoint_availabel=1
+checkpoint_availabel=0
 interval_default=240
 min_interval=5

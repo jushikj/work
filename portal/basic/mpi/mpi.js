@@ -218,6 +218,7 @@ var global_jobscheduler_mpi = {
             name: 'portal-MPIOptions',
             fieldLabel: 'MPI Options',
             allowBlank: true,
+            value: portal_mpioptions,
             maxLength: 12,
             labelWidth: 125,
             width: 540

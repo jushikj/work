@@ -1,29 +1,12 @@
 var introduction_desc = "\
 <p>\
-<br />serial and openmp Portal是GridviewClusportal最基本的portal，\
-可以支持串行程序和openmp程序的作业提交运行，并支持vnc的图形作业，\
-以及clusnap的自动checkpoint功能，\
-此portal适用串行程序节点数只能为1。\
-</p>";
-
-var run_tips_desc = "\
-<p>\
-    <br />Run Script:<br />\
-    <br />输入本次计算任务的执行脚本。 \
-</p>\
-<p>\
-    <br />Working DIR:<br />\
-    <br />本次计算任务的工作目录。\
-</p>\
-<p>\
-    <br />Output File:<br />\
-    <br />计算过程中的标准输出和标准错误输出信息，将被重定向保存为文件。\
-    <p>&nbsp;</p>\
+<br />General Portal是Gridview Clusportal最基本的portal，\
+可以支持各种类型作业的提交，并支持vnc的图形作业，\
 </p>";
 
 var resource_tips_desc = "\
 <p>\
-    <br />Queue Status:<br />\
+    <br />Cluster Queue Information:<br />\
     <br />列出当前集群上的工作队列及其可用资源。 \
 </p>\
 <p>\
@@ -62,10 +45,29 @@ var job_sched_tips_desc = "\
     <br />本次计算任务的名称。\
 </p>\
 <p>\
-    <br />Manage Job File:<br />\
+    <br />WinScp File Manager:<br />\
     <br />启动WinSCP程序上传/下载计算任务的输入输出文件。\
+    <br />Web File Manager:<br />\
+    <br />Gridview界面下的文件管理，可以上传下载和修改文件。\
 </p>\
 <p>&nbsp;</p>";
+
+var run_tips_desc = "\
+<p>\
+    <br />Run Script:<br />\
+    <br />输入本次计算任务的执行脚本。 \
+</p>\
+<p>\
+    <br />Working DIR:<br />\
+    <br />本次计算任务的工作目录。\
+</p>\
+<p>\
+    <br />Output File:<br />\
+    <br />计算过程中的标准输出和标准错误输出信息，将被重定向保存为文件。\
+    <p>&nbsp;</p>\
+</p>";
+
+
 
 var vnc_tips_desc = "\
 <p>\
@@ -91,11 +93,6 @@ var checkpoint_tips_desc = "\
 
 var adv_tips_desc = "\
 <p>\
-    <br />MPI Options:<br />\
-    <br />如果需要手动添加MPI并行时的高级参数，可在此处设置，\
-    这些参数将被传递成为mpirun命令行参数的一部分。该选项默认无需设置。\
-</p>\
-<p>\
     <br />PBS Options:<br />\
     <br />如果需要手动添加PBS作业的高级参数，可在此处设置。\
     这类参数的行首必须包含“#PBS”关键字，将被加到PBS脚本文件的开始处。该选项默认无需设置。\
@@ -115,9 +112,9 @@ var adv_tips_desc = "\
 
 //$("#page-portal-tips").append(all_tips);
 $("#page-portal-tips-introduction").append(introduction_desc);
-$("#page-portal-tips-run").append(run_tips_desc);
 $("#page-portal-tips-resource").append(resource_tips_desc);
 $("#page-portal-tips-sched").append(job_sched_tips_desc);
+$("#page-portal-tips-run").append(run_tips_desc);
 $("#page-portal-tips-vnc").append(vnc_tips_desc);
-$("#page-portal-tips-checkpoint").append(checkpoint_tips_desc);
+//$("#page-portal-tips-checkpoint").append(checkpoint_tips_desc);
 $("#page-portal-tips-adv").append(adv_tips_desc);

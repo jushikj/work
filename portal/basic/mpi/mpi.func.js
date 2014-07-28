@@ -41,6 +41,7 @@ function mySubmit() {
         "GAP_SHARE_MEMORY"  : "\'" + Gv.get("portal_pbs_params_share_memory").attr("checked")+"\'",
         "GAP_CPU_BINDING"   : "\'" + Gv.get("portal_pbs_params_cpu_binding").attr("checked")+"\'",
 
+        "GAP_ENVFILE"   : "\'" + Gv.get("portal_pbs_params_mpi_envfile").val() + "\'",
         "GAP_PROGRAM"       : "\'" + Gv.get("portal_pbs_params_program").val()+"\'",
         "GAP_PROGRAM_ARG"   : "\'" + Gv.get("portal_pbs_params_programarg").val() + "\'",
         "GAP_WORK_DIR"      : "\'" + Gv.get("portal_pbs_params_workdir").val() + "\'",

@@ -46,14 +46,17 @@ get_portal_default()
 generate_mpi_envfile_list()
 {
     for mpi in ${mpi_list//:/ };do
-        mpi_envfile=$(find_software_env mpi_${mpi}-intel)
-        if [ ! -z ${mpi_envfile} ];then
-            mpi_envfile_list="${mpi_envfile_list}:${mpi_envfile}"
-        fi
-        mpi_envfile=$(find_software_env mpi_${mpi}-gnu)
-        if [ ! -z ${mpi_envfile} ];then
-            mpi_envfile_list="${mpi_envfile_list}:${mpi_envfile}"
-        fi
+        #mpi_envfile=$(find_software_env mpi_${mpi}-intel)
+        #if [ ! -z ${mpi_envfile} ];then
+        #    mpi_envfile_list="${mpi_envfile_list}:${mpi_envfile}"
+        #fi
+        #mpi_envfile=$(find_software_env mpi_${mpi}-gnu)
+        #if [ ! -z ${mpi_envfile} ];then
+        #    mpi_envfile_list="${mpi_envfile_list}:${mpi_envfile}"
+        #fi
+        
+        eval envfile='$'${mpi}_envfile
+        mpi_envfile_list="${mpi_envfile_list}:${envfile}"
     done
     mpi_envfile_list=${mpi_envfile_list/:/}
 }
@@ -63,7 +66,6 @@ get_program_info()
     if [ "${workdir_list}" == "" ];then
         workdir_list="${user_home}"
     fi
-    generate_mpi_envfile_list
 
     echo "var program_list='$program_list';"
     echo "var program=program_list.split(':')[0];"
@@ -87,6 +89,11 @@ get_program_info()
     fi
     echo "var sharemem='1';"
     echo "var cpubind='1';"
+    echo "var portal_pbsoptions=\"$portal_pbsoptions\";"
+    echo "var portal_mpioptions=\"$portal_mpioptions\";"
+    echo "var portal_precommands=\"$portal_precommands\";"
+    echo "var portal_postcommands=\"$portal_postcommands\";"
+    echo "var portal_predefine_list=$PORTAL_PREDEFINE_LIST;"
 }
 
 
@@ -96,6 +103,8 @@ main()
     get_user_info $@
     source ${DIRNAM}/../../CommonCheck.sh ${CHECKUSER}
     source ${DIRNAM}/${PORTALNAM}.setting
+
+    generate_mpi_envfile_list
 
     if [ -f ${user_home}/.clusportal/${PORTALNAM}.setting ];then
         source ${user_home}/.clusportal/${PORTALNAM}.setting

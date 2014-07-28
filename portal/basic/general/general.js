@@ -15,7 +15,7 @@
         var cur_id = 'portal-pbs-params-workdir';
         input_workdir = new Gv.form.TextFieldSelect({
             renderTo: 'page-portal-WorkingDIR',
-            fieldLabel: 'Program:',
+            fieldLabel: 'WorkingDIR:',
             id: 'portal-pbs-params-workdir',
             readOnly: false,
             width: 540,

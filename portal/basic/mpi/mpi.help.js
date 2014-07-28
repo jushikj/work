@@ -1,29 +1,38 @@
 var introduction_desc="\
 <p>\
-<br />serial and openmp Portal是GridviewClusportal最基本的portal，\
-可以支持串行程序和openmp程序的作业提交运行，并支持vnc的图形作业，\
-以及clusnap的自动checkpoint功能，\
-此portal适用串行程序节点数只能为1。\
+<br />MPI(Message Passing Interface)是并行程序使用最为广泛的程序设计标准，\
+可以支持大规模多节点并行. 目前发展的版本为MPI2. \
+MPI的具体实现为openmpi、intelmpi、mvapich、mpich等.\
 </p>";
 
 var run_tips_desc="\
 <p>\
     <br />MPI Type:<br />\
-    <br />选择本次计算任务的可执行程序。 \
+    <br />选择MPI并行环境，如Open MPI或Intel MPI\
+</p>\
+<p>\
+    <br />Commucation:<br />\
+    <br />多节点并行任务，节点之间数据交换采用何种网络。如果勾选“Share Memory”选项，\
+    表示同一节点内的MPI进程采用共享内存方式进行数据交换；如果勾选“CPU Binding”选项，\
+    表示将MPI进程与固定的CPU核心绑定，防止进程漂移。开启这两个选项通常可以提高MPI程序的运行速度.\
+</p>\
+<p>\
+    <br />MPI Program:<br />\
+    <br />选择本次计算任务的可执行程序。\
 </p>\
 <p>\
     <br />Arguments:<br />\
-    <br />如果应用程序运行时需要提供自定义的参数，请在此输入。\
+    <br />如果MPI应用程序运行时需要提供自定义的参数，请在此输入\
 </p>\
 <p>\
     <br />Working DIR:<br />\
     <br />本次计算任务的工作目录。\
-</p>\
+</p> \
 <p>\
     <br />Output File:<br />\
     <br />计算过程中的标准输出和标准错误输出信息，将被重定向保存为文件。\
-    <p>&nbsp;</p>\
-</p>";
+</p>\
+<p>&nbsp;</p>";
 
 var resource_tips_desc="\
 <p>\

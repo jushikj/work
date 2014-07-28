@@ -18,18 +18,18 @@ get_basic_params()
 
 parse_portal_params()
 {
-    if [ "$GAP_MPI_TYPE" == openmpi ];then
-        GAP_ENVFILE=${openmpi_envfile}
-    elif [ "$GAP_MPI_TYPE" == cr_mpi ];then
-        GAP_ENVFILE=${cr_ENVFILE}
-    elif [ "$GAP_MPI_TYPE" == mpich2 ];then
-        GAP_ENVFILE=${mpich_envfile}
-    elif [ "$GAP_MPI_TYPE" == mvapich2 ];then
-        GAP_ENVFILE=${mvapich2_envfile}
-    else
-        echo "Error MPI Type" 
-        exit 1
-    fi
+    #if [ "$GAP_MPI_TYPE" == openmpi ];then
+    #    GAP_ENVFILE=${openmpi_envfile}
+    #elif [ "$GAP_MPI_TYPE" == cr_mpi ];then
+    #    GAP_ENVFILE=${cr_ENVFILE}
+    #elif [ "$GAP_MPI_TYPE" == mpich2 ];then
+    #    GAP_ENVFILE=${mpich_envfile}
+    #elif [ "$GAP_MPI_TYPE" == mvapich2 ];then
+    #    GAP_ENVFILE=${mvapich2_envfile}
+    #else
+    #    echo "Error MPI Type" 
+    #    exit 1
+    #fi
 
     if [ "$GAP_COMMUCATION" == tcp ];then 
         if [ "$GAP_SHARE_MEMORY" == "checked" ];then
@@ -132,9 +132,8 @@ fi
 clean_tmp_file()
 {
 if [ "$debug" != 1 ];then
-    rm -f  $pbsfile
-    rm -f /tmp/${prefix}.var
-    rm -f /tmp/${prefix}.runvar
+    #rm -f /tmp/${prefix}.var
+    #rm -f /tmp/${prefix}.runvar
     rm -f $PORTALVAR
 fi
 }
