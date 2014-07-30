@@ -69,20 +69,7 @@ $(function(){
         renderTo:'job-Submission-do',
         cls:'button bg-color-blueDark border-color-blueDark fg-color-white',
         text:'提交'
-        //handler:function(obj){
-        //    $("#jobupdate-floatdiv-con").load("template/��ҵ��ϸ��Ϣ.html");
-        //}
     });
-    /*new Gv.Button({
-        renderTo:'job-Submission-close',
-        cls:'button',
-        text:'����',
-        handler:function(obj){
-            //jobClose();
-            //newJobBottomUp();
-            //jobbuildClose();
-        }
-    });*/
     new Gv.Button({
         renderTo:'job-Submission-preset',
         cls:'button',

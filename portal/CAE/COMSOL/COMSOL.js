@@ -109,7 +109,7 @@
             handler: function() {
                 var workdirRunFilePanel = new Gv.SelectFileWindow({
                     defaultPath: Gv.get('portal-pbs-params-workdir').val(),
-                    isDir: true,
+                    isDir: false,
                     tbar: [{
                         text: '确定',
                         handler: function(obj) {

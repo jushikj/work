@@ -1,0 +1,78 @@
+ #!/bin/bash
+ get_portal_info()
+ {
+ 	export DIRNAM=$(cd "$(dirname "$0")"; pwd)
+	export PORTALNAM=`echo $DIRNAM|awk -F/ '{print $NF}'`
+	export PORTALTYPE=`dirname $DIRNAM|awk -F/ '{print $NF}'`
+	echo var PORTALNAM=\"$PORTALNAM\"\;
+	echo var PORTALTYPE=\"$PORTALTYPE\"\;
+	echo var portal_version=\"${version}\"\;
+ }
+
+ get_user_info()
+ {
+ 	## $1 is UserName
+	if [ -z $1 ];then
+	    export CHECKUSER='root'
+	else
+	    export CHECKUSER=$1
+	fi
+	user_home=$(finger -mlp ${CHECKUSER}|head -n2| tail -n1|awk '{print $2}')
+ 	echo var userhome=\"${user_home}\"\;
+ }
+
+get_portal_default()
+{
+	echo var numnodes=\"$nnodes_default\"\;
+  	echo var numppn=\"\1\"\;
+  	echo var name=\"${name_prefix}\"\;
+  	echo var hours=\"$hours_default\"\;
+  	echo var minutes=\"0\"\;
+  	echo var seconds=\"0\"\;
+  	echo var vnc_available=\"$vnc_available\"\;
+  	echo var checkpoint_available=\"$checkpoint_availabel\"\;
+  	echo var interval=\"$interval_default\"\;
+  	echo var interval_def=\"$interval_default\"\;
+  	echo var min_interval=\"$min_interval\"\;
+}
+
+get_program_info()
+{
+	echo var mpitype=\"$mpi_default\"\;
+	echo var mpilist=\"$mpi_list\"\;
+	echo 'var s_mpi=mpilist.split(":")'\;
+
+	#echo var remoteshell=\"ssh\"\;
+	#echo var ib_available=\"$ib_available\"\;
+	#if [ "$ib_available" == 1 ];then
+		#echo var network=\"ib\"\;
+	#else
+		#echo var network=\"tcp\"\;
+	#fi
+	#echo var sharemem=\"1\"\;
+	#echo var cpubind=\"1\"\;
+
+	echo var program=\"$prog_default\"\;
+	echo var proglist=\"$prog_list\"\;
+	echo 'var s_prog=proglist.split(":")'\;
+
+	echo var programarg=\"$programarg_default\"\;
+	echo 'var workdir=userhome'\;
+	echo var output=\"${output_prefix}\"\;
+	#echo var imgName=\"${PORTALNAM}.png\"\;
+}
+
+main()
+{
+  get_portal_info $@
+  get_user_info $@
+  source ${DIRNAM}/../../CommonCheck.sh ${CHECKUSER}
+  source ${DIRNAM}/${PORTALNAM}.setting
+  if [ -f ${user_home}/.clusportal/${PORTALNAM}.setting ];then
+    source ${user_home}/.clusportal/${PORTALNAM}.setting
+  fi
+  get_portal_default
+  get_program_info
+}
+
+main $@

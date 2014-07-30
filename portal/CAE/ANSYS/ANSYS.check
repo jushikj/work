@@ -27,7 +27,7 @@ get_user_info()
 get_portal_default()
 {
   echo var numnodes=\"$nnodes_default\"\;
-  echo var numppn=\"1\"\;
+  echo var numppn=\"$ppn_default\"\;
   echo var name=\"${name_prefix}\"\;
   echo var hours=\"$hours_default\"\;
   echo var minutes=\"0\"\;
@@ -46,9 +46,6 @@ get_program_info()
     workdir_list="${user_home}:"
     echo var workdir_list=\"$workdir_list\"\;
   fi
-  echo var lictype=\"$lic_default\"\;
-  echo var liclist=\"$lic_list\"\;
-  echo 'var s_lic=liclist.split(":")'\;
   echo var file=\"$mpiprog_default\"\;
   echo var mpiProgList=\"$mpiprog_list\"\;
   echo 'var s_mpiProg=mpiProgList.split(":")'\;

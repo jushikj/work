@@ -7,9 +7,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>作业提交</title>
 <style>
-	.ov {
-		overflow:auto !important;
-	}
+  .ov {
+    overflow:auto !important;
+  }
 </style>
 <script type="text/javascript">
 $(function(){
@@ -32,33 +32,33 @@ $(function(){
     }
     if(winW>1600){
         $(".page-portal-main").animate({"marginRight":300},200);
-		$(".page-portal-side").animate({"width":299},200);
-		$(".portal-side-switch").find("i").attr("class","icon-caret-right");
-		$(".portal-side-switch").click(function(){
-			if($(this).find("i").attr("class")=="icon-caret-left"){
-				$(this).find("i").attr("class","icon-caret-right");
-				$(".page-portal-main").animate({"marginRight":300},200);
-				$(".page-portal-side").animate({"width":299},200).addClass("ov");
-			}else{
-				$(this).find("i").attr("class","icon-caret-left");
-				$(".page-portal-main").animate({"marginRight":10},200);
-				$(".page-portal-side").animate({"width":9},200).removeClass("ov");
-			};
-		});
+    $(".page-portal-side").animate({"width":299},200);
+    $(".portal-side-switch").find("i").attr("class","icon-caret-right");
+    $(".portal-side-switch").click(function(){
+      if($(this).find("i").attr("class")=="icon-caret-left"){
+        $(this).find("i").attr("class","icon-caret-right");
+        $(".page-portal-main").animate({"marginRight":300},200);
+        $(".page-portal-side").animate({"width":299},200).addClass("ov");
+      }else{
+        $(this).find("i").attr("class","icon-caret-left");
+        $(".page-portal-main").animate({"marginRight":10},200);
+        $(".page-portal-side").animate({"width":9},200).removeClass("ov");
+      };
+    });
     }else{
         $(".page-portal-main").animate({"marginRight":10},200);
-		$(".page-portal-side").animate({"width":9},200);
-		$(".portal-side-switch").click(function(){
-			if($(this).find("i").attr("class")=="icon-caret-left"){
-				$(this).find("i").attr("class","icon-caret-right");
-				$(".page-portal-main").animate({"marginRight":300},200);
-				$(".page-portal-side").animate({"width":299},200).addClass("ov");
-			}else{
-				$(this).find("i").attr("class","icon-caret-left");
-				$(".page-portal-main").animate({"marginRight":10},200);
-				$(".page-portal-side").animate({"width":9},200).removeClass("ov");
-			};
-		});
+    $(".page-portal-side").animate({"width":9},200);
+    $(".portal-side-switch").click(function(){
+      if($(this).find("i").attr("class")=="icon-caret-left"){
+        $(this).find("i").attr("class","icon-caret-right");
+        $(".page-portal-main").animate({"marginRight":300},200);
+        $(".page-portal-side").animate({"width":299},200).addClass("ov");
+      }else{
+        $(this).find("i").attr("class","icon-caret-left");
+        $(".page-portal-main").animate({"marginRight":10},200);
+        $(".page-portal-side").animate({"width":9},200).removeClass("ov");
+      };
+    });
     };
     $(".page-jobupdate-floatdiv").show();
 
@@ -69,7 +69,20 @@ $(function(){
         renderTo:'job-Submission-do',
         cls:'button bg-color-blueDark border-color-blueDark fg-color-white',
         text:'提交'
+        //handler:function(obj){
+        //    $("#jobupdate-floatdiv-con").load("template/��ҵ��ϸ��Ϣ.html");
+        //}
     });
+    /*new Gv.Button({
+        renderTo:'job-Submission-close',
+        cls:'button',
+        text:'����',
+        handler:function(obj){
+            //jobClose();
+            //newJobBottomUp();
+            //jobbuildClose();
+        }
+    });*/
     new Gv.Button({
         renderTo:'job-Submission-preset',
         cls:'button',
@@ -208,72 +221,31 @@ gen_time_identify_string = function() {
                 </div>
                 <div class="form-group-content">
                     <div class="cl">
-						<div class="fl" style="display:inline; margin-right:20px;">
-							<span>Run Mod:</span><span id="page-portal-fluent-run-mod"/>
-							
-							<span id='page-portal-fluent-version'/>
-							<span id='page-portal-fluent-mpi-type'/>
-							<span id='page-portal-Arguments'></span>
-							
-						</div>
-						<div class="fl">
-							<div>
-								<span id='page-portal-fluent-bin-path' style="display: inline-block;"></span>
-								<a id='page-portal-WorkingDIR-Select-fluent' style="display: inline-block; vertical-align: middle;"></a>
-							</div>
-							<span>Precision:</span>
-							<span id='page-portal-fluent-precision'/>
-							<span>Remote Shell:</span>
-							<span id='page-portal-fluent-remote-shell'/>
-							<div>
-								<span id='page-portal-WorkingDIR' style="display: inline-block;"></span>
-								<a id='page-portal-WorkingDIR-Select' style="display: inline-block; vertical-align: middle;"></a>
-							</div>
-							<div style="display:none">
-								<span id='page-portal-InputFile' style="display: inline-block;"></span>
-								<a id='page-portal-WorkingDIR-Select-fluent-inputfile' style="display: inline-block; vertical-align: middle;"></a>
-							</div>
-							<span id='page-portal-OutputFile'></span>
-						</div>
-					</div>
-                    </div>
-                
-            </div>
-			<div id="page-portal-fluent-batch-mode-parames" class="form-group">
-                <div class="form-group-title">
-                    <div class="title-float cl">
-                        <div class="title-front">
-                            <i class="icon-chevron-sign-down"></i>
-                        </div>
-                        <div class="title-text">Jou Parameters</div>
+                      <div class="fl" style="display:inline; margin-right:20px;">
+                        <span>CPU Binding:</span><span id="page-portal-lammps-cpu-binding"/>
+                        <span>Parallel Mode:</span><span id='page-portal-lammps-parallel-mode'/>
+                        <span id='page-portal-lammps-mpi-type'/>
+                        <span id='page-portal-lammps-arguments'></span>
+                        <span id='page-portal-lammps-output-log'/>
+                      </div>
+                    <div class="fl">
+                      <span>Commucation:</span><span id='page-portal-lammps-commucation'/>
+                      <span>Remote Shell:</span><span id='page-portal-lammps-remote-shell'/>
+                      <div>
+                        <span id='page-portal-lammps-mpi-program' style="display: inline-block;"></span>
+                        <a id='page-portal-lammps-mpi-program-btn' style="display: inline-block; vertical-align: middle;"></a>
+                      </div>
+                      <div>
+                        <span id='page-portal-lammps-work-dir' style="display: inline-block;"></span>
+                        <a id='page-portal-lammps-work-dir-btn' style="display: inline-block; vertical-align: middle;"></a>
+                      </div>
+                      <div>
+                        <span id='page-portal-lammps-input-file' style="display: inline-block;"></span>
+                        <a id='page-portal-lammps-input-file-btn' style="display: inline-block; vertical-align: middle;"></a>
+                      </div>
                     </div>
                 </div>
-                <div class="form-group-content">
-                    <div class="cl">
-						<div class="fl" style="display:inline; margin-right:20px;">
-							<span id='page-portal-fluent-bmp-jou-file-input'></span>
-							<span>Time:</span>
-							<span id='page-portal-fluent-bmp-jou-file-radio'/>
-							<div>
-								<span id='page-portal-fluent-bmp-case-file' style="display: inline-block;"></span>
-								<a id='page-portal-fluent-case-file-dir-select' style="display: inline-block; vertical-align: middle;"></a>
-							</div>
-							<div>
-								<span id='page-portal-fluent-bmp-data-file' style="display: inline-block;"></span>
-								<a id='page-portal-fluent-data-file-dir-select' style="display: inline-block; vertical-align: middle;"></a>
-							</div>
-							<span id='page-portal-fluent-data-save'/>
-						</div>
-						<div class="fl">
-							<span id='page-portal-fluent-time-step-input'/>
-							<span id='page-portal-fluent-time-step-number'/>
-							<span id='page-portal-fluent-iteration-step-number'/>
-							<span id='page-portal-fluent-autosave-step-number'/>
-							<span id='page-portal-fluent-max-iteration-time-steps'/>
-							
-						</div>
-					</div>
-                </div>
+              </div>
             </div>
             <div id="page-portal-vnc" class="form-group">
                 <div class="form-group-title">
@@ -350,8 +322,8 @@ gen_time_identify_string = function() {
     </div>
 </div>
 <script type="text/javascript" src="/jm_as/CommonComp.js"></script>
-<script type="text/javascript" src="/jm_as/CAE/FLUENT/FLUENT.help.js"></script>
-<script type="text/javascript" src="/jm_as/CAE/FLUENT/FLUENT.js"></script>
+<script type="text/javascript" src="/jm_as/MD/LAMMPS/LAMMPS.help.js"></script>
+<script type="text/javascript" src="/jm_as/MD/LAMMPS/LAMMPS.js"></script>
 <div class="jobupdate-floatdiv-bottom">
 <span id="job-Submission-do"></span>
 <span id="job-Submission-preset"></span>

@@ -1,0 +1,157 @@
+#!/bin/bash 
+get_portal_input()
+{
+  QTIMESTAMP=`date +%G%m%d_%H%M`
+  PORTALVAR=/tmp/clusportal_LAMMPS_$USER$QTIMESTAMP.var
+
+  dos2unix -n $1 $PORTALVAR 2>/dev/null
+  source $PORTALVAR
+}
+
+get_basic_params()
+{
+  source /opt/gridview/gridviewAppTemplate/CAE/COMSOL/COMSOL.setting
+  pbsfile=${GAP_NAME}.pbs
+  time=`date +%m%d%H%M%S`
+  username = `whoami`
+}
+
+parse_portal_params()
+{
+  if [ "$GAP_MPI_TYPE" == openmpi ];then
+   GAP_ENVFILE=${openmpi_ENVFILE}
+  elif [ "$GAP_MPI_TYPE" == intelmpi ];then
+   GAP_ENVFILE=${intelmpi_ENVFILE}
+  elif [ "$GAP_MPI_TYPE" == cr_mpi ];then
+   GAP_ENVFILE=${cr_ENVFILE}
+  elif [ "$GAP_MPI_TYPE" == mpich2 ];then
+   GAP_ENVFILE=${mpich2_ENVFILE}
+  elif [ "$GAP_MPI_TYPE" == mvapich2 ];then
+   GAP_ENVFILE=${mvapich2_ENVFILE}
+  else
+   echo "Error MPI Type" 
+   exit -1
+  fi
+  if [ "$GAP_COMMUCATION" == tcp ];then 
+    if [ "$GAP_SHARE_MEMORY" == 1 ];then
+    GAP_NETWORK=tcp_memory
+    else 
+    GAP_NETWORK=tcp
+    fi
+  elif [ "$GAP_COMMUCATION" == ib ];then
+    if [ "$GAP_SHARE_MEMORY" == 1 ];then
+    GAP_NETWORK=ib_memory
+    else
+    GAP_NETWORK=ib
+    fi
+  fi
+  #echo " $GAP_COMMUCATION $GAP_NETWORK"
+  if [ "$GAP_CPU_BINDING" == 1 ];then
+   CPU_BINDING_OPTION="-bindcore"
+  fi
+  if [ "$GAP_VNC" == 1 ];then
+   VNC_OPTION="-vnc"
+   else
+   VNC_OPTION=""
+  fi
+
+  ##check input file
+  cd ${GAP_WORK_DIR}
+}
+
+CheckInput()
+{
+if [ ! -f ${GAP_PROGRAM} ];then
+  echo Can not find program file ${GAP_PROGRAM}.
+  exit -1
+fi
+
+if [ ! -f ${GAP_INPUT} ];then
+  echo Can not find input file ${GAP_INPUT}.
+  exit -1
+fi
+}
+
+create_pbs_script()
+{
+  dos2unix ${GAP_INPUT} >&/dev/null
+  CheckInput
+
+  ################################################################################################################################################
+  #createpbs -t Type [-o logfile] [-pbs pbsfile]
+  #        -prog Program  [-proarg Program Argment] 
+  #       [-nnodes NodeNum] [-ppn PPN] [-wtime WallTime] [-name JobName] [-wdir WorkDir] [-q queque] [ -pbsoption 'option1:option2: ... :optionN' ]
+  #       [-envfile envfile1 envfile2 ... envfileN] 
+  #       [-precommand 'command1:command2: ... commandN'] [ -postcommand 'command1:command2: ... :commandN' )
+  #       [-vnc]
+  #       [-mpirun mpirun command] [-net Network] [-r ssh/rsh] [-bindcore] [-mpiarg MPIRUN Argment] 
+  #       [-cri CheckPoint Interval(Minitues)] [-ocpg Old CheckPoint Group name] [-ncpg Old CheckPoint Group name] [-ncp number CheckPoints]
+  #       Type should be serial,openmpi,intelmpi cr_mpi, mvapich2,mpich2
+  #       Network should be tcp,ib,memory,ib_memory,tcp_memory #
+  ##############################################################################################################################################
+
+  /opt/gridview/gridviewAppTemplate/createpbs -t "${GAP_MPI_TYPE}" -o "${GAP_OUTPUT}" -pbs ${pbsfile} \
+              -prog "${GAP_PROGRAM}" -proarg "${GAP_PROGRAM_ARG} < ${GAP_INPUT}"\
+              -envfile  "${GAP_ENVFILE}"     \
+              -precommand "${GAP_PRE_CMD}" -postcommand "${GAP_POST_CMD}" \
+              ${VNC_OPTION}  \
+              -nnodes   "${GAP_NNODES}" -ppn "${GAP_PPN}" -wtime "${GAP_WALL_TIME}" -name "${GAP_NAME}" -wdir "${GAP_WORK_DIR}" -q "${GAP_QUEUE}"  \
+               -pbsoption "${GAP_PBS_OPT}" \
+              -net "${GAP_NETWORK}" -r "${GAP_REMOTE_SHELL}"  ${CPU_BINDING_OPTION} -mpiarg "${GAP_MPI_OPT}"  \
+              -ncpg '$id.ckps' -cri "${GAP_INTERVAL}" -ncp 2 
+}
+
+
+submit_job()
+{
+  jobid=`qsub $pbsfile`
+  return $?
+}
+
+checkpoint_func()
+{
+  if [ "${GAP_CHECK_POINT}" == 1 ];then
+      id=`echo $jobid|awk -F. '{print $1}' `
+      echo "Jobid:${id}
+      Cr_type:mpi_system
+      User_name:`whoami`
+      Work_dir:${wdir}
+      Job_batch:autocr.${id}.pbs
+      Cr_batch:autocr.${id}.pbs
+      Cr_interval:${cri}
+      Num_CP_save:${ncp}
+      " >/checkpoints/autocr/spoolautocr.${id}.Q
+    fi
+}
+
+clean_tmp_file()
+{
+    if [ "$debug" != "1" ];then
+      rm -f /tmp/${prefix}.var
+      rm -f /tmp/${prefix}.runvar
+      rm -f $PORTALVAR
+    fi
+}
+
+output_result()
+{
+    if [ "$1" == "0" ];then
+     echo $jobid | grep "^[0-9]*\.\w*" || exit 1
+    else
+     echo "Job Submit Error: ${jobid}" && exit 1
+    fi
+}
+
+main()
+{
+  get_portal_input $@
+  get_basic_params $@
+  parse_portal_params
+  create_pbs_script
+  submit_job
+  job_status=$?
+  checkpoint_func
+  clean_tmp_file
+  output_result ${job_status}
+}
+main "$@"

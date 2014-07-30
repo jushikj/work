@@ -11,15 +11,18 @@ create_jou_file()
     jou_file_path="${GAP_WORK_DIR}/${GAP_JOU_FILE}"
     touch ${jou_file_path}
     if [ "${GAP_TIME}" == "steady" ];then
-	echo "/file/rc ${GAP_CAS_FILE}
+cat <<EOF >${jou_file_path}
+/file/rc ${GAP_CAS_FILE}
 /parallel/timer/reset 
 /solve/iterate ${GAP_NUM_ITERATIONS} 
 /parallel/timer/usage 
 /file/wd ${GAP_DATA_SAVE} 
 ok 
-exit" >${jou_file_path}
+exit
+EOF
     else
-	echo "/file/rc ${GAP_CAS_FILE} 
+cat <<EOF > ${jou_file_path}
+/file/rc ${GAP_CAS_FILE} 
 /parallel/timer/reset 
 /file/auto-save/data-frequency ${GAP_AUTO_SAVE_TIME_STEP}
 /solve/set/time-step ${GAP_TIME_STEP}
@@ -27,8 +30,25 @@ exit" >${jou_file_path}
 /parallel/timer/usage
 /file/write-data ${jou_file_path%.*}_${GAP_TIME}_"end.dat"
 ok 
-exit" >${jou_file_path}
+exit
+EOF
     fi
+#	echo "/file/rc ${GAP_CAS_FILE}
+#/parallel/timer/reset 
+#/solve/iterate ${GAP_NUM_ITERATIONS} 
+#/parallel/timer/usage 
+#/file/wd ${GAP_DATA_SAVE} 
+#ok 
+#exit" >${jou_file_path}
+#	echo "/file/rc ${GAP_CAS_FILE} 
+#/parallel/timer/reset 
+#/file/auto-save/data-frequency ${GAP_AUTO_SAVE_TIME_STEP}
+#/solve/set/time-step ${GAP_TIME_STEP}
+#/solve/dual-time-iterate ${GAP_NUM_TIME_STEP} ${GAP_MAX_ITERATIONS}
+#/parallel/timer/usage
+#/file/write-data ${jou_file_path%.*}_${GAP_TIME}_"end.dat"
+#ok 
+#exit" >${jou_file_path}
 }
 get_basic_params()
 {

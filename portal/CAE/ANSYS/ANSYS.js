@@ -390,7 +390,6 @@
         "GAP_QUEUE": Gv.get("portal-pbs-params-queue").val(),
         "GAP_NAME": Gv.get("portal-pbs-params-name").val(),
         //environment parameters
-        //"GAP_MPI_LIC_TYPE"     : global_jobscheduler_portal_ansys.ansys_license_select.value(),
         "GAP_MPI_REMOTE_SHELL" : global_jobscheduler_portal_ansys.ansys_remote_shell_radio.value()[0].value,
         "GAP_MPI_MPIRUNTYPE"   : global_jobscheduler_portal_ansys.ansys_mpi_type_select.value(),
         "GAP_MPI_PROGRAM"      : global_jobscheduler_portal_ansys.ansys_ansys_bin_input.value(),
@@ -495,7 +494,6 @@
       $("#page-portal-ansys-hpc-run-smp")[0].checked=true;
       global_jobscheduler_portal_ansys.ansys_mpi_type_select.value(mpi_def);
       global_jobscheduler_portal_ansys.ansys_mpi_type_select.disabled(true);
-      //global_jobscheduler_portal_ansys.ansys_license_select.value(lictype);
       global_jobscheduler_portal_ansys.ansys_arguments_input.value('');
       global_jobscheduler_portal_ansys.ansys_ansys_bin_input.data(global_jobscheduler_portal_ansys.ansys_bin_data);
       //console.log(global_jobscheduler_portal_ansys.ansys_bin_data);
