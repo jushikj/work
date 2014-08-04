@@ -334,7 +334,17 @@
               $("#portal-pbs-params-name").val(PORTALNAM + "_" + portal_reset_timestamp);
 
               // run parameters
-
+              $("#"+global_portal_lammps.lammps_cpu_binding.getId())[0].checked=true;
+              $("#page-portal-lammps-parallel-mode-smp")[0].checked=true;
+              $("#page-portal-lammps-commucation-ib")[0].checked=true;
+              $("#page-portal-lammps-remote-shell-ssh")[0].checked=true;
+              global_portal_lammps.lammps_mpi_type.value(mpitype);
+              global_portal_lammps.lammps_program.data(global_portal_lammps.lammps_prog_data);
+              global_portal_lammps.lammps_program.value(program);
+              global_portal_lammps.lammps_arguments.value('');
+              global_portal_lammps.lammps_work_dir.value(workdir);
+              global_portal_lammps.lammps_output_log.value(PORTALNAM + "_" + portal_reset_timestamp+".txt");
+              global_portal_lammps.lammps_input_file.value('');
 
               //Remote Visualization Parameters
               if($("#portal-pbs-params-vnc")[0]){
