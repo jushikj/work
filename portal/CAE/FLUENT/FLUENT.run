@@ -33,22 +33,6 @@ ok
 exit
 EOF
     fi
-#	echo "/file/rc ${GAP_CAS_FILE}
-#/parallel/timer/reset 
-#/solve/iterate ${GAP_NUM_ITERATIONS} 
-#/parallel/timer/usage 
-#/file/wd ${GAP_DATA_SAVE} 
-#ok 
-#exit" >${jou_file_path}
-#	echo "/file/rc ${GAP_CAS_FILE} 
-#/parallel/timer/reset 
-#/file/auto-save/data-frequency ${GAP_AUTO_SAVE_TIME_STEP}
-#/solve/set/time-step ${GAP_TIME_STEP}
-#/solve/dual-time-iterate ${GAP_NUM_TIME_STEP} ${GAP_MAX_ITERATIONS}
-#/parallel/timer/usage
-#/file/write-data ${jou_file_path%.*}_${GAP_TIME}_"end.dat"
-#ok 
-#exit" >${jou_file_path}
 }
 get_basic_params()
 {
@@ -115,13 +99,21 @@ create_pbs_script()
     #       Network should be tcp,ib,memory,ib_memory,tcp_memory #
     ##############################################################################################################################    ####################
     dollor=$
-    /opt/gridview/gridviewAppTemplate/createpbs -t serial -o "${GAP_OUTPUT}" -pbs ${pbsfile} \
+    /opt/gridview/gridviewAppTemplate/createpbs -t serial \
+        -pbs ${pbsfile} \
+		-nnodes   "${GAP_NNODES}" \
+        -ppn "${GAP_PPN}" \
+        -wtime "${GAP_WALL_TIME}" \
+        -name "${GAP_NAME}" \
+        -wdir "${GAP_WORK_DIR}" \
+        -o "${GAP_OUTPUT}" \
 		-prog "${GAP_PROGRAM}" \
-		-proarg "${GAP_DIMENSION_PRECISION} ${FLUENT_VNC} -t${dollor}NP -cnf=${dollor}PBS_NODEFILE ${rsh_option} -mpi=${GAP_MPI_TYPE} ${GAP_PROGRAM_ARG} -i ${GAP_INPUT}" \
+		-proarg "${GAP_DIMENSION_PRECISION} ${FLUENT_VNC} -t${dollor}NP -cnf=${dollor}PBS_NODEFILE ${rsh_option} -mpi=${GAP_MPI_TYPE} ${GAP_PROGRAM_ARG} -i ${jou_file_path}" \
 		-envfile  "${Fluent_ENVFILE}"     \
-		-precommand "${GAP_PRE_CMD}" -postcommand "${GAP_POST_CMD}" \
+		-precommand "${GAP_PRE_CMD}" \
+        -postcommand "${GAP_POST_CMD}" \
 		${VNC_OPTION}  \
-		-nnodes   "${GAP_NNODES}" -ppn "${GAP_PPN}" -wtime "${GAP_WALL_TIME}" -name "${GAP_NAME}" -wdir "${GAP_WORK_DIR}" -q "${GAP_QUEUE}"  \
+        -q "${GAP_QUEUE}"  \
 		-pbsoption "${GAP_PBS_OPT}" \
 		-ncpg '$id.ckps' -cri "${GAP_INTERVAL}" -ncp 2
 }
@@ -148,7 +140,6 @@ checkpoint_func()
 clean_tmp_file()
 {
     if [ "$debug" != "1" ];then
-    	rm -f $pbsfile
     	rm -f /tmp/${prefix}.var
     	rm -f /tmp/${prefix}.runvar
     	rm -f $PORTALVAR
