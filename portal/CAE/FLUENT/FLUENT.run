@@ -22,13 +22,13 @@ exit
 EOF
     else
 cat <<EOF > ${jou_file_path}
-/file/rc ${GAP_CAS_FILE} 
+/file/rcd ${GAP_CAS_FILE} 
 /parallel/timer/reset 
 /file/auto-save/data-frequency ${GAP_AUTO_SAVE_TIME_STEP}
 /solve/set/time-step ${GAP_TIME_STEP}
 /solve/dual-time-iterate ${GAP_NUM_TIME_STEP} ${GAP_MAX_ITERATIONS}
 /parallel/timer/usage
-/file/write-data ${jou_file_path%.*}_${GAP_TIME}_"end.dat"
+/file/write-data ${jou_file_path%.*}_${GAP_TIME}_end.dat
 ok 
 exit
 EOF
@@ -106,7 +106,7 @@ create_pbs_script()
         -wtime "${GAP_WALL_TIME}" \
         -name "${GAP_NAME}" \
         -wdir "${GAP_WORK_DIR}" \
-        -o "${GAP_OUTPUT}" \
+        -o "${GAP_OUTPUT_FILE}" \
 		-prog "${GAP_PROGRAM}" \
 		-proarg "${GAP_DIMENSION_PRECISION} ${FLUENT_VNC} -t${dollor}NP -cnf=${dollor}PBS_NODEFILE ${rsh_option} -mpi=${GAP_MPI_TYPE} ${GAP_PROGRAM_ARG} -i ${jou_file_path}" \
 		-envfile  "${Fluent_ENVFILE}"     \
