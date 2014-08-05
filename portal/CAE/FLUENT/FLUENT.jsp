@@ -332,14 +332,18 @@ gen_time_identify_string = function() {
             <div class="portal-sideMenu">
                 <h3 class="on">Introduction</h3>
                 <div class="portal-sideMenu-help" id="page-portal-tips-introduction"> </div>
-                <h3>Run Tips</h3>
-                <div class="portal-sideMenu-help" id="page-portal-tips-run"> </div>
                 <h3>Resource Tips</h3>
                 <div class="portal-sideMenu-help" id="page-portal-tips-resource"> </div>
                 <h3>Job Schedule Tips</h3>
                 <div class="portal-sideMenu-help" id="page-portal-tips-sched"> </div>
+                <h3>Run Tips</h3>
+                <div class="portal-sideMenu-help" id="page-portal-tips-run"> </div>
+                <!--
                 <h3>Remote Visualiztion Tips</h3>
                 <div class="portal-sideMenu-help" id="page-portal-tips-vnc"> </div>
+                -->
+                <h3>Jou Tips</h3>
+                <div class="portal-sideMenu-help" id="page-portal-tips-fluent-jou"> </div>
                 <h3>Checkpoint Start/Restart Tips</h3>
                 <div class="portal-sideMenu-help" id="page-portal-tips-checkpoint"> </div>
                 <h3>Advanced Parameter Tips</h3>

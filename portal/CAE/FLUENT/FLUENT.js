@@ -48,7 +48,7 @@ var global_jobscheduler_general = {
             text:'Browse...',
             handler: function() {
                 var workdirRunFilePanel = new Gv.SelectFileWindow({
-                    defaultPath: Gv.get('portal-pbs-params-workdir').val(),
+                    defaultPath: fluent_bin.value(),
                     isDir: false,
                     tbar: [{
                         text: '确定',
@@ -151,6 +151,16 @@ var global_jobscheduler_general = {
         this.fluent_params.push(arguments_input);
 		global_jobscheduler_general.arguments_input=arguments_input;
 		//work dir
+        input_workdir = new Gv.form.TextFieldSelect({
+            renderTo: 'page-portal-WorkingDIR',
+            fieldLabel: '<font color="#FF0000">*</font>WorkingDIR:',
+            readOnly: false,
+            //width: 540,
+            value: workdir,
+            autoLoad:false,
+             data:workdir_list.split(":")
+          });
+        /*
 		input_workdir = new Gv.form.TextField({
             renderTo: 'page-portal-WorkingDIR',
             fieldLabel: '<font color="#FF0000">*</font>Working DIR',
@@ -159,6 +169,7 @@ var global_jobscheduler_general = {
             bodyStyle: ''
             //width: 540
         });
+*/
         this.fluent_params.push(input_workdir);
 		global_jobscheduler_general.input_workdir=input_workdir;
 		//work dir button
@@ -168,7 +179,7 @@ var global_jobscheduler_general = {
             text:'Browse...',
             handler: function() {
                 var workdirRunFilePanel = new Gv.SelectFileWindow({
-                    defaultPath: Gv.get('portal-pbs-params-workdir').val(),
+                    defaultPath: input_workdir.value(),
                     isDir: true,
                     tbar: [{
                         text: '确定',
@@ -243,7 +254,7 @@ var global_jobscheduler_general = {
             }, {
                 id: 'portal_fluent_batch_mode_parames_no_dingchang',
                 value: 'translent',
-                fieldLabel: 'translent',
+                fieldLabel: 'transient',
 				disabled:false,
 				handler:function(){
 					input_iteration_step_num.disabled(true);
@@ -299,7 +310,7 @@ var global_jobscheduler_general = {
 			disabled:false,
             handler: function() {
                 var workdirRunFilePanel = new Gv.SelectFileWindow({
-                    defaultPath: Gv.get('portal-pbs-params-workdir').val(),
+                    defaultPath: global_jobscheduler_general.input_workdir.value(),
                     isDir: false,
                     tbar: [{
                         text: '确定',
@@ -343,7 +354,7 @@ var global_jobscheduler_general = {
 			disabled:false,
             handler: function() {
                 var workdirRunFilePanel = new Gv.SelectFileWindow({
-                    defaultPath: Gv.get('portal-pbs-params-workdir').val(),
+                    defaultPath: global_jobscheduler_general.input_workdir.value(),
                     isDir: false,
                     tbar: [{
                         text: '确定',
@@ -615,7 +626,9 @@ var global_jobscheduler_general = {
 			global_jobscheduler_general.input_autosave_step_num.value('100');
 			global_jobscheduler_general.input_max_iterations.value('20');
 			//Remote Visualization Parameters
-			$("#portal-pbs-params-vnc")[0].checked=false;
+            if($("#portal-pbs-params-vnc")[0]){
+                $("#portal-pbs-params-vnc")[0].checked=false;
+            }
 			$('#page-portal-vnc').removeClass('active');
 			$('#page-portal-vnc i').attr('class','icon-chevron-sign-down');
 			

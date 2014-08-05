@@ -18,34 +18,85 @@ var resource_tips_desc = "\
 
 var run_tips_desc = "\
 <p>\
-    <br />Version:<br />\
-    <br />选择Fluent计算算例的类型，分为2d,3d,2ddp,3ddp 等等。 \
+    <br />Run Mod:<br />\
+    <br />运行模式，如果勾选Window，则打开图形界面。 \
 </p>\
 <p>\
-    <br />MPI Type:<br />\
-    <br />并行计算时，选择使用的MPI类型，分为HP mpi，Intel mpi或openmpi，建议使用效率最高的默认的HP mpi。  \
+    <br />Fluent Bin:<br />\
+    <br />Fluent运行文件路径。 \
+</p>\
+<p>\
+    <br />Dimension:<br />\
+    <br />Fluent计算算例的维度，分为2d,3d等。 \
+</p>\
+<p>\
+    <br />Precision:<br />\
+    <br />Fluent计算算例的精度，分为Double双精度和Single单精度。 \
 </p>\
 <p>\
     <br />Remote Shell:<br />\
     <br />多节点并行任务，节点之间的访问模式。建议采用默认的SSH模式。 \
 </p>\
 <p>\
-    <br />Arguments:<br />\
-    <br />Fluent的其它选项，默认为空。 \
+    <br />MPI Type:<br />\
+    <br />并行计算时，选择使用的MPI类型，分为PC mpi，Intel mpi或openmpi，默认为PC mpi。  \
 </p>\
 <p>\
     <br />Working DIR:<br />\
     <br />本次计算任务的工作目录。\
 </p>\
 <p>\
-    <br />Input File:<br />\
-    <br />Fluent的输入控制文件。\
+    <br />Arguments:<br />\
+    <br />Fluent的其它选项，默认为空。 \
 </p>\
 <p>\
     <br />Output File:<br />\
     <br />计算过程中的标准输出和标准错误输出信息，将被重定向保存为文件。\
     <p>&nbsp;</p>\
 </p>";
+
+var job_sched_tips_jou = "\
+<p>\
+    <br />Jou File:<br />\
+    <br />Jou文件名称，默认以.jou结尾。<br />\
+</p>\
+<p>\
+    <br />Time:<br />\
+    <br />分为steady定常和translent非定常，默认为非定常。 \
+</p>\
+<p>\
+    <br />Cas File:<br />\
+    <br />Cas文件路径，文件后缀必须为.cas。 <br />\
+</p>\
+<p>\
+    <br />Dat File:<br />\
+    <br />Dat文件路径，文件后缀必须为.dat。 \
+</p>\
+<p>\
+    <br />Dat Save:<br />\
+    <br />保存Dat数据的文件名，文件名与Cas文件名相同，且以.dat结尾。\
+</p>\
+<p>\
+    <br />Time Step Size:<br />\
+    <br />时间步长，为大于0的数字。\
+</p>\
+<p>\
+    <br />Number of Time Steps:<br />\
+    <br />时间步数，为正整数。\
+</p>\
+<p>\
+    <br />Number of Iterations:<br />\
+    <br />迭代步数，为正整数。\
+</p>\
+<p>\
+    <br />AutoSave Every(Time Steps):<br />\
+    <br />自动保存步数，为正整数。\
+</p>\
+<p>\
+    <br />Max Iterations/Time Step:<br />\
+    <br />最大迭代/时间步数，为正整数。\
+</p>\
+<p>&nbsp;</p>";
 
 var job_sched_tips_desc = "\
 <p>\
@@ -75,6 +126,10 @@ var job_sched_tips_desc = "\
     <br />Manage Job File:<br />\
     <br />启动WinSCP程序上传/下载计算任务的输入输出文件。\
 </p>\
+<p>\
+    <br />Web File Manager:<br />\
+    <br />打开文件管理界面上传/下载计算任务的输入输出文件。\
+</p>\
 <p>&nbsp;</p>";
 
 var vnc_tips_desc = "\
@@ -101,11 +156,6 @@ var checkpoint_tips_desc = "\
 
 var adv_tips_desc = "\
 <p>\
-    <br />MPI Options:<br />\
-    <br />如果需要手动添加MPI并行时的高级参数，可在此处设置，\
-    这些参数将被传递成为mpirun命令行参数的一部分。该选项默认无需设置。\
-</p>\
-<p>\
     <br />PBS Options:<br />\
     <br />如果需要手动添加PBS作业的高级参数，可在此处设置。\
     这类参数的行首必须包含“#PBS”关键字，将被加到PBS脚本文件的开始处。该选项默认无需设置。\
@@ -131,3 +181,4 @@ $("#page-portal-tips-sched").append(job_sched_tips_desc);
 $("#page-portal-tips-vnc").append(vnc_tips_desc);
 $("#page-portal-tips-checkpoint").append(checkpoint_tips_desc);
 $("#page-portal-tips-adv").append(adv_tips_desc);
+$("#page-portal-tips-fluent-jou").append(job_sched_tips_jou);
