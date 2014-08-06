@@ -227,22 +227,19 @@ gen_time_identify_string = function() {
                           <span id='page-portal-abaqus-bin' style="display: inline-block;"></span>
                           <a id='page-portal-abaqus-bin-select-btn' style="display: inline-block; vertical-align: middle;"></a>
                         </div>
-                        <div>
-                          <span id='page-portal-abaqus-subroutine-file' style="display: inline-block;"></span>
-                          <a id='page-portal-abaqus-subroutine-file-select-btn' style="display: inline-block; vertical-align: middle;"></a>
-                        </div>
                         <span id='page-portal-abaqus-arguments'></span>
                       </div>
                       <div class="fl">
-                        <span>mp_mode:</span><span id='page-portal-abaqus-mp-mode'/>
                         <div>
                           <span id='page-portal-abaqus-work-dir' style="display: inline-block;"></span>
                           <a id='page-portal-abaqus-workdir-btn' style="display: inline-block; vertical-align: middle;"></a>
                         </div>
+                        <!--
                         <div>
                           <span id='page-portal-abaqus-input-file' style="display: inline-block;"></span>
                           <a id='page-portal-abaqus-input-file-btn' style="display: inline-block; vertical-align: middle;"></a>
                         </div>
+                        -->
                         <span id="page-portal-abaqus-output-file"/>                 
                       </div>
                     </div>

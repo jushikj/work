@@ -16,24 +16,7 @@ var global_jobscheduler_portal_abaqus = {
 	    });
 	    this.abaqus_run_mode=abaqus_run_mode;
 
-	    // mp mode
-	    abaqus_mp_mode = new Gv.form.RadioGroup({
-            id:'page-portal-abaqus-mp-mode-radio',
-            renderTo: 'page-portal-abaqus-mp-mode',
-            defualtName: 'mp-mode',
-            items: [{
-                id: 'page-portal-abaqus-mp-mode-mpi',
-                value: 'MPI',
-                fieldLabel: 'MPI'
-            }, {
-                id: 'page-portal-abaqus-mp-mode-threads',
-                value: 'THREADS',
-                fieldLabel: 'THREADS',
-                checked:true
-            }]
-    	});
-    	this.abaqus_mp_mode=abaqus_mp_mode;
-
+	    
     	// abaqus bin
     	var o_mpiProg = [];
 	    if(!Gv.isEmpty(s_mpiProg)){
@@ -62,7 +45,7 @@ var global_jobscheduler_portal_abaqus = {
             text:'Browse...',
             handler: function() {
                 var workdirRunFilePanel = new Gv.SelectFileWindow({
-                    defaultPath: Gv.get('portal-pbs-params-workdir').val(),
+                    defaultPath: abaqus_work_dir.value(),
                     isDir: false,
                     tbar: [{
                         text: '确定',
@@ -99,7 +82,7 @@ var global_jobscheduler_portal_abaqus = {
             text:'Browse...',
             handler: function() {
                 var workdirRunFilePanel = new Gv.SelectFileWindow({
-                    defaultPath: Gv.get('portal-pbs-params-workdir').val(),
+                    defaultPath: abaqus_work_dir.value(),
                     isDir: true,
                     tbar: [{
                         text: '确定',
@@ -117,16 +100,6 @@ var global_jobscheduler_portal_abaqus = {
                 });
             }
     	});
-
-    	// subroutine file
-    	abaqus_subroutine_file = new Gv.form.TextField({
-            renderTo: 'page-portal-abaqus-subroutine-file',
-            fieldLabel: 'Subroutine File',
-            labelWidth:125,
-            allowBlank: true
-   		});
-    	this.abaqus_subroutine_file=abaqus_subroutine_file;
-    	this.abaqus_run_components.push(abaqus_subroutine_file);
     	
     	// browse...
     	new Gv.Button({
@@ -155,6 +128,7 @@ var global_jobscheduler_portal_abaqus = {
     	});
 
     	// input file
+        /*
     	abaqus_input_file = new Gv.form.TextField({
             renderTo: 'page-portal-abaqus-input-file',
             fieldLabel: '<font color="#FF0000">*</font>Input File',
@@ -162,7 +136,7 @@ var global_jobscheduler_portal_abaqus = {
    		});
    		this.abaqus_input_file=abaqus_input_file;
    		this.abaqus_run_components.push(abaqus_input_file);
-
+        
    		// browse...
    		new Gv.Button({
             renderTo: 'page-portal-abaqus-input-file-btn',
@@ -187,7 +161,7 @@ var global_jobscheduler_portal_abaqus = {
                     }]
                 });
             }
-    	});
+    	});*/
 
     	// arguments
     	abaqus_arguments = new Gv.form.TextField({
@@ -243,13 +217,13 @@ var global_jobscheduler_portal_abaqus = {
 		        //run parameters
 		        "GAP_MPI_REMOTE_SHELL" : "",
                 "GAP_MPI_MPIRUNTYPE"   : "",
-                "GAP_MPI_PARAMODE"     : global_jobscheduler_portal_abaqus.abaqus_mp_mode.value()[0].value,
+                //"GAP_MPI_PARAMODE"     : global_jobscheduler_portal_abaqus.abaqus_mp_mode.value()[0].value,
                 "GAP_MPI_INPUTTYPE"    : "",
                 "GAP_MPI_PROGRAM"      : global_jobscheduler_portal_abaqus.abaqus_bin.value(),
                 "GAP_MPI_PROGRAM_ARG"  : global_jobscheduler_portal_abaqus.abaqus_arguments.value(),
                 "GAP_MPI_WORK_DIR"     : global_jobscheduler_portal_abaqus.abaqus_work_dir.value(),
                 "GAP_MPI_INPUT"        : global_jobscheduler_portal_abaqus.abaqus_input_file.value(),
-                "GAP_MPI_SUB"          : global_jobscheduler_portal_abaqus.abaqus_subroutine_file.value(),
+                //"GAP_MPI_SUB"          : global_jobscheduler_portal_abaqus.abaqus_subroutine_file.value(),
                 "GAP_MPI_OUTPUT"       : global_jobscheduler_portal_abaqus.abaqus_output_file.value(),
 		        
 		        //Remote Visualization Parameters
@@ -342,7 +316,7 @@ var global_jobscheduler_portal_abaqus = {
 	      	global_jobscheduler_portal_abaqus.abaqus_bin.data(global_jobscheduler_portal_abaqus.abaqus_bin_data);
 	      	global_jobscheduler_portal_abaqus.abaqus_bin.value(file);
 	      	global_jobscheduler_portal_abaqus.abaqus_work_dir.value(workdir);
-	      	global_jobscheduler_portal_abaqus.abaqus_subroutine_file.value('');
+	      	//global_jobscheduler_portal_abaqus.abaqus_subroutine_file.value('');
 	      	global_jobscheduler_portal_abaqus.abaqus_input_file.value('');
 	      	global_jobscheduler_portal_abaqus.abaqus_arguments.value('');
 	      	global_jobscheduler_portal_abaqus.abaqus_output_file.value(PORTALNAM + "_" + portal_reset_timestamp + '.txt');
