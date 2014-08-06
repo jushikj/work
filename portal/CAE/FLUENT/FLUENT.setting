@@ -24,7 +24,9 @@ output_prefix=`echo ${PORTALNAM}|tr [A-Z] [a-z]`
 programarg_default=' '
 
 ##predefine
-PORTAL_PREDEFINE_LIST='{"Default Program List":"program_list", "Default Work Dir": "workdir_list"}'
+PORTAL_PREDEFINE_LIST='{"Default Program List":"prog_list", "Default MPI List":"mpi_list",
+"Default Work Dir": "workdir_list","Default PBS Options":"portal_pbsoptions",
+"Default PreCommands": "portal_precommands","Default PostCommands": "portal_postcommands"}'
 
 ## vnc_setting
 vnc_available=0

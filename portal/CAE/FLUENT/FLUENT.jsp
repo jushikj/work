@@ -75,6 +75,11 @@ $(function(){
         cls:'button',
         text:'重置'
     });
+    new Gv.Button({
+         renderTo:'job-Submission-predifine',
+          cls:'button',
+          text:'预设参数'
+    });
 });
 jQuery(".portal-sideMenu").slide({titCell:"h3", targetCell:".portal-sideMenu-help",defaultIndex:1,effect:"slideDown",delayTime:300,trigger:"click"});
 </script>
@@ -357,6 +362,7 @@ gen_time_identify_string = function() {
 <script type="text/javascript" src="/jm_as/CAE/FLUENT/FLUENT.help.js"></script>
 <script type="text/javascript" src="/jm_as/CAE/FLUENT/FLUENT.js"></script>
 <div class="jobupdate-floatdiv-bottom">
+<span id="job-Submission-predifine"></span>
 <span id="job-Submission-do"></span>
 <span id="job-Submission-preset"></span>
 </div>

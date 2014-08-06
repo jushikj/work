@@ -108,7 +108,9 @@ var global_jobscheduler_general = {
         var o_mpi=[];
         if(!Gv.isEmpty(s_mpi)){
             for(var i in s_mpi){
-                o_mpi.push({id:s_mpi[i],text:s_mpi[i]});
+                if(!Gv.isEmpty(s_mpi[i])){
+                    o_mpi.push({id:s_mpi[i],text:s_mpi[i]});
+                }
             }
         }
 		mpitype_select = new Gv.form.ComboBox({
@@ -655,6 +657,130 @@ var global_jobscheduler_general = {
 			}
 			
 		});
+        
+        $("#job-Submission-predifine").bind('click',function(){
+            var formList = [];
+            for(var key in portal_predefine_list){
+                var predefine_value = portal_predefine_list[key];
+                formList.push(new Gv.form.TextField({
+                    id: 'portal-pbs-predefine-'+predefine_value,
+                    name: 'portal_pbs_predefine_'+predefine_value,
+                    fieldLabel: key,
+                    value: eval(predefine_value),
+                    labelWidth: '200',
+                    width: '670',
+                    allowBlank: false,
+                    listeners: {
+                        focus: function (v) {},
+                        focusout: function (v) {
+                        }
+                    }
+                }));
+            }
+            var predefineFormPanel = new Gv.form.FormPanel({
+                layout: 'form',
+                items: formList
+            });
+
+            var isContinue = true;
+            var win = new Gv.Window({
+                id:'win-page-troublesubmit-id',
+                title: '参数预定义',
+                width: 700,
+                height: 250,
+                items: [predefineFormPanel],
+                bodyStyle: 'padding:10px;',
+                listeners:{
+                    afterLayout:function(){
+                    }
+                },
+                tbar: [{
+                    text: '确定',
+                    handler: function(){
+                        var patest = {}; 
+                        for(var key in portal_predefine_list){
+                            var predefine_value = portal_predefine_list[eval("\""+key+"\"")];
+                            patest[predefine_value] = "\'" +Gv.get("portal-pbs-predefine-"+predefine_value).val() +"\'";
+                        }   
+                        $.ajax( {
+                            url : "/jm_as/appsubmit/predefineAppJob.action",
+                            type:'post',
+                            data : { 
+                                strJobManagerID : portal_strJobManagerID,
+                                strJobManagerAddr : portal_strJobManagerAddr,
+                                strJobManagerPort : portal_strJobManagerPort,
+                                strJobManagerType : portal_strJobManagerType,
+                                strAppType : portal_strAppType,
+                                strAppName : portal_strAppName,
+                                strOSUser : portal_strOsUser,
+                                strKeyWord : "k1;k2;;;;",
+                                strRemark : "remarktest",
+                                mapAppJobInfo :Gv.Obj2str(patest)
+                            },
+
+                            success : function(response,options) {
+                                if(response.exitVal == "0"){
+                                    Gv.msgNote("参数预设成功,加载预设请刷新portal");
+                                } else {
+                                    Gv.msg.error({html:"参数预设失败: "+response.stdErr});
+                                }
+                            },
+
+                            failure : function(response,options){
+                                Gv.msg.error({
+                                    html : "请求参数预设失败!"
+                                });
+                            }
+                        });
+
+
+                    }
+                }, {
+                    text: '还原默认值',
+                    handler: function(){
+                        var patest = {};
+                        $.ajax( {
+                            url : "/jm_as/appsubmit/predefineAppJob.action",
+                            type:'post',
+                            data : {
+                                strJobManagerID : portal_strJobManagerID,
+                                strJobManagerAddr : portal_strJobManagerAddr,
+                                strJobManagerPort : portal_strJobManagerPort,
+                                strJobManagerType : portal_strJobManagerType,
+                                strAppType : portal_strAppType,
+                                strAppName : portal_strAppName,
+                                strOSUser : portal_strOsUser,
+                                strKeyWord : "k1;k2;;;;",
+                                strRemark : "remarktest",
+                                mapAppJobInfo :Gv.Obj2str(patest)
+                            },
+
+                            success : function(response,options) {
+                                if(response.exitVal == "0"){
+                                    Gv.msgNote("默认值还原成功,加载预设请刷新portal");
+                                } else {
+                                    Gv.msg.error({html:"默认值还原失败失败: "+response.stdErr});
+                                }
+                            },
+
+                            failure : function(response,options){
+                                Gv.msg.error({
+                                    html : "请求还原默认值失败!"
+                                });
+                            }
+                        });
+                    }
+
+                },{
+                    text: '关闭',
+                    handler: function () {
+                        win.close();
+                    }
+                }]
+            });
+
+
+        });
 		
 	},
     onReady: function() {

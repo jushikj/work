@@ -1,0 +1,16 @@
+#!/bin/bash 
+
+username=`whoami`
+user_home=$(finger -mlp ${username}|head -n2| tail -n1|awk '{print $2}')
+if [ ! -d ${user_home}/.clusportal ];then
+    mkdir -p ${user_home}/.clusportal
+fi
+PORTALNAM=FLUENT
+PRESET_FILE=${user_home}/.clusportal/${PORTALNAM}.setting
+if [ ! -s $1 ];then
+    rm -rf $PRESET_FILE
+    exit 0
+else
+    dos2unix -n $1 $PRESET_FILE 2>/dev/null
+    exit 0
+fi

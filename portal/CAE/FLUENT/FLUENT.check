@@ -47,8 +47,8 @@ get_portal_default()
     echo "var version=\"$version_default\";"
     echo "var s_version=version_list.split(':');"
     echo "var mpitype=\"$mpi_default\";"
-    echo "var mpilist=\"$mpi_list\";"
-    echo "var s_mpi=mpilist.split(':');"
+    echo "var mpi_list=\"$mpi_list\";"
+    echo "var s_mpi=mpi_list.split(':');"
 }
 
 get_program_info()
@@ -57,8 +57,8 @@ get_program_info()
         workdir_list="${user_home}:"
     fi
     echo "var program=\"$prog_default\";"
-    echo "var proglist=\"$prog_list\";"
-    echo "var s_prog=proglist.split(':');"
+    echo "var prog_list=\"$prog_list\";"
+    echo "var s_prog=prog_list.split(':');"
     echo "var program_argument_list=\"$program_argument_list\";"
     echo "var program_argument=program_argument_list.split(':')[0];"
     echo "var workdir_list=\"${workdir_list}\";"
