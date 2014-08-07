@@ -73,16 +73,16 @@ $(function(){
         //    $("#jobupdate-floatdiv-con").load("template/��ҵ��ϸ��Ϣ.html");
         //}
     });
-    /*new Gv.Button({
-        renderTo:'job-Submission-close',
+    new Gv.Button({
+        renderTo:'job-Submission-predefine',
         cls:'button',
-        text:'����',
+        text:'预设参数',
         handler:function(obj){
             //jobClose();
             //newJobBottomUp();
             //jobbuildClose();
         }
-    });*/
+    });
     new Gv.Button({
         renderTo:'job-Submission-preset',
         cls:'button',
@@ -223,24 +223,54 @@ gen_time_identify_string = function() {
                     <div class="cl">
                       <div class="fl" style="display:inline; margin-right:20px;">
                         <span>Run Mode:</span><span id='page-portal-abaqus-run-mode'/>
-                        <div>
-                          <span id='page-portal-abaqus-bin' style="display: inline-block;"></span>
-                          <a id='page-portal-abaqus-bin-select-btn' style="display: inline-block; vertical-align: middle;"></a>
-                        </div>
+                         <span id="page-portal-abaqus-parallel-mode"/>
                         <span id='page-portal-abaqus-arguments'></span>
                       </div>
                       <div class="fl">
                         <div>
+                          <span id='page-portal-abaqus-bin' style="display: inline-block;"></span>
+                          <a id='page-portal-abaqus-bin-select-btn' style="display: inline-block; vertical-align: middle;"></a>
+                        </div>
+                        <div>
                           <span id='page-portal-abaqus-work-dir' style="display: inline-block;"></span>
                           <a id='page-portal-abaqus-workdir-btn' style="display: inline-block; vertical-align: middle;"></a>
                         </div>
-                        <!--
+                        <span id="page-portal-abaqus-output-file"/> 
+                      </div>
+                    </div>
+              </div> 
+            </div>
+            <div class="form-group active">
+                <div class="form-group-title">
+                    <div class="title-float cl">
+                        <div class="title-front">
+                            <i class="icon-chevron-sign-down"></i>
+                        </div>
+                        <div class="title-text">Environment Parameters</div>
+                    </div>
+                </div>
+                <div class="form-group-content">
+                    <div class="cl">
+                      <div class="fl" style="display:inline; margin-right:20px;">
+                        <span>Mode:</span><span id='page-portal-abaqus-mode'/>
+                        <span id="page-portal-abaqus-gpu"/>
+                        <span id="page-portal-abaqus-job-name"/>
+                        <span id="page-portal-abaqus-number-of-domain"/>
+                        <span id="page-portal-abaqus-parallelization-method"/>
+                      </div>
+                      <!--
+                      <span>Maximum preprocessor and analysis memory:</span><span id="page-poral-abaqus-mpaam"/>
+                      -->
+                      <div class="fl">
+                        <span>Output Precision:</span><span id='page-portal-abaqus-output-precision'/>
+                        <div class="cl">
+                            <span class="fl" id="page-poral-abaqus-mpaam" /><span class="fl" id="page-poral-abaqus-mpaam-t" />
+                        </div>
+                        <span id="page-portal-abaqus-explicit-precision"/>
                         <div>
                           <span id='page-portal-abaqus-input-file' style="display: inline-block;"></span>
                           <a id='page-portal-abaqus-input-file-btn' style="display: inline-block; vertical-align: middle;"></a>
-                        </div>
-                        -->
-                        <span id="page-portal-abaqus-output-file"/>                 
+                        </div>                                         
                       </div>
                     </div>
               </div> 
@@ -323,6 +353,7 @@ gen_time_identify_string = function() {
 <script type="text/javascript" src="/jm_as/CAE/ABAQUS/ABAQUS.help.js"></script>
 <script type="text/javascript" src="/jm_as/CAE/ABAQUS/ABAQUS.js"></script>
 <div class="jobupdate-floatdiv-bottom">
+<span id="job-Submission-predefine"></span>
 <span id="job-Submission-do"></span>
 <span id="job-Submission-preset"></span>
 </div>

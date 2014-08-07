@@ -8,21 +8,37 @@ nfs_quota_filesystem=node22:/home
 
 ## pbs setting
 queue_default=test
-nnodes_default=4
+nnodes_default=1
  name_prefix=`echo ${PORTALNAM}|tr [A-Z] [a-z]`
 hours_default=1
 
 ## run setting
 output_prefix=`echo ${PORTALNAM}|tr [A-Z] [a-z]`
 mpiprog_default=/public/software/abaqus/6.10-1/exec/abq6101.exe
-mpiprog_list=/public/software/abaqus/6.10-1/exec/abq6101.exe
+prog_list=/public/software/abaqus/6.10-1/exec/abq6101.exe
 programarg_default=' '
+
+#Environment setting
+parallel_mode=default:mpi:threads
+parallel_mode_default=default
+preprocessor_memory=90
+explicit_precision=single:fofrce-single/double-off:Double-analysis-only:Double-constraints-only:Double-analysis+Packager
+explicit_precision_default=single
+parallelization_method=domain:loop
+parallelization_method_default=domain
+
+#predefine
+PORTAL_PREDEFINE_LIST='{"Default Program List":"prog_list","Default Work Dir": "workdir_list",
+"Default Parallel Mode":"parallel_mode","Default Explicit Precision":"explicit_precision",
+"Default Parallelization Method":"parallelization_method",
+"Default PBS Options":"portal_pbsoptions",
+"Default PreCommands": "portal_precommands","Default PostCommands": "portal_postcommands"}'
 
 ## vnc_setting
 vnc_available=0
 
 ## checkpoint
-checkpoint_availabel=1
+checkpoint_availabel=0
 interval_default=240
 min_interval=5
 

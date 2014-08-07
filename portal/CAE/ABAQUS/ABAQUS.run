@@ -4,157 +4,160 @@ get_portal_input()
 {
 	QTIMESTAMP=`date +%G%m%d_%H%M`
 	PORTALVAR=/tmp/clusportal_$USER$QTIMESTAMP.var
-	##touch $PORTALVAR
 	dos2unix -n $1 $PORTALVAR 2>/dev/null
 	source $PORTALVAR
 
-	#GAP_MPI_NNODES=2
-	#GAP_MPI_PPN=2
-	#GAP_MPI_WALL_TIME=1:0:0
-	#GAP_MPI_QUEUE=high
-	#GAP_MPI_NAME=ANSYS_job
-
-	#GAP_MPI_MPI_TYPE=openmpi
-	#GAP_MPI_REMOTE_SHELL=ssh
-	#GAP_MPI_COMMUCATION=(ib,valure)
-	#GAP_MPI_SHARE_MEMORY=(1,null)
-	#GAP_MPI_CPU_BINDING=(1,null)
-	#GAP_MPI_PROGRAM=/public/software/vasp/vasp5-ompi
-	#GAP_MPI_PROGRAM_ARG=(null,'optin')
-	#GAP_MPI_WORK_DIR=/root
-	#GAP_MPI_INPUT=INCAR
-	#GAP_MPI_OUTPUT=ANSYS_job.log
-
-	#GAP_MPI_VNC=(1,null)
-
-	#GAP_MPI_CKECK_POINT=null
-	#GAP_MPI_INTERVAL=null
-
-	#GAP_MPI_MPI_OPT='--mca btl self'
-	#GAP_MPI_PBS_OPT='#PBS -j oe:#PBS -m zj@sugon.com'
-	#GAP_MPI_PRE_CMD='echo $HOME:echo $USER'
-	#GAP_MPI_POST_CMD='echo $JOB_ID:echo $PATH'
-
+	
 }
 
 get_basic_params()
 {
-	## ANSYS Input check
 	source /opt/gridview/gridviewAppTemplate/CAE/ABAQUS/ABAQUS.setting
-	### runfile setting
-	#openmpi_ENVFILE intelmpi_ENVFILE mpich2_ENVFILE cr_mpi_ENVFILE mvapich2_ENVFILE debug
-
-	##prefix=`basename $1|awk -F. '{print $1}'`
+	prefix=`basename $1|awk -F. '{print $1}'`
 	time=`date +%m%d%H%M%S`
 	username=`whoami`
-	pbsfile=${GAP_MPI_NAME}.pbs
+	pbsfile=${GAP_NAME}.pbs
 }
 
 parse_portal_params()
 {
+	#vnc
+	if [ "$GAP_VNC" == "1" ];then
+    	VNC_OPTION="-vnc"
+    	ABAQUS_VNC=""
+    else
+    	VNC_OPTION=""
+    	ABAQUS_VNC="-g"
+    fi
 	# PRODUCTID Check
-	if [ "null$GAP_MPI_MPI_OPT" == "null" ];then
-	 GAP_MPI_MPI_OPT=" "
+	if [ "null$GAP_PBS_OPT" == "null" ];then
+	 GAP_PBS_OPT=" "
 	fi
-	if [ "null$GAP_MPI_PBS_OPT" == "null" ];then
-	 GAP_MPI_PBS_OPT=" "
+	if [ "null$GAP_PRE_CMD" == "null" ];then
+	 GAP_PRE_CMD=" "
 	fi
-	if [ "null$GAP_MPI_PRE_CMD" == "null" ];then
-	 GAP_MPI_PRE_CMD=" "
-	fi
-	if [ "null$GAP_MPI_POST_CMD" == "null" ];then
-	 GAP_MPI_POST_CMD=" "
+	if [ "null$GAP_POST_CMD" == "null" ];then
+	 GAP_POST_CMD=" "
 	fi
 
-
-
-	## hpc run option	
-	PRECMD='hostlist="";for node in `cat $PBS_NODEFILE | uniq`;do num=`cat $PBS_NODEFILE | grep $node | wc -l`;if [ -z $hostlist ];then hostlist=[\GridViewPortalQuotes$node\GridViewPortalQuotes,$num];else hostlist=$hostlist,[\GridViewPortalQuotes$node\GridViewPortalQuotes,$num];fi;done;hostlist=[$hostlist];'
-	RUNLIST="cpus=\$NP"
-
-
-
-	##Other options
-	PRECMD2="echo \"mp_host_list=\${hostlist}\" > abaqus_v6.env;echo ask_delete=OFF >> abaqus_v6.env;echo mp_mode=${GAP_MPI_PARAMODE} >> abaqus_v6.env;rm *.lck -rf >& /dev/null;"
-
-
-
-	## gpu acc option
-	echo ${GAP_MPI_GPUACC} > abc
-	echo ${GAP_MPI_GPUTYPE} > abc
-
-	if [ "$GAP_MPI_GPUACC" = '1' -a "$GAP_MPI_GPUTYPE" != "null" ];then
-	        GPUACC="gpu=${GAP_MPI_GPUTYPE}"
+	# GPU
+	if [[ "${GAP_VNC}" == "0" && "${GAP_GPU}" == "1" ]];then
+		gpu="gpu=NVIDIA"
 	else
-	        GPUACC=""
+		gpu=" "
 	fi
 
-	## vnc option
-	cd ${GAP_MPI_WORK_DIR}
+	#job
+	if [ "${GAP_VNC}" == "0" ];then
+		job="job=${GAP_JOB_NAME}"
+	else
+		job=" "
+	fi
 
-	if [ ${GAP_MPI_INPUT} != "" ];then
-	        FILE=${GAP_MPI_INPUT}
+	#parallel mode
+	if [ "${GAP_VNC}" == "0" ];then
+		mp_mode="mp_mode=${GAP_PARALLEL_MODE}"
+	else
+		mp_mode=" "
+	fi
+
+	#number of domain and explicit precision and parallel mothod
+	if [[ "${GAP_VNC}" == "0" && "${GAP_MODE}" == "explicit" ]];then
+		parallel="parallel=${GAP_PRALLEL_METHOD}"
+		domains="domains=${GAP_NUMBER_DOMAIN}" 
+		memory=" "
+		#explicit="double=explicit"
+		if [ "${GAP_EXPLICIT_PRECISION}" == "single" ];then
+			explicit=" "
+		elif [ "${GAP_EXPLICIT_PRECISION}" == "fofrce-single/double-off" ];then
+			explicit="double=off"
+		elif [ "${GAP_EXPLICIT_PRECISION}" == "Double-analysis-only" ];then
+			explicit="double=explicit"
+		elif [ "${GAP_EXPLICIT_PRECISION}" == "Double-constraints-only" ];then
+			explicit="double=constraint"
+		elif [ "${GAP_EXPLICIT_PRECISION}" == "Double-analysis+Packager" ];then
+			explicit="double=both"
+		else
+			explicit=" "
+		fi
+
+	elif [[ "${GAP_VNC}" == "0" && "${GAP_MODE}" == "standard" ]];then
+		parallel=" "
+		explicit=" "
+		domains=" "
+		if [ "${GAP_MAX_MEMORY_T}" == "%" ];then
+			memory="memory=\"${GAP_MAX_MEMORY}${GAP_MAX_MEMORY_T}\"" #90%
+		else
+			memory="memory=\"${GAP_MAX_MEMORY} ${GAP_MAX_MEMORY_T}\"" #2 GB
+		fi
+	else
+		parallel=" "
+		explicit=" "
+		number_domain=" "
+		memory=" "
+	fi
+
+	#output precision
+	if [ "${GAP_VNC}" == "0" ];then
+		output_precision="output_precision=${GAP_OUTPUT_PRECISION}"
+	else
+		output_precision=" "
+	fi
+
+	# input file
+	if [[ "${GAP_VNC}" == "0" && "${GAP_INPUT}" != "" ]];then
+	        FILE=${GAP_INPUT}
 	        FILE=${FILE##/*/}
 	        dos2unix ${FILE} >& /dev/null &
 	        INPUT=${FILE}
-			INP="job=${INPUT}"
+			INP="input=${INPUT}"
 	else
 		INP=""
 	fi
 
-	if [[ ${GAP_MPI_SUB} != "" ]];then
-	##if [ -n ${GAP_MPI_SUB} ];then
-	        FILE=${GAP_MPI_SUB}
-	        FILE=${FILE##/*/}
-	        FILE=${FILE##*.}
-	#	if [ ${FILE} == "f" -o ${FILE} == "o" ]
-		{
-		if [[ ${FILE} == 'f' ]]
-			then
-		FILE1=${GAP_MPI_SUB}
-		FILE1=${FILE1##/*/}
-		FILE1=${FILE1%.*}
-		SUB="user=${FILE1}"
-			else
-	#		exit -1
-	echo "The user subroutine not with suffix .f or .o can't accept by ABAQUS, please rename the subroutine file ${GAP_MPI_SUB}"
-	exit -1
-		fi
-		}
-	else
-		SUB=""
+	#cpus
+	ncpus=$[${GAP_PPN} * ${GAP_NNODES}]
+	cpus="cpus=${ncpus}"
+
+	## hpc run option	
+	PRECMD='hostlist="";for node in `cat $PBS_NODEFILE | uniq`;do num=`cat $PBS_NODEFILE | grep $node | wc -l`;if [ -z $hostlist ];then hostlist=[\GridViewPortalQuotes$node\GridViewPortalQuotes,$num];else hostlist=$hostlist,[\GridViewPortalQuotes$node\GridViewPortalQuotes,$num];fi;done;hostlist=[$hostlist];'
+	#RUNLIST="cpus=\$NP"
+	#PRECMD='mp_host_list="[";for n in $(sort -u $PBS_NODEFILE);do mp_host_list="${mp_host_list}['$n',$(grep -c $n $PBS_NODEFILE)],";done;mp_host_list=$(echo ${mp_host_list} | sed -e "s/,$/]/")'
+
+
+	##Other options
+	#PRECMD2="echo \"mp_host_list=\${hostlist}\" > abaqus_v6.env;echo ask_delete=OFF >> abaqus_v6.env;echo mp_mode=${GAP_MPI_PARAMODE} >> abaqus_v6.env;rm *.lck -rf >& /dev/null;"
+	PRECMD2="echo \"mp_host_list=${hostlist}\" > abaqus_v6.env"
+
+	if [ "${GAP_VNC}" == "0" ];then
+		PRECMD2=" "
 	fi
-	cd ${GAP_MPI_WORK_DIR}
+
+	cd ${GAP_WORK_DIR}
 }
 
 create_pbs_script()
 {
-	################################################################################################################################################
-	#createpbs -t Type [-o logfile] [-pbs pbsfile]
-	#        -prog Program  [-proarg Program Argment] 
-	#       [-nnodes NodeNum] [-ppn PPN] [-wtime WallTime] [-name JobName] [-wdir WorkDir] [-q queque] [ -pbsoption 'option1:option2: ... :optionN' ]
-	#       [-envfile envfile1 envfile2 ... envfileN] 
-	#       [-precommand 'command1:command2: ... commandN'] [ -postcommand 'command1:command2: ... :commandN' )
-	#       [-vnc]
-	#       [-mpirun mpirun command] [-net Network] [-r ssh/rsh] [-bindcore] [-mpiarg MPIRUN Argment] 
-	#       [-cri CheckPoint Interval(Minitues)] [-ocpg Old CheckPoint Group name] [-ncpg Old CheckPoint Group name] [-ncp number CheckPoints]
-	#       Type should be serial,openmpi,intelmpi cr_mpi, mvapich2,mpich2
-	#       Network should be tcp,ib,memory,ib_memory,tcp_memory #
-	##############################################################################################################################################
+	
 
-
-	/opt/gridview/gridviewAppTemplate/createpbs -t serial -o "${GAP_MPI_OUTPUT}" -pbs ${pbsfile} -precommand "${PRECMD} ${PRECMD2}" -prog "${GAP_MPI_PROGRAM}" -proarg "${MPIINPUT} ${INP} ${SUB} ${RUNLIST} ${GPUACC} ${GAP_MPI_PROGRAM_ARG} interactive" -envfile "${ABAQUS_ENVFILE}" ${VNC_OPTION}  -nnodes   "${GAP_MPI_NNODES}" -ppn "${GAP_MPI_PPN}" -wtime "${GAP_MPI_WALL_TIME}" -name "${GAP_MPI_NAME}" -wdir "${GAP_MPI_WORK_DIR}" -q "${GAP_MPI_QUEUE}" -pbsoption "${GAP_MPI_PBS_OPT}"
-	sed -i "s/GridViewPortalQuotes/'/g" ${pbsfile} 
-	#/opt/gridview/gridviewAppTemplate/createpbs -t "${GAP_MPI_MPI_TYPE}" -o "${GAP_MPI_OUTPUT}" -pbs ${pbsfile} \
-	#            -prog "${GAP_MPI_PROGRAM}" -proarg "${GAP_MPI_PROGRAM_ARG}"\
-	#            -envfile  "${ANSYS_ENVFILE}"     \
-	#            -precommand "${GAP_MPI_PRE_CMD}" -postcommand "${GAP_MPI_POST_CMD}" \
-	#            ${VNC_OPTION}  \
-	#            -nnodes   "${GAP_MPI_NNODES}" -ppn "${GAP_MPI_PPN}" -wtime "${GAP_MPI_WALL_TIME}" -name "${GAP_MPI_NAME}" -wdir "${GAP_MPI_WORK_DIR}" -q "${GAP_MPI_QUEUE}"  \
-	#             -pbsoption "${GAP_MPI_PBS_OPT}" \
-	#            -net "${GAP_MPI_NETWORK}" -r "${GAP_MPI_REMOTE_SHELL}"  ${CPU_BINDING_OPTION} -mpiarg "${GAP_MPI_MPI_OPT}"  \
-	#            -ncpg '$id.ckps' -cri "${GAP_MPI_INTERVAL}" -ncp 2 
-	#
+	/opt/gridview/gridviewAppTemplate/createpbs -t serial \
+	-o "${GAP_OUTPUT}" \
+	-pbs ${pbsfile} \
+	-precommand "${GAP_PRE_CMD} ${PRECMD} ${PRECMD2}" \
+	-prog "${GAP_PROGRAM}" \
+	-proarg "${job} ${ABAQUS_VNC} analysis ${mp_mode} ${memory} ${parallel} ${output_precision} ${domains} ${explicit} ${INP} ${cpus} ${gpu} ${GAP_PROGRAM_ARG} interactive" \
+	-envfile "${ABAQUS_ENVFILE}" ${VNC_OPTION}  \
+	-nnodes   "${GAP_NNODES}" \
+	-ppn "${GAP_PPN}" \
+	-wtime "${GAP_WALL_TIME}" \
+	-name "${GAP_NAME}" \
+	-wdir "${GAP_WORK_DIR}" \
+	-q "${GAP_QUEUE}" \
+	-postcommand "${GAP_POST_CMD}" \
+	-pbsoption "${GAP_PBS_OPT}" \
+	-ncpg '$id.ckps' -cri "${GAP_INTERVAL}" -ncp 2
+	sed -i 's/GridViewPortalColon/:/g' ${pbsfile}
+	
 }
 
 submit_job(){
@@ -181,7 +184,6 @@ checkpoint_func()
 clean_tmp_file()
 {
     if [ "$debug" != "1" ];then
-    	rm -f $pbsfile
     	rm -f /tmp/${prefix}.var
     	rm -f /tmp/${prefix}.runvar
     	rm -f $PORTALVAR

@@ -43,7 +43,7 @@ get_portal_default()
   echo "var portal_pbsoptions=\"$portal_pbsoptions\";"
   echo "var portal_precommands=\"$portal_precommands\";"
   echo "var portal_postcommands=\"$portal_postcommands\";"
-  echo "var portal_predefine_list=\"$PORTAL_PREDEFINE_LIST\";"
+  echo "var portal_predefine_list=$PORTAL_PREDEFINE_LIST;"
 }
 
 ## program
@@ -51,38 +51,31 @@ get_program_info()
 {
   if [ "${workdir_list}" == "" ];then
     workdir_list="${user_home}:"
-    echo var workdir_list=\"$workdir_list\"\;
   fi
   echo var file=\"$mpiprog_default\"\;
-  echo var mpiProgList=\"$mpiprog_list\"\;
-  echo 'var s_mpiProg=mpiProgList.split(":")'\;
+  echo var prog_list=\"$prog_list\"\;
+  echo 'var s_mpiProg=prog_list.split(":")'\;
+  echo var workdir_list=\"$workdir_list\"\;
   echo 'var workdir=workdir_list.split(":")[0]'\;
   echo var programarg=\"$programarg_default\"\;
-
-  ## old parameters but not use
-  echo var lictype=\"$lic_default\"\;
-  echo var mpiruntype=\"hpmpi\"\;
-  echo var seconds=\"0\"\;
-  echo var liclist=\"$lic_list\"\;
-  echo 'var s_lic=liclist.split(":")'\;
-  echo var remoteshell=\"ssh\"\;
-  echo var ib_available=\"$ib_available\"\;
-  if [ "$ib_available" == 1 ];then
-    echo var network=\"ib\"\;
-  else
-    echo var network=\"tcp\"\;
-  fi
-  echo var paramode=\"smp\"\;
-  echo var inputtype=\"db\"\;
-  echo var sharemem=\"0\"\;
-  echo var cpubind=\"0\"\;
   echo var output=\"${output_prefix}\"\;
-  echo var vnc=\"0\"\;
-  echo var gputype=\"nvidia\"\;
-  echo var gpuacc_available=\"$gpuacc_available\"\;
-  echo var gpuacc=\"0\"\;
-  echo var imgName=\"${PORTALNAM}.png\"\;
 
+  echo var parallel_mode_default=\"$parallel_mode_default\"\;
+  echo var parallel_mode=\"$parallel_mode\"\;
+  echo 'var s_parallel_mode=parallel_mode.split(":")'\;
+
+  echo var preprocessor_memory=\"$preprocessor_memory\"\;
+
+  echo var explicit_precision_default=\"$explicit_precision_default\"\;
+  echo var explicit_precision=\"$explicit_precision\"\;
+  echo 'var s_explicit_precision=explicit_precision.split(":")'\;
+
+  echo var parallelization_method_default=\"$parallelization_method_default\"\;
+  echo var parallelization_method=\"$parallelization_method\"\;
+  echo 'var s_parallelization_method=parallelization_method.split(":")'\;
+
+  
+  
 }
 
 ##main
