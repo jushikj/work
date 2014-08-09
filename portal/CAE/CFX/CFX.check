@@ -36,6 +36,9 @@ get_portal_default()
   	echo var interval_def=\"$interval_default\"\;
   	echo var min_interval=\"$min_interval\"\;
   	echo var current_time=\"$QTIMESTAMP\"\;
+  	echo "var portal_pbsoptions=\"$portal_pbsoptions\";"
+    echo "var portal_precommands=\"$portal_precommands\";"
+    echo "var portal_postcommands=\"$portal_postcommands\";"
 }
 
 get_program_info()
