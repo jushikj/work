@@ -21,164 +21,134 @@ get_basic_params()
 
 parse_portal_params()
 {
-	#vnc
-	if [ "$GAP_VNC" == "1" ];then
-    	VNC_OPTION="-vnc"
-    	ABAQUS_VNC=""
-    else
-    	VNC_OPTION=""
-    	ABAQUS_VNC="-g"
+    #vnc
+    abaqus_args=""
+    if [ "$GAP_VNC" == "1" ];then
+        VNC_OPTION="-vnc"
+        abaqus_args="${abaqus_args} cae"
+        return
     fi
-	# PRODUCTID Check
-	if [ "null$GAP_PBS_OPT" == "null" ];then
-	 GAP_PBS_OPT=" "
-	fi
-	if [ "null$GAP_PRE_CMD" == "null" ];then
-	 GAP_PRE_CMD=" "
-	fi
-	if [ "null$GAP_POST_CMD" == "null" ];then
-	 GAP_POST_CMD=" "
-	fi
 
-	# GPU
-	if [[ "${GAP_VNC}" == "0" && "${GAP_GPU}" == "1" ]];then
-		gpu="gpu=NVIDIA"
-	else
-		gpu=" "
-	fi
+    VNC_OPTION=""
+    abaqus_args="${abaqus_args} analysis"
+    #job name
+    abaqus_args="${abaqus_args} job=${GAP_JOB_NAME}"
+    #parallel mode
+    abaqus_args="${abaqus_args} mp_mode=${GAP_PARALLEL_MODE}"
 
-	#job
-	if [ "${GAP_VNC}" == "0" ];then
-		job="job=${GAP_JOB_NAME}"
-	else
-		job=" "
-	fi
+    #number of domain and explicit precision and parallel mothod
+    if [ "${GAP_MODE}" == "explicit" ];then
+        parallel="parallel=${GAP_PRALLEL_METHOD}"
+        domains="domains=${GAP_NUMBER_DOMAIN}" 
+        memory=" "
+        #explicit="double=explicit"
+        if [ "${GAP_EXPLICIT_PRECISION}" == "single" ];then
+            explicit=" "
+        elif [ "${GAP_EXPLICIT_PRECISION}" == "fofrce-single/double-off" ];then
+            explicit="double=off"
+        elif [ "${GAP_EXPLICIT_PRECISION}" == "Double-analysis-only" ];then
+            explicit="double=explicit"
+        elif [ "${GAP_EXPLICIT_PRECISION}" == "Double-constraints-only" ];then
+            explicit="double=constraint"
+        elif [ "${GAP_EXPLICIT_PRECISION}" == "Double-analysis+Packager" ];then
+            explicit="double=both"
+        else
+            explicit=" "
+        fi
 
-	#parallel mode
-	if [ "${GAP_VNC}" == "0" ];then
-		mp_mode="mp_mode=${GAP_PARALLEL_MODE}"
-	else
-		mp_mode=" "
-	fi
+    elif [ "${GAP_MODE}" == "standard" ];then
+        parallel=" "
+        explicit=" "
+        domains=" "
+        if [ "${GAP_MAX_MEMORY_T}" == "%" ];then
+            memory="memory=\"${GAP_MAX_MEMORY}${GAP_MAX_MEMORY_T}\"" #90%
+        else
+            memory="memory=\"${GAP_MAX_MEMORY} ${GAP_MAX_MEMORY_T}\"" #2 GB
+        fi
+    else
+        parallel=" "
+        explicit=" "
+        number_domain=" "
+        memory=" "
+    fi
+    abaqus_args="${abaqus_args} ${memory} ${parallel} ${domains} ${explicit}"
 
-	#number of domain and explicit precision and parallel mothod
-	if [[ "${GAP_VNC}" == "0" && "${GAP_MODE}" == "explicit" ]];then
-		parallel="parallel=${GAP_PRALLEL_METHOD}"
-		domains="domains=${GAP_NUMBER_DOMAIN}" 
-		memory=" "
-		#explicit="double=explicit"
-		if [ "${GAP_EXPLICIT_PRECISION}" == "single" ];then
-			explicit=" "
-		elif [ "${GAP_EXPLICIT_PRECISION}" == "fofrce-single/double-off" ];then
-			explicit="double=off"
-		elif [ "${GAP_EXPLICIT_PRECISION}" == "Double-analysis-only" ];then
-			explicit="double=explicit"
-		elif [ "${GAP_EXPLICIT_PRECISION}" == "Double-constraints-only" ];then
-			explicit="double=constraint"
-		elif [ "${GAP_EXPLICIT_PRECISION}" == "Double-analysis+Packager" ];then
-			explicit="double=both"
-		else
-			explicit=" "
-		fi
-
-	elif [[ "${GAP_VNC}" == "0" && "${GAP_MODE}" == "standard" ]];then
-		parallel=" "
-		explicit=" "
-		domains=" "
-		if [ "${GAP_MAX_MEMORY_T}" == "%" ];then
-			memory="memory=\"${GAP_MAX_MEMORY}${GAP_MAX_MEMORY_T}\"" #90%
-		else
-			memory="memory=\"${GAP_MAX_MEMORY} ${GAP_MAX_MEMORY_T}\"" #2 GB
-		fi
-	else
-		parallel=" "
-		explicit=" "
-		number_domain=" "
-		memory=" "
-	fi
-
-	#output precision
-	if [ "${GAP_VNC}" == "0" ];then
-		output_precision="output_precision=${GAP_OUTPUT_PRECISION}"
-	else
-		output_precision=" "
-	fi
-
-	# input file
-	if [[ "${GAP_VNC}" == "0" && "${GAP_INPUT}" != "" ]];then
-	        FILE=${GAP_INPUT}
-	        FILE=${FILE##/*/}
-	        dos2unix ${FILE} >& /dev/null &
-	        INPUT=${FILE}
-			INP="input=${INPUT}"
-	else
-		INP=""
-	fi
-
-	#cpus
-	ncpus=$[${GAP_PPN} * ${GAP_NNODES}]
-	cpus="cpus=${ncpus}"
-
-	## hpc run option	
-	PRECMD='hostlist="";for node in `cat $PBS_NODEFILE | uniq`;do num=`cat $PBS_NODEFILE | grep $node | wc -l`;if [ -z $hostlist ];then hostlist=[\GridViewPortalQuotes$node\GridViewPortalQuotes,$num];else hostlist=$hostlist,[\GridViewPortalQuotes$node\GridViewPortalQuotes,$num];fi;done;hostlist=[$hostlist];'
-	#RUNLIST="cpus=\$NP"
-	#PRECMD='mp_host_list="[";for n in $(sort -u $PBS_NODEFILE);do mp_host_list="${mp_host_list}['$n',$(grep -c $n $PBS_NODEFILE)],";done;mp_host_list=$(echo ${mp_host_list} | sed -e "s/,$/]/")'
+    #output precision
+    abaqus_args="${abaqus_args} output_precision=${GAP_OUTPUT_PRECISION}"
 
 
-	##Other options
-	#PRECMD2="echo \"mp_host_list=\${hostlist}\" > abaqus_v6.env;echo ask_delete=OFF >> abaqus_v6.env;echo mp_mode=${GAP_MPI_PARAMODE} >> abaqus_v6.env;rm *.lck -rf >& /dev/null;"
-	PRECMD2="echo \"mp_host_list=${hostlist}\" > abaqus_v6.env"
+    # input file
+    if [ "${GAP_INPUT}" != "" ];then
+        FILE=${GAP_INPUT}
+        FILE=${FILE##/*/}
+        dos2unix ${FILE} >& /dev/null &
+        INPUT=${FILE}
+        INP="input=${INPUT}"
+        abaqus_args="${abaqus_args} input=${INPUT}"
+    fi
 
-	if [ "${GAP_VNC}" == "0" ];then
-		PRECMD2=" "
-	fi
+    #cpus
+    ncpus=$[${GAP_PPN} * ${GAP_NNODES}]
+    abaqus_args="${abaqus_args} cpus=${ncpus}"
 
-	cd ${GAP_WORK_DIR}
+    #GPU
+    if [ "${GAP_GPU}" == "1" ];then
+        abaqus_args="${abaqus_args} gpu=NVIDIA"
+    fi
+    abaqus_args="${abaqus_args} ${GAP_PROGRAM_ARG} interactive"
+
+    ## hpc run option	
+    PRECMD='hostlist="";
+    for node in $(cat ${PBS_NODEFILE} | uniq);do
+        num=$(cat $PBS_NODEFILE | grep $node | wc -l);
+        if [ -z $hostlist ];then
+            hostlist=['"\\'\$node\\'"',$num]; 
+        else
+            hostlist=$hostlist,['"\\'\$node\\'"',$num]; 
+        fi;
+    done;
+    hostlist=[$hostlist];'
+    PRECMD2='echo mp_host_list=${hostlist} > abaqus_v6.env'
+
+    cd ${GAP_WORK_DIR}
+
+    if [ "null$GAP_PBS_OPT" == "null" ];then
+        GAP_PBS_OPT=" "
+    fi
+    if [ "null$GAP_PRE_CMD" == "null" ];then
+        GAP_PRE_CMD=" "
+    fi
+    if [ "null$GAP_POST_CMD" == "null" ];then
+        GAP_POST_CMD=" "
+    fi
+
 }
 
 create_pbs_script()
 {
-	
 
-	/opt/gridview/gridviewAppTemplate/createpbs -t serial \
-	-o "${GAP_OUTPUT}" \
-	-pbs ${pbsfile} \
-	-precommand "${GAP_PRE_CMD} ${PRECMD} ${PRECMD2}" \
-	-prog "${GAP_PROGRAM}" \
-	-proarg "${job} ${ABAQUS_VNC} analysis ${mp_mode} ${memory} ${parallel} ${output_precision} ${domains} ${explicit} ${INP} ${cpus} ${gpu} ${GAP_PROGRAM_ARG} interactive" \
-	-envfile "${ABAQUS_ENVFILE}" ${VNC_OPTION}  \
-	-nnodes   "${GAP_NNODES}" \
-	-ppn "${GAP_PPN}" \
-	-wtime "${GAP_WALL_TIME}" \
-	-name "${GAP_NAME}" \
-	-wdir "${GAP_WORK_DIR}" \
-	-q "${GAP_QUEUE}" \
-	-postcommand "${GAP_POST_CMD}" \
-	-pbsoption "${GAP_PBS_OPT}" \
-	-ncpg '$id.ckps' -cri "${GAP_INTERVAL}" -ncp 2
-	sed -i 's/GridViewPortalColon/:/g' ${pbsfile}
-	
+
+    /opt/gridview/gridviewAppTemplate/createpbs -t serial \
+    -o "${GAP_OUTPUT}" \
+    -pbs ${pbsfile} \
+    -precommand "${GAP_PRE_CMD} ${PRECMD} ${PRECMD2}" \
+    -prog "${GAP_PROGRAM}" \
+    -proarg "${abaqus_args}" \
+    -envfile "${ABAQUS_ENVFILE}" \
+    ${VNC_OPTION}  \
+    -nnodes   "${GAP_NNODES}" \
+    -ppn "${GAP_PPN}" \
+    -wtime "${GAP_WALL_TIME}" \
+    -name "${GAP_NAME}" \
+    -wdir "${GAP_WORK_DIR}" \
+    -q "${GAP_QUEUE}" \
+    -postcommand "${GAP_POST_CMD}" \
+    -pbsoption "${GAP_PBS_OPT}"
 }
 
 submit_job(){
-	jobid=`qsub $pbsfile`
-	return $?
-}
-
-checkpoint_func()
-{
-	if [ "${GAP_CHECK_POINT}" == 1 ];then
-	    id=`echo $jobid|awk -F. '{print $1}' `
-    	echo "Jobid:${id}
-    	Cr_type:mpi_system
-    	User_name:`whoami`
-    	Work_dir:${wdir}
-    	Job_batch:autocr.${id}.pbs
-    	Cr_batch:autocr.${id}.pbs
-    	Cr_interval:${cri}
-    	Num_CP_save:${ncp}
-    	" >/checkpoints/autocr/spoolautocr.${id}.Q
-    fi
+    jobid=`qsub $pbsfile`
+    return $?
 }
 
 clean_tmp_file()
@@ -199,14 +169,13 @@ output_result()
 }
 main()
 {
-	get_portal_input $@
-	get_basic_params $@
-	parse_portal_params
-	create_pbs_script
-	submit_job
-	job_status=$?
-	checkpoint_func
-	clean_tmp_file
-	output_result ${job_status}
+    get_portal_input $@
+    get_basic_params $@
+    parse_portal_params
+    create_pbs_script
+    submit_job
+    job_status=$?
+    clean_tmp_file
+    output_result ${job_status}
 }
 main "$@"

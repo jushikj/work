@@ -19,7 +19,7 @@ prog_list=/public/software/abaqus/6.10-1/exec/abq6101.exe
 programarg_default=' '
 
 #Environment setting
-parallel_mode=default:mpi:threads
+parallel_mode=mpi:threads
 parallel_mode_default=default
 preprocessor_memory=90
 explicit_precision=single:fofrce-single/double-off:Double-analysis-only:Double-constraints-only:Double-analysis+Packager
