@@ -7,27 +7,7 @@ get_portal_input()
 
   dos2unix -n $1 $PORTALVAR 2>/dev/null
   source $PORTALVAR
-  #GAP_PPN=12
-  #GAP_INTERVAL=null
-  #GAP_PBS_OPT=''
-  #GAP_PRECISION=single
-  #GAP_INPUT='/public/users/mashj/cfx-test/Benchmark.def'
-  #GAP_CKECK_POINT=null
-  #GAP_METHOD='HP MPI'
-  #GAP_PRE_CMD=''
-  #GAP_MODE=Distributed
-  #GAP_NAME=cfx_1002_165029
-  #GAP_REMOTE_SHELL=ssh
-  #GAP_PROGRAM_ARG=
-  #GAP_VNC=null
-  #GAP_POST_CMD=''
-  #GAP_PROGRAM='/public/software/ansys_inc/v121/CFX/bin/cfx5solve'
-  #GAP_NNODES=4
-  #GAP_WALL_TIME=1:0:0
-  #GAP_QUEUE=I_cb60
-  #GAP_OUTPUT=cfx_1002_165029.txt
-  #GAP_WORK_DIR='/public/users/mashj/cfx-test'
-
+  
 }
 
 get_basic_params()

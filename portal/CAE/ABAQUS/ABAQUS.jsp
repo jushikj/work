@@ -253,10 +253,13 @@ gen_time_identify_string = function() {
                     <div class="cl">
                       <div class="fl" style="display:inline; margin-right:20px;">
                         <span>Mode:</span><span id='page-portal-abaqus-mode'/>
-                        <span id="page-portal-abaqus-gpu"/>
-                        <span id="page-portal-abaqus-job-name"/>
+                        <span id="page-portal-abaqus-gpu"/>                        
+                        <div>
+                          <span id='page-portal-abaqus-input-file' style="display: inline-block;"></span>
+                          <a id='page-portal-abaqus-input-file-btn' style="display: inline-block; vertical-align: middle;"></a>
+                        </div>   
                         <span id="page-portal-abaqus-number-of-domain"/>
-                        <span id="page-portal-abaqus-parallelization-method"/>
+                        <span id="page-portal-abaqus-job-name"/>                        
                       </div>
                       <!--
                       <span>Maximum preprocessor and analysis memory:</span><span id="page-poral-abaqus-mpaam"/>
@@ -267,10 +270,7 @@ gen_time_identify_string = function() {
                             <span class="fl" id="page-poral-abaqus-mpaam" /><span class="fl" id="page-poral-abaqus-mpaam-t" />
                         </div>
                         <span id="page-portal-abaqus-explicit-precision"/>
-                        <div>
-                          <span id='page-portal-abaqus-input-file' style="display: inline-block;"></span>
-                          <a id='page-portal-abaqus-input-file-btn' style="display: inline-block; vertical-align: middle;"></a>
-                        </div>                                         
+                        <span id="page-portal-abaqus-parallelization-method"/>                                      
                       </div>
                     </div>
               </div> 

@@ -8,33 +8,6 @@ get_portal_input()
 	dos2unix -n $1 $PORTALVAR 2>/dev/null
 	source $PORTALVAR
 
-	#GAP_MPI_NNODES=2
-	#GAP_MPI_PPN=2
-	#GAP_MPI_WALL_TIME=1:0:0
-	#GAP_MPI_QUEUE=high
-	#GAP_MPI_NAME=ANSYS_job
-
-	#GAP_MPI_MPI_TYPE=openmpi
-	#GAP_MPI_REMOTE_SHELL=ssh
-	#GAP_MPI_COMMUCATION=(ib,valure)
-	#GAP_MPI_SHARE_MEMORY=(1,null)
-	#GAP_MPI_CPU_BINDING=(1,null)
-	#GAP_MPI_PROGRAM=/public/software/vasp/vasp5-ompi
-	#GAP_MPI_PROGRAM_ARG=(null,'optin')
-	#GAP_MPI_WORK_DIR=/root
-	#GAP_MPI_INPUT=INCAR
-	#GAP_MPI_OUTPUT=ANSYS_job.log
-
-	#GAP_MPI_VNC=(1,null)
-
-	#GAP_MPI_CKECK_POINT=null
-	#GAP_MPI_INTERVAL=null
-
-	#GAP_MPI_MPI_OPT='--mca btl self'
-	#GAP_MPI_PBS_OPT='#PBS -j oe:#PBS -m zj@sugon.com'
-	#GAP_MPI_PRE_CMD='echo $HOME:echo $USER'
-	#GAP_MPI_POST_CMD='echo $JOB_ID:echo $PATH'
-
 }
 
 get_basic_params()
@@ -102,7 +75,8 @@ parse_portal_params()
 		MPP="-lsdynampp"
 	else
 		PRECMD='num=`cat $PBS_NODEFILE | wc -l`;'
-		RUNLIST='-np $num'
+		#RUNLIST='-np $num'
+		RUNLIST=""
 		#no mpi
 		MPIINPUT=""
 		MPP=""

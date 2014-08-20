@@ -25,7 +25,7 @@ get_user_info()
 get_portal_default()
 {
 	echo var numnodes=\"$nnodes_default\"\;
-  	echo var numppn=\"1\"\;
+  	echo var numppn=\"$ppn_default\"\;
   	echo var name=\"${name_prefix}\"\;
   	echo var hours=\"$hours_default\"\;
   	echo var minutes=\"0\"\;
@@ -39,14 +39,19 @@ get_portal_default()
   	echo "var portal_pbsoptions=\"$portal_pbsoptions\";"
     echo "var portal_precommands=\"$portal_precommands\";"
     echo "var portal_postcommands=\"$portal_postcommands\";"
+    echo "var portal_predefine_list=$PORTAL_PREDEFINE_LIST;"
 }
 
 get_program_info()
 {
+  if [ "${workdir_list}" == "" ];then
+        workdir_list="${user_home}:"
+  fi
+  echo "var workdir_list=\"${workdir_list}\";"
 	echo var program=\"$prog_default\"\;
-	echo var proglist=\"$prog_list\"\;
-	echo 'var s_prog=proglist.split(":")'\;
-	echo 'var workdir=userhome'\;
+	echo var prog_list=\"$prog_list\"\;
+	echo 'var s_prog=prog_list.split(":")'\;
+	echo 'var workdir=workdir_list.split(":")[0]'\;
 	echo var output=\"${output_prefix}\"\;
 	echo var mpi_def=\"$mpi_default\"\;
  	echo var mpi_list=\"$mpi_list\"\;
@@ -64,6 +69,9 @@ main()
 	get_portal_info $@
   	get_user_info $@
   	source ${DIRNAM}/../../CommonCheck.sh ${CHECKUSER}
+  	if [ ! -z $ppn_default ];then
+        ppn_default=$((ppn_default/2))
+    fi
   	source ${DIRNAM}/${PORTALNAM}.setting
   	if [ -f ${user_home}/.clusportal/${PORTALNAM}.setting ];then
     	source ${user_home}/.clusportal/${PORTALNAM}.setting

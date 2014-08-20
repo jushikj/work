@@ -290,7 +290,7 @@ var global_jobscheduler_portal_abaqus = {
 
         // number of domain
         abaqus_number_domain = new Gv.form.TextField({
-            renderTo: 'page-portal-abaqus-job-name',
+            renderTo: 'page-portal-abaqus-number-of-domain',
             fieldLabel: '<font color="#FF0000">*</font>Number Of Domain',
             allowBlank: false,
             value:numppn*numnodes,

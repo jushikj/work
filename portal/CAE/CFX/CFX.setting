@@ -8,7 +8,7 @@ nfs_quota_filesystem=node22:/home
 
 ## pbs setting
 queue_default=test
-nnodes_default=4
+nnodes_default=1
 name_prefix=`echo ${PORTALNAM}|tr [A-Z] [a-z]`
 hours_default=1
 
@@ -20,11 +20,16 @@ programarg_default=' '
 mpi_default=hpmpi
 mpi_list=hpmpi:mpich
 
+##predefine
+PORTAL_PREDEFINE_LIST='{"Default Program List":"prog_list", "Default MPI List":"mpi_list",
+"Default Work Dir": "workdir_list","Default PBS Options":"portal_pbsoptions",
+"Default PreCommands": "portal_precommands","Default PostCommands": "portal_postcommands"}'
+
 ## vnc_setting
 vnc_available=0
 
 ## checkpoint setting
-checkpoint_availabel=1
+checkpoint_availabel=0
 interval_default=240
 min_interval=5
 

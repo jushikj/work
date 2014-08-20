@@ -69,24 +69,16 @@ $(function(){
         renderTo:'job-Submission-do',
         cls:'button bg-color-blueDark border-color-blueDark fg-color-white',
         text:'提交'
-        //handler:function(obj){
-        //    $("#jobupdate-floatdiv-con").load("template/��ҵ��ϸ��Ϣ.html");
-        //}
     });
-    /*new Gv.Button({
-        renderTo:'job-Submission-close',
-        cls:'button',
-        text:'����',
-        handler:function(obj){
-            //jobClose();
-            //newJobBottomUp();
-            //jobbuildClose();
-        }
-    });*/
     new Gv.Button({
         renderTo:'job-Submission-preset',
         cls:'button',
         text:'重置'
+    });
+    new Gv.Button({
+         renderTo:'job-Submission-predifine',
+          cls:'button',
+          text:'预设参数'
     });
 });
 jQuery(".portal-sideMenu").slide({titCell:"h3", targetCell:".portal-sideMenu-help",defaultIndex:1,effect:"slideDown",delayTime:300,trigger:"click"});
@@ -232,11 +224,11 @@ gen_time_identify_string = function() {
                       </div>
                       <div class="fl">
                         <span>Remote Shell:</span><span id='page-portal-cfx-remote-shell'/>
-                        <span id="page-portal-cfx-mpi-type"/>
                         <div>
                           <span id='page-portal-cfx-work-dir' style="display: inline-block;"></span>
                           <a id='page-portal-cfx-workdir-btn' style="display: inline-block; vertical-align: middle;"></a>
-                        </div>                 
+                        </div>
+                        <span id="page-portal-cfx-mpi-type"/>                 
                       </div>
                     </div>
               </div> 
@@ -253,7 +245,10 @@ gen_time_identify_string = function() {
                 <div class="form-group-content">
                     <div class="cl">
                       <div class="fl" style="display:inline; margin-right:20px;">
-                        <span id='page-portal-cfx-def-file'/><br/>
+                        <div>
+                          <span id='page-portal-cfx-def-file' style="display: inline-block;"></span>
+                          <a id='page-portal-cfx-def-file-btn' style="display: inline-block; vertical-align: middle;"></a>
+                        </div>
                         
                       </div>
                       <div class="fl">
@@ -344,6 +339,7 @@ gen_time_identify_string = function() {
 <script type="text/javascript" src="/jm_as/CAE/CFX/CFX.help.js"></script>
 <script type="text/javascript" src="/jm_as/CAE/CFX/CFX.js"></script>
 <div class="jobupdate-floatdiv-bottom">
+<span id="job-Submission-predifine"></span>
 <span id="job-Submission-do"></span>
 <span id="job-Submission-preset"></span>
 </div>

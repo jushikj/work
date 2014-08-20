@@ -13,9 +13,11 @@
           $('#page-portal-cfx-run-parameters-group').removeClass('active');
           $('#page-portal-cfx-run-parameters-group i').attr('class','icon-chevron-sign-down');
           global_portal_cfx.cfx_def_file.disabled(true);
+          global_portal_cfx.cfx_def_file_btn.disabled(true);
           global_portal_cfx.cfx_def_file.value('');
           global_portal_cfx.cfx_res_file.disabled(true);
           global_portal_cfx.cfx_res_file.value('');
+          global_portal_cfx.cfx_res_file_btn.disabled(true);
           global_portal_cfx.cfx_time.disabled(true);
           $("#portal_cfx-time-type-steady")[0].checked=false;
           $("#portal_cfx-time-type-translent")[0].checked=false;
@@ -24,9 +26,11 @@
           $('#page-portal-cfx-run-parameters-group').addClass('active');
           $('#page-portal-cfx-run-parameters-group i').attr('class','icon-chevron-sign-up');
           global_portal_cfx.cfx_def_file.disabled(false);
-          global_portal_cfx.cfx_def_file.value(PORTALNAM + "_" + portal_time_stamp + '.def');
+          global_portal_cfx.cfx_def_file_btn.disabled(false);
+          //global_portal_cfx.cfx_def_file.value(PORTALNAM + "_" + portal_time_stamp + '.def');
           global_portal_cfx.cfx_res_file.disabled(false);
           global_portal_cfx.cfx_res_file.value('');
+          global_portal_cfx.cfx_res_file_btn.disabled(false);
           global_portal_cfx.cfx_time.disabled(false);
           $("#portal_cfx-time-type-steady")[0].checked=false;
           $("#portal_cfx-time-type-translent")[0].checked=false;
@@ -82,7 +86,7 @@
     // cfx fluent bin
     cfx_fluent_bin = new Gv.form.ComboBox({
             renderTo: 'page-portal-cfx-fluent-bin',
-            fieldLabel: '<font color="#FF0000">*</font>Fluent Bin',
+            fieldLabel: '<font color="#FF0000">*</font>CFX Bin',
             allowBlank:false,
             value: program,
             autoLoad:false,
@@ -97,7 +101,7 @@
             text:'Browse...',
             handler: function() {
                 var workdirRunFilePanel = new Gv.SelectFileWindow({
-                    defaultPath: Gv.get('portal-pbs-params-workdir').val(),
+                    defaultPath: cfx_fluent_bin.value(),
                     isDir: false,
                     tbar: [{
                         text: '确定',
@@ -149,12 +153,16 @@
       this.cfx_params.push(cfx_arguments);
 
       //work dir
-      cfx_work_dir = new Gv.form.TextField({
+      cfx_work_dir = new Gv.form.TextFieldSelect({
             renderTo: 'page-portal-cfx-work-dir',
-            fieldLabel: '<font color="#FF0000">*</font>Working DIR',
-            allowBlank: false,
-            value:workdir
-      });
+            fieldLabel: '<font color="#FF0000">*</font>WorkingDIR:',
+            readOnly: false,
+            //width: 540,
+            value: workdir,
+            autoLoad:false,
+            data:workdir_list.split(":")
+          });
+
       this.cfx_work_dir=cfx_work_dir;
       this.cfx_params.push(cfx_work_dir);
       // browse ...
@@ -164,7 +172,7 @@
             text:'Browse...',
             handler: function() {
                 var workdirRunFilePanel = new Gv.SelectFileWindow({
-                    defaultPath: Gv.get('portal-pbs-params-workdir').val(),
+                    defaultPath: cfx_work_dir.value(),
                     isDir: true,
                     tbar: [{
                         text: '确定',
@@ -194,6 +202,33 @@
       this.cfx_def_file=cfx_def_file;
       this.cfx_params.push(cfx_def_file);
 
+      btn2 = new Gv.Button({
+            renderTo: 'page-portal-cfx-def-file-btn',
+            cls:'button',
+            disabled:true,
+            text:'Browse...',
+            handler: function() {
+                var workdirRunFilePanel = new Gv.SelectFileWindow({
+                    defaultPath: cfx_work_dir.value(),
+                    isDir: false,
+                    tbar: [{
+                        text: '确定',
+                        handler: function(obj) {
+                            cfx_def_file.value(obj);
+                            cfx_def_file.validate();
+                            workdirRunFilePanel.close();
+                        }
+                    }, {
+                        text: '关闭',
+                        handler: function() {
+                            workdirRunFilePanel.close();
+                        }
+                    }]
+                });
+            }
+      });
+      this.cfx_def_file_btn = btn2;
+
       // time
       cfx_time = new Gv.form.RadioGroup({
             id:'portal_cfx_time_type',
@@ -208,6 +243,7 @@
                 handler:function(){
                   global_portal_cfx.cfx_res_file.value('');
                   global_portal_cfx.cfx_res_file.disabled(true);
+                  global_portal_cfx.cfx_res_file_btn.disabled(true);
                 }
             }, {
                 id: 'portal_cfx-time-type-translent',
@@ -216,6 +252,7 @@
                 disabled:false,
                 handler:function(){
                   global_portal_cfx.cfx_res_file.disabled(false);
+                  global_portal_cfx.cfx_res_file_btn.disabled(false);
                 }
             }]
         });
@@ -233,13 +270,13 @@
       this.cfx_res_file=cfx_res_file;
       this.cfx_params.push(cfx_res_file);
       // browse ...
-      new Gv.Button({
+      btn1 = new Gv.Button({
             renderTo: 'page-portal-cfx-res-file-btn',
             cls:'button',
             text:'Browse...',
             handler: function() {
                 var workdirRunFilePanel = new Gv.SelectFileWindow({
-                    defaultPath: Gv.get('portal-pbs-params-workdir').val(),
+                    defaultPath: cfx_work_dir.value(),
                     isDir: false,
                     tbar: [{
                         text: '确定',
@@ -257,6 +294,7 @@
                 });
             }
       });
+      this.cfx_res_file_btn = btn1;
 
   },
   bindEvents:function(){
@@ -398,6 +436,7 @@
       global_portal_cfx.cfx_work_dir.value(workdir);
 
       global_portal_cfx.cfx_def_file.disabled(true);
+      global_portal_cfx.cfx_def_file_btn.disabled(true);
       global_portal_cfx.cfx_def_file.value('');
       global_portal_cfx.cfx_res_file.disabled(true);
       global_portal_cfx.cfx_res_file.value('');
@@ -428,6 +467,130 @@
         global_portal_cfx.cfx_params[i].validate();
       }
 
+    });
+    //预设参数
+    $("#job-Submission-predifine").bind('click',function(){
+      var formList = [];
+      for(var key in portal_predefine_list){
+          var predefine_value = portal_predefine_list[key];
+          formList.push(new Gv.form.TextField({
+              id: 'portal-pbs-predefine-'+predefine_value,
+              name: 'portal_pbs_predefine_'+predefine_value,
+              fieldLabel: key,
+              value: eval(predefine_value),
+              labelWidth: '200',
+              width: '670',
+              allowBlank: false,
+              listeners: {
+                  focus: function (v) {},
+                  focusout: function (v) {
+                  }
+              }
+          }));
+      }
+      var predefineFormPanel = new Gv.form.FormPanel({
+          layout: 'form',
+          items: formList
+      });
+
+      var isContinue = true;
+      var win = new Gv.Window({
+          id:'win-page-troublesubmit-id',
+          title: '参数预定义',
+          width: 700,
+          height: 250,
+          items: [predefineFormPanel],
+          bodyStyle: 'padding:10px;',
+          listeners:{
+              afterLayout:function(){
+              }
+          },
+          tbar: [{
+              text: '确定',
+              handler: function(){
+                  var patest = {}; 
+                  for(var key in portal_predefine_list){
+                      var predefine_value = portal_predefine_list[eval("\""+key+"\"")];
+                      patest[predefine_value] = "\'" +Gv.get("portal-pbs-predefine-"+predefine_value).val() +"\'";
+                  }   
+                  $.ajax( {
+                      url : "/jm_as/appsubmit/predefineAppJob.action",
+                      type:'post',
+                      data : { 
+                          strJobManagerID : portal_strJobManagerID,
+                          strJobManagerAddr : portal_strJobManagerAddr,
+                          strJobManagerPort : portal_strJobManagerPort,
+                          strJobManagerType : portal_strJobManagerType,
+                          strAppType : portal_strAppType,
+                          strAppName : portal_strAppName,
+                          strOSUser : portal_strOsUser,
+                          strKeyWord : "k1;k2;;;;",
+                          strRemark : "remarktest",
+                          mapAppJobInfo :Gv.Obj2str(patest)
+                      },
+
+                      success : function(response,options) {
+                          if(response.exitVal == "0"){
+                              Gv.msgNote("参数预设成功,加载预设请刷新portal");
+                          } else {
+                              Gv.msg.error({html:"参数预设失败: "+response.stdErr});
+                          }
+                      },
+
+                      failure : function(response,options){
+                          Gv.msg.error({
+                              html : "请求参数预设失败!"
+                          });
+                      }
+                  });
+
+
+              }
+          }, {
+              text: '还原默认值',
+              handler: function(){
+                  var patest = {};
+                  $.ajax( {
+                      url : "/jm_as/appsubmit/predefineAppJob.action",
+                      type:'post',
+                      data : {
+                          strJobManagerID : portal_strJobManagerID,
+                          strJobManagerAddr : portal_strJobManagerAddr,
+                          strJobManagerPort : portal_strJobManagerPort,
+                          strJobManagerType : portal_strJobManagerType,
+                          strAppType : portal_strAppType,
+                          strAppName : portal_strAppName,
+                          strOSUser : portal_strOsUser,
+                          strKeyWord : "k1;k2;;;;",
+                          strRemark : "remarktest",
+                          mapAppJobInfo :Gv.Obj2str(patest)
+                      },
+
+                      success : function(response,options) {
+                          if(response.exitVal == "0"){
+                              Gv.msgNote("默认值还原成功,加载预设请刷新portal");
+                          } else {
+                              Gv.msg.error({html:"默认值还原失败失败: "+response.stdErr});
+                          }
+                      },
+
+                      failure : function(response,options){
+                          Gv.msg.error({
+                              html : "请求还原默认值失败!"
+                          });
+                      }
+                  });
+              }
+
+          },{
+              text: '关闭',
+              handler: function () {
+                  win.close();
+              }
+          }]
+      });
+
+      
     });
 
   },

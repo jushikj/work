@@ -110,7 +110,7 @@
             text:'Browse...',
             handler: function() {
                 var workdirRunFilePanel = new Gv.SelectFileWindow({
-                    defaultPath: Gv.get('portal-pbs-params-workdir').val(),
+                    defaultPath: ansys_ansys_bin_input.value(),
                     isDir: false,
                     tbar: [{
                         text: '确定',
@@ -192,7 +192,7 @@
             text:'Browse...',
             handler: function() {
                 var workdirRunFilePanel = new Gv.SelectFileWindow({
-                    defaultPath: Gv.get('portal-pbs-params-workdir').val(),
+                    defaultPath: ansys_work_dir_input.value(),
                     isDir: true,
                     tbar: [{
                         text: '确定',
@@ -315,7 +315,7 @@
             disabled:true,
             handler: function() {
                 var workdirRunFilePanel = new Gv.SelectFileWindow({
-                    defaultPath: Gv.get('portal-pbs-params-workdir').val(),
+                    defaultPath: global_jobscheduler_portal_ansys.ansys_work_dir_input.value(),
                     isDir: false,
                     tbar: [{
                         text: '确定',

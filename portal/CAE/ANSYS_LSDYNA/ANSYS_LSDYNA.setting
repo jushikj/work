@@ -15,7 +15,7 @@ hours_default=1
 ## run setting
  output_prefix=`echo ${PORTALNAM}|tr [A-Z] [a-z]`
 mpiprog_default=/public/software/ansys_inc/v121/ansys/bin/ansys121
-mpiprog_list=/public/software/ansys_inc/v121/ansys/bin/ansys121
+prog_list=/public/software/ansys_inc/v121/ansys/bin/ansys121
 programarg_default=' '
 mpi_default=pcmpi
 mpi_list=pcmpi:intelmpi:hpmpi
@@ -23,11 +23,18 @@ mpi_list=pcmpi:intelmpi:hpmpi
 ansys_lsdyna_version_default=lsdyna
 ansys_lsdyna_version_list=lsdyna:lstcdyna
 
+##predefine
+PORTAL_PREDEFINE_LIST='{"Default Program List":"prog_list", "Default MPI List":"mpi_list",
+"Default Version List":"ansys_lsdyna_version_list","Default Work Dir": "workdir_list",
+"Default PBS Options":"portal_pbsoptions",
+"Default PreCommands": "portal_precommands","Default PostCommands": "portal_postcommands"}'
+
+
 ## vnc_setting
 vnc_available=0
 
 #checkpoint
-checkpoint_availabel=1
+checkpoint_availabel=0
 interval_default=240
 min_interval=5
 
