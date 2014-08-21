@@ -70,8 +70,8 @@ main()
   	get_user_info $@
   	source ${DIRNAM}/../../CommonCheck.sh ${CHECKUSER}
   	if [ ! -z $ppn_default ];then
-        ppn_default=$((ppn_default/2))
-    fi
+        	ppn_default=$((ppn_default/2))
+    	fi
   	source ${DIRNAM}/${PORTALNAM}.setting
   	if [ -f ${user_home}/.clusportal/${PORTALNAM}.setting ];then
     	source ${user_home}/.clusportal/${PORTALNAM}.setting
