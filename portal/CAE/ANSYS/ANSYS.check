@@ -41,42 +41,24 @@ get_portal_default()
     echo "var portal_pbsoptions=\"$portal_pbsoptions\";"
     echo "var portal_precommands=\"$portal_precommands\";"
     echo "var portal_postcommands=\"$portal_postcommands\";"
+    echo "var portal_predefine_list=$PORTAL_PREDEFINE_LIST;"
 }
 ##program info
 get_program_info()
 {
     if [ "${workdir_list}" == "" ];then
         workdir_list="${user_home}:"
-        echo var workdir_list=\"$workdir_list\"\;
     fi
     echo var file=\"$mpiprog_default\"\;
-    echo var mpiProgList=\"$mpiprog_list\"\;
-    echo 'var s_mpiProg=mpiProgList.split(":")'\;
+    echo var prog_list=\"$prog_list\"\;
+    echo 'var s_mpiProg=prog_list.split(":")'\;
     echo var programarg=\"$programarg_default\"\;
+    echo "var workdir_list=\"${workdir_list}\";"
     echo 'var workdir=workdir_list.split(":")[0]'\;
     echo var mpi_def=\"$mpi_default\"\;
     echo var mpi_list=\"$mpi_list\"\;
     echo 'var s_mpilist=mpi_list.split(":")'\;
-
-    ##old params,but no use now
-    echo var ib_available=\"$ib_available\"\;
-    if [ "$ib_available" == 1 ];then
-        echo var network=\"ib\"\;
-    else
-        echo var network=\"tcp\"\;
-    fi
-    echo var mpiruntype=\"hpmpi\"\;
-    echo var seconds=\"0\"\;
-    echo var remoteshell=\"ssh\"\;
-    echo var paramode=\"smp\"\;
-    echo var inputtype=\"db\"\;
-    echo var sharemem=\"0\"\;
-    echo var cpubind=\"0\"\;
-    echo var vnc=\"0\"\;
-    echo var gputype=\"nvidia\"\;
-    echo var gpuacc_available=\"$gpuacc_available\"\;
-    echo var gpuacc=\"0\"\;
-    echo var output=\"${output_prefix}\"\;
+    
 }
 
 ##main
@@ -85,6 +67,9 @@ main()
     get_portal_info $@
     get_user_info $@
     source ${DIRNAM}/../../CommonCheck.sh ${CHECKUSER}
+    if [ ! -z $ppn_default ];then
+        ppn_default=$((ppn_default/2))
+    fi
     source ${DIRNAM}/${PORTALNAM}.setting
     if [ -f ${user_home}/.clusportal/${PORTALNAM}.setting ];then
         source ${user_home}/.clusportal/${PORTALNAM}.setting

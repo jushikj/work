@@ -17,10 +17,15 @@ hours_default=1
 output_prefix=`echo ${PORTALNAM}|tr [A-Z] [a-z]`
 ib_available=1
 mpiprog_default=/public/software/ansys_inc/v140/ansys/bin/ansys140
-mpiprog_list=/public/software/ansys_inc/v140/ansys/bin/ansys140:
+prog_list=/public/software/ansys_inc/v140/ansys/bin/ansys140:
 programarg_default=' '
 mpi_default=pcmpi
 mpi_list=pcmpi:intelmpi
+
+##predefine
+PORTAL_PREDEFINE_LIST='{"Default Program List":"prog_list", "Default MPI List":"mpi_list",
+"Default Work Dir": "workdir_list","Default PBS Options":"portal_pbsoptions",
+"Default PreCommands": "portal_precommands","Default PostCommands": "portal_postcommands"}'
 
 ## vnc_setting
 vnc_available=0

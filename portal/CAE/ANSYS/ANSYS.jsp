@@ -75,6 +75,11 @@ $(function(){
         cls:'button',
         text:'重置'
     });
+    new Gv.Button({
+         renderTo:'job-Submission-predifine',
+          cls:'button',
+          text:'预设参数'
+    });
 });
 jQuery(".portal-sideMenu").slide({titCell:"h3", targetCell:".portal-sideMenu-help",defaultIndex:1,effect:"slideDown",delayTime:300,trigger:"click"});
 </script>
@@ -219,11 +224,11 @@ gen_time_identify_string = function() {
                       </div>
                       <div class="fl">
                         <span>Remote Shell:</span><span id='page-portal-ansys-remote-shell'/>
-                        <span id="page-portal-ansys-mpi-type"/>
                         <div>
                           <span id='page-portal-ansys-work-dir' style="display: inline-block;"></span>
                           <a id='page-portal-ansys-workdir-btn' style="display: inline-block; vertical-align: middle;"></a>
-                        </div>                 
+                        </div>
+                        <span id="page-portal-ansys-mpi-type"/>                 
                       </div>
                     </div>
               </div> 
@@ -336,6 +341,7 @@ gen_time_identify_string = function() {
 <script type="text/javascript" src="/jm_as/CAE/ANSYS/ANSYS.help.js"></script>
 <script type="text/javascript" src="/jm_as/CAE/ANSYS/ANSYS.js"></script>
 <div class="jobupdate-floatdiv-bottom">
+<span id="job-Submission-predifine"></span>
 <span id="job-Submission-do"></span>
 <span id="job-Submission-preset"></span>
 </div>
