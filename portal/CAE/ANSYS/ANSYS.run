@@ -27,6 +27,13 @@ parse_portal_params()
     if [ "null$GAP_POST_CMD" == "null" ];then
         GAP_POST_CMD=" "
     fi
+    ##jobname
+    if [ "${GAP_OUTPUT}" != "" ];then
+        jobname="-j ${GAP_OUTPUT}"
+    else
+        jobname=""
+    fi
+    ansys_args="${ansys_args} ${jobname}"
 
     ## not window
     if [ "$GAP_VNC" == 0 ];then

@@ -343,10 +343,13 @@
             fieldLabel: '<font color="#FF0000">*</font>Output File',
             allowBlank: false,
             disabled:true,
-            value:PORTALNAM + "_" + portal_time_stamp + '.txt'
+            value:PORTALNAM + "_" + portal_time_stamp
     });
     this.ansys_log_file_input=ansys_log_file_input;
     this.ansys_runp_components.push(ansys_log_file_input);
+    $("#"+ansys_log_file_input.getId()).bind('keyup',function(){
+            Gv.get("portal-pbs-params-name").val(ansys_log_file_input.value());
+    });
     //end
   },
   bindEvents:function(){
@@ -471,7 +474,7 @@
           }
           new_time_stamp = gen_time_identify_string();
           $("#portal-pbs-params-name").val(PORTALNAM+"_"+new_time_stamp);
-          global_jobscheduler_portal_ansys.ansys_log_file_input.value(PORTALNAM + "_" + new_time_stamp + '.txt');
+          global_jobscheduler_portal_ansys.ansys_log_file_input.value(PORTALNAM + "_" + new_time_stamp);
         },
 
         failure: function(response, options) {
@@ -504,12 +507,12 @@
       global_jobscheduler_portal_ansys.ansys_work_dir_input.value(workdir);
       
       //global_jobscheduler_portal_ansys.ansys_input_file_input.value('');
-      global_jobscheduler_portal_ansys.ansys_log_file_input.value(PORTALNAM + "_" + portal_reset_timestamp + '.txt');
+      
       if(!$("#"+global_jobscheduler_portal_ansys.ansys_run_mode.getId())[0].checked){
         $("#"+global_jobscheduler_portal_ansys.ansys_run_mode.getId())[0].checked=true;
         global_jobscheduler_portal_ansys.controlRunParameters();
       }
-      
+      global_jobscheduler_portal_ansys.ansys_log_file_input.value(PORTALNAM + "_" + portal_reset_timestamp);
       //Remote Visualization Parameters
       if($("#portal-pbs-params-vnc")[0]){
         $("#portal-pbs-params-vnc")[0].checked=false;

@@ -206,7 +206,7 @@ gen_time_identify_string = function() {
                 <div class="form-group-title">
                     <div class="title-float cl">
                         <div class="title-front">
-                            <i class="icon-chevron-sign-down"></i>
+                            <i class="icon-chevron-sign-up"></i>
                         </div>
                         <div class="title-text">Environment Parameters</div>
                     </div>
@@ -233,11 +233,11 @@ gen_time_identify_string = function() {
                     </div>
               </div> 
             </div>
-            <div class="form-group" id="page-portal-cfx-run-parameters-group">
+            <div class="form-group active" id="page-portal-cfx-run-parameters-group">
                 <div class="form-group-title">
                     <div class="title-float cl">
                         <div class="title-front">
-                            <i class="icon-chevron-sign-down"></i>
+                            <i class="icon-chevron-sign-up"></i>
                         </div>
                         <div class="title-text">Run Parameters</div>
                     </div>
@@ -294,7 +294,7 @@ gen_time_identify_string = function() {
                     </div>
                 </div>
             </div>
-            <div class="form-group" id="page-portal-advanced">
+            <div class="form-group none" id="page-portal-advanced">
                 <div class="form-group-title">
                     <div class="title-float cl">
                         <div class="title-front">

@@ -84,6 +84,9 @@ parse_portal_params()
     rshcommand='export CFX5RSH=rsh'
   fi
 
+  #output
+  GAP_OUTPUT="${GAP_NAME}.log"
+
   hostlistcommand='hostlist=""...for node in `cat $PBS_NODEFILE | uniq`;do...num=`cat $PBS_NODEFILE | grep $node | wc -l`...if [ -z $hostlist ];then... hostlist=$node*$num...else...hostlist=$hostlist,$node*$num...fi...done'
   cd ${GAP_WORK_DIR}
 }

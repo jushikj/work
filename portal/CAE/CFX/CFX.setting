@@ -10,7 +10,7 @@ nfs_quota_filesystem=node22:/home
 queue_default=test
 nnodes_default=1
 name_prefix=`echo ${PORTALNAM}|tr [A-Z] [a-z]`
-hours_default=1
+hours_default=24
 
 ## run setting
 prog_default=/public/software/ansys_inc/v140/CFX/bin/cfx5solve

@@ -11,12 +11,17 @@ create_jou_file()
     jou_file_path="${GAP_WORK_DIR}/${GAP_JOU_FILE}"
     touch ${jou_file_path}
     if [ "${GAP_TIME}" == "steady" ];then
+        if [ -z "${GAP_DAT_FILE}" ];then
+            cmd="rc"
+        else
+            cmd="rcd"
+        fi
 cat <<EOF >${jou_file_path}
-/file/rc ${GAP_CAS_FILE}
+/file/${cmd} ${GAP_CAS_FILE}
 /parallel/timer/reset 
 /solve/iterate ${GAP_NUM_ITERATIONS} 
 /parallel/timer/usage 
-/file/wd ${GAP_DATA_SAVE} 
+/file/wcd ${GAP_DATA_SAVE} 
 ok 
 exit
 EOF
@@ -28,7 +33,7 @@ cat <<EOF > ${jou_file_path}
 /solve/set/time-step ${GAP_TIME_STEP}
 /solve/dual-time-iterate ${GAP_NUM_TIME_STEP} ${GAP_MAX_ITERATIONS}
 /parallel/timer/usage
-/file/write-data ${jou_file_path%.*}_${GAP_TIME}_end.dat
+/file/wcd ${jou_file_path%.*}_${GAP_TIME}_end.dat
 ok 
 exit
 EOF

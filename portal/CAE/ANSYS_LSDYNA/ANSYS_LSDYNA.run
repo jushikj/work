@@ -79,7 +79,7 @@ parse_portal_params()
 		RUNLIST=""
 		#no mpi
 		MPIINPUT=""
-		MPP=""
+		MPP="-lsdynampp"
 	fi
 	## memory
 	if [ "${GAP_MEMORY}" != "" ];then

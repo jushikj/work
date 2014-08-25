@@ -6,7 +6,7 @@
     cfx_run_mode = new Gv.form.Checkbox({
       renderTo:'page-portal-cfx-run-mode',
       fieldLabel:'Window',
-      checked:true,
+      checked:false,
       handler:function(){
         if($('#'+cfx_run_mode.getId())[0].checked){
           
@@ -28,11 +28,11 @@
           global_portal_cfx.cfx_def_file.disabled(false);
           global_portal_cfx.cfx_def_file_btn.disabled(false);
           //global_portal_cfx.cfx_def_file.value(PORTALNAM + "_" + portal_time_stamp + '.def');
-          global_portal_cfx.cfx_res_file.disabled(false);
+          global_portal_cfx.cfx_res_file.disabled(true);
           global_portal_cfx.cfx_res_file.value('');
-          global_portal_cfx.cfx_res_file_btn.disabled(false);
+          global_portal_cfx.cfx_res_file_btn.disabled(true);
           global_portal_cfx.cfx_time.disabled(false);
-          $("#portal_cfx-time-type-steady")[0].checked=false;
+          $("#portal_cfx-time-type-steady")[0].checked=true;
           $("#portal_cfx-time-type-translent")[0].checked=false;
         };
       }
@@ -196,7 +196,7 @@
             renderTo: 'page-portal-cfx-def-file',
             fieldLabel: 'Def File',
             allowBlank: true,
-            disabled:true
+            disabled:false
 
         });
       this.cfx_def_file=cfx_def_file;
@@ -205,7 +205,7 @@
       btn2 = new Gv.Button({
             renderTo: 'page-portal-cfx-def-file-btn',
             cls:'button',
-            disabled:true,
+            disabled:false,
             text:'Browse...',
             handler: function() {
                 var workdirRunFilePanel = new Gv.SelectFileWindow({
@@ -238,7 +238,7 @@
                 id: 'portal_cfx-time-type-steady',
                 value: 'steady',
                 fieldLabel: 'steady',
-                checked: false,
+                checked: true,
                 disabled:false,
                 handler:function(){
                   global_portal_cfx.cfx_res_file.value('');
@@ -264,7 +264,7 @@
             fieldLabel: 'Res File',
             allowBlank: true,
             value: '',
-            disabled:false
+            disabled:true
 
         });
       this.cfx_res_file=cfx_res_file;
@@ -273,6 +273,7 @@
       btn1 = new Gv.Button({
             renderTo: 'page-portal-cfx-res-file-btn',
             cls:'button',
+            disabled:true,
             text:'Browse...',
             handler: function() {
                 var workdirRunFilePanel = new Gv.SelectFileWindow({
